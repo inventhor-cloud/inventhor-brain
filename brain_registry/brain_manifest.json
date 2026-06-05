@@ -1,0 +1,11 @@
+{
+  "name": "INVENTHOR Brain",
+  "role": "central_shared_brain",
+  "owner_controlled": true,
+  "normal_user_write_access": false,
+  "private_user_data_allowed": false,
+  "owner_approval_required": true,
+  "private_data_filter_required": true,
+  "versioning_required": true,
+  "rollback_required": true
+}
