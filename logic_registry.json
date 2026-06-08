@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "entries": [
+    {"id": "pre_action_query_route", "purpose": "Check logic, risk and approval before risky actions."},
+    {"id": "provider_quota_memory", "purpose": "Track provider quota, cooldown and live/stale status."},
+    {"id": "smart_provider_router", "purpose": "Choose providers by task, quota, cost, privacy and capability."},
+    {"id": "cloud_role_registry", "purpose": "Separate update cloud, central brain, user brain and archives."},
+    {"id": "core_family_registry", "purpose": "Group same-purpose modules into core families."},
+    {"id": "module_catalog", "purpose": "Selectable modular feature catalog."},
+    {"id": "notification_panel", "purpose": "Status, errors, actions and shortcuts."},
+    {"id": "done_work_logger", "purpose": "Record completed INVENTHOR operations."},
+    {"id": "privacy_policy_rules", "purpose": "Protect private user and owner data."}
+  ]
+}

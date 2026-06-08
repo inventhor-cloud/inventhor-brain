@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "modules": [
+    {
+      "module_id": "provider_core",
+      "title": "Provider Core",
+      "domain": "ai_provider",
+      "load_mode": "external_or_app",
+      "weight": "medium",
+      "required": true,
+      "owner_only": false,
+      "user_available": true,
+      "cloud_capable": true,
+      "external_core_candidate": true
+    },
+    {
+      "module_id": "notification_panel",
+      "title": "Smart Notification Panel",
+      "domain": "system_ui",
+      "load_mode": "app",
+      "weight": "light",
+      "required": true,
+      "owner_only": false,
+      "user_available": true,
+      "cloud_capable": false,
+      "external_core_candidate": false
+    },
+    {
+      "module_id": "owner_dev_core",
+      "title": "Owner Development Core",
+      "domain": "development",
+      "load_mode": "owner_cloud_or_external_core",
+      "weight": "heavy",
+      "required": false,
+      "owner_only": true,
+      "user_available": false,
+      "cloud_capable": true,
+      "external_core_candidate": true
+    }
+  ]
+}

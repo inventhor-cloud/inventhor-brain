@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "allowed_signals": [
+    "anonymous_error_type",
+    "module_health",
+    "crash_fix_pattern",
+    "performance_metric",
+    "compatibility_issue",
+    "non_personal_logic_improvement"
+  ],
+  "blocked_data": [
+    "api_key",
+    "token",
+    "raw_conversation",
+    "personal_archive",
+    "photo",
+    "video",
+    "document",
+    "private_user_brain",
+    "owner_private_data"
+  ],
+  "anonymization_required": true,
+  "user_contribution_levels": [
+    "privacy_closed_minimal_safe_signal",
+    "anonymous_errors_only",
+    "anonymous_system_health",
+    "off"
+  ],
+  "owner_approval_required": true,
+  "central_brain_write_rules": "Only filtered, anonymized, non-private improvement data may be promoted."
+}

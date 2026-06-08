@@ -1,0 +1,16 @@
+{
+  "brain_id": "inventhor-central-brain",
+  "version": "1.0.0",
+  "repo_role": "CENTRAL_BRAIN",
+  "owner": "INVENTHOR",
+  "public_read": true,
+  "private_data_allowed": false,
+  "files": [
+    "brain_manifest.json",
+    "logic_registry.json",
+    "module_catalog.json",
+    "safe_learning_policy.json",
+    "sync_policy.json"
+  ],
+  "notes": "Central public INVENTHOR brain manifest. No private user data, tokens, personal files, photos, videos or raw conversations."
+}

@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "read_policy": "Public central brain files may be read without user private tokens.",
+  "write_policy": "Central brain writes require filtering, validation, versioning and approval.",
+  "conflict_policy": "Prefer newest valid version with rollback metadata.",
+  "versioning": true,
+  "rollback": true,
+  "cache_ttl": "24h",
+  "offline_behavior": "Use cached safe manifest and local logic registry."
+}
