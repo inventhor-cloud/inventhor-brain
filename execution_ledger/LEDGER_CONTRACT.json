@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0",
+  "ledger_id": "inventhor-execution-ledger",
+  "purpose": "Provide durable, resumable and auditable execution memory for the INVENTHOR central brain and all authorized execution actors.",
+  "canonical_files": {
+    "current_state": "execution_ledger/CURRENT_STATE.json",
+    "active_task": "execution_ledger/ACTIVE_TASK.json",
+    "handoff": "execution_ledger/HANDOFF.json",
+    "event_log": "execution_ledger/EVENT_LOG.jsonl",
+    "decision_log": "execution_ledger/DECISION_LOG.jsonl"
+  },
+  "startup_read_order": [
+    "execution_ledger/LEDGER_CONTRACT.json",
+    "execution_ledger/CURRENT_STATE.json",
+    "execution_ledger/ACTIVE_TASK.json",
+    "execution_ledger/HANDOFF.json",
+    "continuation/STATUS.json",
+    "continuation/NEXT_TASK.json",
+    "continuation/DECISIONS.md"
+  ],
+  "rules": {
+    "single_active_task": true,
+    "append_only_event_log": true,
+    "append_only_decision_log": true,
+    "final_bs_or_bf_required": true,
+    "history_rewrite_allowed": false,
+    "private_data_allowed": false,
+    "direct_main_write_allowed": false,
+    "handoff_update_required": true,
+    "state_version_increment_required": true
+  },
+  "supported_actions": [
+    "CREATE",
+    "ACCEPT",
+    "UPDATE",
+    "PAUSE",
+    "RESUME",
+    "COMPLETE_BS",
+    "COMPLETE_BF",
+    "REPLACE",
+    "MERGE_REFERENCE",
+    "ARCHIVE"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "handoff_version": 1,
+  "from_actor": "CHATGPT_PC",
+  "to_actor": [
+    "INVENTHOR_TABLET_CLIENT",
+    "AUTHORIZED_AI_ACTOR",
+    "AUTHORIZED_EXECUTION_MODULE"
+  ],
+  "current_summary": "The modular, updateable and high-performance INVENTHOR execution foundation is being prepared.",
+  "architecture_rules": [
+    "Keep the central core small.",
+    "Load heavy modules only when required.",
+    "Allow independent module versioning and updates.",
+    "Connect modules through versioned contracts.",
+    "Avoid duplicated state and duplicated knowledge.",
+    "Use platform adapters instead of platform-specific brains."
+  ],
+  "completed": [
+    "GitHub repository connected",
+    "Feature branch created",
+    "Central brain role verified",
+    "Execution ledger contract created",
+    "Current execution state created",
+    "Active task state created"
+  ],
+  "next_action": "Complete and validate the INVENTHOR execution ledger foundation.",
+  "blocked_by": [],
+  "warnings": [
+    "INVENTHOR remains the controller.",
+    "Operator is only an execution module.",
+    "Do not modify main directly.",
+    "Do not store private data."
+  ]
+}

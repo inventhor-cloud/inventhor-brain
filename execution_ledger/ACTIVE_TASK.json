@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "task_id": null,
+  "status": "IDLE",
+  "title": null,
+  "accepted_by": null,
+  "started_at": null,
+  "last_update": null,
+  "required_result": [
+    "BS",
+    "BF"
+  ],
+  "result": null
+}
