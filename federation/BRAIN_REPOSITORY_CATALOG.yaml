@@ -1,0 +1,39 @@
+schema_version: 1
+federation_id: inventhor-brain-federation
+updated: 2026-07-26
+central_repository: inventhor-cloud/inventhor-brain
+shared_knowledge_filter: inventhor-cloud/inventhor-knowledge-filter
+development_lab: inventhor-cloud/inventhor-development-lab
+
+domains:
+  architecture:
+    repository: inventhor-cloud/inventhor-brain-architecture
+    manifest: BRAIN_MANIFEST.yaml
+  design:
+    repository: inventhor-cloud/inventhor-brain-design
+    manifest: BRAIN_MANIFEST.yaml
+  visual:
+    repository: inventhor-cloud/inventhor-brain-visual
+    manifest: BRAIN_MANIFEST.yaml
+  social:
+    repository: inventhor-cloud/inventhor-brain-social
+    manifest: BRAIN_MANIFEST.yaml
+  language:
+    repository: inventhor-cloud/inventhor-brain-language
+    manifest: BRAIN_MANIFEST.yaml
+  automation:
+    repository: inventhor-cloud/inventhor-brain-automation
+    manifest: BRAIN_MANIFEST.yaml
+  memory:
+    repository: inventhor-cloud/inventhor-brain-memory
+    manifest: BRAIN_MANIFEST.yaml
+
+rules:
+  duplicate_domain_ownership: forbidden
+  cross_domain_copy: forbidden
+  cross_domain_reference: versioned_commit_sha
+  secrets_in_repository: forbidden
+  continuation_file_required: CONTINUE_HERE.md
+  daily_ledger_required: ledger/DAILY_LOG.md
+  unsupported_execution_result: BF_UNSUPPORTED_TASK
+  verified_evidence_before_success: required
