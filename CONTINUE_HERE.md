@@ -1,9 +1,9 @@
 # Continue Here
 
-STATUS=BRAIN_FEDERATION_REFERENCE_LOCK_VALID
+STATUS=SOFTWARE_BRAIN_FOUNDATION_VALID
 LAST_VERIFIED=2026-07-31
-CURRENT_SCOPE=Security/filter foundation: seven private domain brains are pinned by versioned read-only references.
-NEXT_TASK=Build and validate the software-brain contract and filtered promotion boundary.
+CURRENT_SCOPE=Security/filter foundation and software-brain contracts are validated.
+NEXT_TASK=Create and validate the read-only software-brain to Operator adapter contract.
 DO_NOT_REPEAT=Domain repository creation.
 
 DEVELOPMENT_ORDER=
@@ -15,7 +15,7 @@ DEVELOPMENT_ORDER=
 6. Sequential module improvements.
 
 PRIORITY=Software brain is the strongest capability area; application design is second.
-OPERATOR_CONNECTION=BLOCKED_UNTIL_SOFTWARE_BRAIN_VALIDATED
+OPERATOR_CONNECTION=BLOCKED_UNTIL_ADAPTER_AND_SMOKE_TEST_VALIDATED
 
 Any reset AI must read the federation catalog, this record and the latest daily
 ledger entry before selecting exactly one finite next task.

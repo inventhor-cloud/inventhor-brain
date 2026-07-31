@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "inventhor-software-continuation",
+  "version": "0.1.0",
+  "states": [
+    "PENDING",
+    "RUNNING",
+    "PAUSED",
+    "WAITING",
+    "BS",
+    "BF"
+  ],
+  "required_record_fields": [
+    "TASK_ID",
+    "PROJECT_ID",
+    "STATUS",
+    "CLASS",
+    "STAGE",
+    "ORIGIN_PACKAGE",
+    "LAST_ACTION",
+    "SOURCE_HASH_BEFORE",
+    "SOURCE_HASH_AFTER",
+    "RESULT",
+    "NEXT_ACTION",
+    "UPDATED_AT"
+  ],
+  "resume_rules": {
+    "read_latest_state_first": true,
+    "preserve_task_id": true,
+    "preserve_project_id": true,
+    "do_not_repeat_terminal_task": true,
+    "do_not_resume_stale_running_without_recovery": true,
+    "one_active_task_per_project": true,
+    "next_task_requires_terminal_result": true
+  },
+  "autonomous_continuation": {
+    "enabled": true,
+    "mode": "SEQUENTIAL_FINITE",
+    "advance_after": "BS",
+    "stop_after": [
+      "BF",
+      "OWNER_APPROVAL_REQUIRED",
+      "SECURITY_VIOLATION",
+      "RESULT_DELIVERY_FAILED"
+    ],
+    "max_same_task_retries": 1,
+    "never_idle_when_next_task_exists": true,
+    "never_invent_next_task": true
+  },
+  "terminal_result_rules": {
+    "accepted_is_terminal": false,
+    "pending_is_terminal": false,
+    "running_is_terminal": false,
+    "bs_or_bf_required": true,
+    "result_delivery_required": true
+  }
+}
