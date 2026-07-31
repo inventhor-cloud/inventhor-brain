@@ -3,6 +3,15 @@
   "gate_id": "inventhor-software-operator-connection",
   "version": "0.1.0",
   "status": "BLOCKED_UNTIL_VALIDATED",
+  "connection_policy": {
+    "discovery": "AUTOMATIC",
+    "activation": "USER_APPROVAL_IN_SETTINGS",
+    "default_state": "DISCOVERED_NOT_CONNECTED",
+    "after_validation_state": "AWAITING_USER_APPROVAL",
+    "after_approval": "AUTO_CONNECT_ON_SESSION_START",
+    "approval_scope": "PROFILE_AND_DEVICE",
+    "revoke_immediately": true
+  },
   "connection_order": [
     "software_brain_manifest_valid",
     "software_capability_registry_valid",

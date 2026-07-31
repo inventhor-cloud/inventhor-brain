@@ -41,6 +41,15 @@ def main() -> int:
         errors.append("GATE_NOT_BLOCKED")
     if gate.get("initial_mode_after_validation") != "READ_ONLY_BRIDGE":
         errors.append("INITIAL_MODE_MUST_BE_READ_ONLY")
+    connection_policy = gate.get("connection_policy", {})
+    if connection_policy.get("discovery") != "AUTOMATIC":
+        errors.append("OPERATOR_DISCOVERY_MUST_BE_AUTOMATIC")
+    if connection_policy.get("activation") != "USER_APPROVAL_IN_SETTINGS":
+        errors.append("OPERATOR_ACTIVATION_MUST_REQUIRE_SETTINGS_APPROVAL")
+    if connection_policy.get("after_approval") != "AUTO_CONNECT_ON_SESSION_START":
+        errors.append("APPROVED_OPERATOR_CONNECTION_MUST_BE_AUTOMATIC")
+    if connection_policy.get("revoke_immediately") is not True:
+        errors.append("OPERATOR_REVOKE_MUST_BE_IMMEDIATE")
     if policy.get("promotion_rules", {}).get("anonymization_required") is not True:
         errors.append("ANONYMIZATION_REQUIRED")
     if policy.get("promotion_rules", {}).get("secret_scan_required") is not True:
