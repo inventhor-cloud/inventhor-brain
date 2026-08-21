@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0.0",
+  "policy_id": "inventhor-software-promotion-filter",
+  "version": "0.1.0",
+  "allowed_signals": [
+    "anonymous_error_type",
+    "module_health",
+    "crash_fix_pattern",
+    "performance_metric",
+    "compatibility_issue",
+    "non_personal_logic_improvement"
+  ],
+  "blocked_data": [
+    "api_key",
+    "token",
+    "password",
+    "raw_conversation",
+    "personal_archive",
+    "photo",
+    "video",
+    "document",
+    "private_user_brain",
+    "owner_private_data",
+    "credential",
+    "cookie",
+    "session_secret"
+  ],
+  "promotion_rules": {
+    "anonymization_required": true,
+    "secret_scan_required": true,
+    "source_hash_required": true,
+    "normalized_content_hash_required": true,
+    "duplicate_action": "REJECT_UNLESS_NEWER_VALID_VERSION",
+    "conflict_action": "OWNER_APPROVAL_REQUIRED",
+    "unverified_action": "BF_DO_NOT_PROMOTE",
+    "rollback_metadata_required": true,
+    "private_data_action": "BF_REJECT"
+  },
+  "never_promote": [
+    "raw_ai_transcripts",
+    "user_files",
+    "private_repository_content",
+    "tokens_or_credentials",
+    "unverified_success_claims"
+  ]
+}

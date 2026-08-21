@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "federation_id": "inventhor-brain-federation",
+  "verified_at": "2026-07-31",
+  "central_repository": "inventhor-cloud/inventhor-brain",
+  "central_branch": "main",
+  "central_catalog_commit_sha": "7b70b6adf8b5d623734de07f401903a051daa4de",
+  "reference_policy": {
+    "mode": "PINNED_READ_ONLY",
+    "cross_domain_copy": false,
+    "reference_key": "repository + manifest + commit_sha",
+    "secrets_allowed": false,
+    "owner_approval_required_for_promotion": true,
+    "rollback_required": true
+  },
+  "domains": [
+    {
+      "domain": "architecture",
+      "repository": "inventhor-cloud/inventhor-brain-architecture",
+      "manifest": "BRAIN_MANIFEST.yaml",
+      "manifest_version": "0.1.0",
+      "commit_sha": "61cff74e9ca919cb35085d12958a009b513e929c",
+      "manifest_blob_sha": "bfe522527f309fe7b8dee283712438fb3c74f1dc",
+      "reference_mode": "PINNED_READ_ONLY"
+    },
+    {
+      "domain": "design",
+      "repository": "inventhor-cloud/inventhor-brain-design",
+      "manifest": "BRAIN_MANIFEST.yaml",
+      "manifest_version": "0.1.0",
+      "commit_sha": "3d06d6e4e5faed94dfaf3489f8bf3babc68af1e6",
+      "manifest_blob_sha": "c391a76adf087b6441b14668e6056ce1e5aaac92",
+      "reference_mode": "PINNED_READ_ONLY"
+    },
+    {
+      "domain": "visual",
+      "repository": "inventhor-cloud/inventhor-brain-visual",
+      "manifest": "BRAIN_MANIFEST.yaml",
+      "manifest_version": "0.1.0",
+      "commit_sha": "27ba8ba3ba3776082cd1a2b86abf67021478a3ea",
+      "manifest_blob_sha": "7f93bf59830bc77a919caa8a186ddfd64637811e",
+      "reference_mode": "PINNED_READ_ONLY"
+    },
+    {
+      "domain": "social",
+      "repository": "inventhor-cloud/inventhor-brain-social",
+      "manifest": "BRAIN_MANIFEST.yaml",
+      "manifest_version": "0.1.0",
+      "commit_sha": "08c23efcf5cf9634936d4fd959103a2dddd9f67a",
+      "manifest_blob_sha": "db95b073bd5e98c689e116c6fbb6da1ccfcccd35",
+      "reference_mode": "PINNED_READ_ONLY"
+    },
+    {
+      "domain": "language",
+      "repository": "inventhor-cloud/inventhor-brain-language",
+      "manifest": "BRAIN_MANIFEST.yaml",
+      "manifest_version": "0.1.0",
+      "commit_sha": "495e6d3dee84b1812bd99b788774d5d150906c8b",
+      "manifest_blob_sha": "d8cf7d26319210ef38edf9a4c28f7d2007618735",
+      "reference_mode": "PINNED_READ_ONLY"
+    },
+    {
+      "domain": "automation",
+      "repository": "inventhor-cloud/inventhor-brain-automation",
+      "manifest": "BRAIN_MANIFEST.yaml",
+      "manifest_version": "0.1.0",
+      "commit_sha": "b7b90fa6715241819771f7789a911002c046075a",
+      "manifest_blob_sha": "716fabbf8684ed364c159f372b466ab422bb1c0c",
+      "reference_mode": "PINNED_READ_ONLY"
+    },
+    {
+      "domain": "memory",
+      "repository": "inventhor-cloud/inventhor-brain-memory",
+      "manifest": "BRAIN_MANIFEST.yaml",
+      "manifest_version": "0.1.0",
+      "commit_sha": "785f6f5faa456764cbd2f3571a1b4acc90b9b948",
+      "manifest_blob_sha": "72d170f636059e1ecc23cfe69c6137b37fbf73bd",
+      "reference_mode": "PINNED_READ_ONLY"
+    }
+  ]
+}

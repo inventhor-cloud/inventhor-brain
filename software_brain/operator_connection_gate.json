@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "gate_id": "inventhor-software-operator-connection",
+  "version": "0.1.0",
+  "status": "BLOCKED_UNTIL_VALIDATED",
+  "connection_policy": {
+    "discovery": "AUTOMATIC",
+    "activation": "USER_APPROVAL_IN_SETTINGS",
+    "default_state": "DISCOVERED_NOT_CONNECTED",
+    "after_validation_state": "AWAITING_USER_APPROVAL",
+    "after_approval": "AUTO_CONNECT_ON_SESSION_START",
+    "approval_scope": "PROFILE_AND_DEVICE",
+    "revoke_immediately": true
+  },
+  "connection_order": [
+    "software_brain_manifest_valid",
+    "software_capability_registry_valid",
+    "software_filter_policy_valid",
+    "software_continuation_contract_valid",
+    "operator_adapter_contract_valid",
+    "read_only_smoke_test_passed",
+    "result_delivery_smoke_test_passed"
+  ],
+  "initial_mode_after_validation": "READ_ONLY_BRIDGE",
+  "write_mode": "OWNER_APPROVAL_REQUIRED",
+  "forbidden_until_gate_opens": [
+    "arbitrary_shell_execution",
+    "unbounded_background_loop",
+    "secret_transfer",
+    "unverified_source_write",
+    "result_without_evidence"
+  ],
+  "origin_and_identity": {
+    "preserve_origin_ai": true,
+    "preserve_task_id": true,
+    "preserve_project_id": true,
+    "do_not_replace_task_with_status_query": true
+  }
+}

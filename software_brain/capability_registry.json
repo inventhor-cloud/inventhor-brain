@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "registry_id": "inventhor-software-capabilities",
+  "version": "0.1.0",
+  "default_policy": {
+    "one_task_at_a_time": true,
+    "explicit_task_id_required": true,
+    "generic_handler_fallback": false,
+    "fake_success": false,
+    "finite_retries": true,
+    "result_delivery_required": true,
+    "source_hash_required_for_change": true
+  },
+  "capabilities": [
+    {
+      "capability_id": "READ_ONLY_ANALYSIS",
+      "stage": "ANALYSIS",
+      "requires_source_evidence": true,
+      "requires_owner_approval": false,
+      "terminal_result": "BS_OR_BF"
+    },
+    {
+      "capability_id": "FINITE_PLAN",
+      "stage": "PLAN",
+      "requires_source_evidence": true,
+      "requires_owner_approval": false,
+      "terminal_result": "BS_OR_BF"
+    },
+    {
+      "capability_id": "MODULAR_IMPLEMENTATION",
+      "stage": "IMPLEMENT",
+      "requires_source_evidence": true,
+      "requires_owner_approval": true,
+      "requires_rollback": true,
+      "terminal_result": "BS_OR_BF"
+    },
+    {
+      "capability_id": "BUILD_TEST_DELIVERY",
+      "stage": "VERIFY",
+      "requires_source_evidence": true,
+      "requires_owner_approval": false,
+      "requires_build_evidence": true,
+      "terminal_result": "BS_OR_BF"
+    },
+    {
+      "capability_id": "LEDGER_CONTINUATION",
+      "stage": "CONTINUE",
+      "requires_source_evidence": true,
+      "requires_owner_approval": false,
+      "preserves_task_id": true,
+      "terminal_result": "BS_OR_BF"
+    },
+    {
+      "capability_id": "GITHUB_REVIEWED_CHANGE",
+      "stage": "DELIVERY",
+      "requires_source_evidence": true,
+      "requires_owner_approval": true,
+      "requires_reviewed_branch": true,
+      "requires_push_evidence": true,
+      "terminal_result": "BS_OR_BF"
+    }
+  ]
+}

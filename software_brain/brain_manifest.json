@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "brain_id": "inventhor-software-brain",
+  "role": "software_execution_and_improvement_brain",
+  "version": "0.1.0",
+  "status": "foundation",
+  "priority": 1,
+  "public_safe_contract_only": true,
+  "private_data_allowed": false,
+  "owner_approval_required_for_promotion": true,
+  "operator_connection": "BLOCKED_UNTIL_VALIDATED",
+  "scope": [
+    "finite_task_planning",
+    "executor_capability_selection",
+    "source_integrity",
+    "build_test_delivery_evidence",
+    "continuation_and_recovery",
+    "safe_modular_improvement"
+  ],
+  "required_contracts": [
+    "capability_registry.json",
+    "filter_policy.json",
+    "continuation_contract.json",
+    "operator_connection_gate.json"
+  ],
+  "next": "Validate all software-brain contracts before creating the Operator adapter."
+}
