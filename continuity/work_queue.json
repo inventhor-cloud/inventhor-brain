@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "queue_id": "INVENTHOR_GLOBAL_WORK_QUEUE",
+  "owner_system": "INVENTHOR_MAIN",
+  "executor_default": "WINDOWS_OPERATOR",
+  "updated_at": "2026-09-22T20:55:00+02:00",
+  "policy": {
+    "durable": true,
+    "ordered": true,
+    "provider_usage": "MINIMIZE",
+    "local_first": true,
+    "checkpoint_after_each_work_item": true,
+    "duplicate_filter_required": true,
+    "done_requires_evidence": true,
+    "autonomous_execution": "ONLY_WHEN_PREREQUISITES_AND_AUTHORITY_ALLOW"
+  },
+  "items": [
+    {
+      "id": "WQ-001",
+      "priority": 1,
+      "title": "Finish movable always-on-top Mini Status Monitor and live activity telemetry",
+      "state": "IN_PROGRESS",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_DEVELOPMENT",
+      "provider_need": "NONE_UNLESS_BUILD_FAILURE",
+      "acceptance": [
+        "Movable small dark always-on-top window",
+        "Shows service/brain/access/current project/current task/activity",
+        "Click opens/focuses main Operator window",
+        "Position persists",
+        "Main UI can show/hide it",
+        "Current activity comes from durable runtime telemetry"
+      ]
+    },
+    {
+      "id": "WQ-002",
+      "priority": 2,
+      "title": "Add Operator dashboard pages for Projects, Work Queue, Tasks, Modules, Evidence and Logs",
+      "state": "QUEUED",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_DEVELOPMENT",
+      "provider_need": "NONE_UNLESS_DESIGN_REVIEW",
+      "acceptance": [
+        "All active/queued/completed projects visible",
+        "Buttons navigate to detail pages",
+        "Live project/task state visible",
+        "No white/light surfaces; dark professional UI"
+      ]
+    },
+    {
+      "id": "WQ-003",
+      "priority": 3,
+      "title": "Complete current-head Windows CI and package current Operator build",
+      "state": "QUEUED",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_CI",
+      "provider_need": "NONE_UNLESS_FAILURE_REQUIRES_REASONING"
+    },
+    {
+      "id": "WQ-004",
+      "priority": 4,
+      "title": "Deploy current verified Operator build to WINDOWS-INVENTHOR with snapshot and rollback",
+      "state": "BLOCKED_BY_WQ-003",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_DEPLOYMENT",
+      "provider_need": "NONE"
+    },
+    {
+      "id": "WQ-005",
+      "priority": 5,
+      "title": "Verify Windows Service, Repair Service and Session Agent automatic runtime",
+      "state": "BLOCKED_BY_WQ-004",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_ACCEPTANCE",
+      "provider_need": "NONE"
+    },
+    {
+      "id": "WQ-006",
+      "priority": 6,
+      "title": "Verify Mini Monitor, URL/app/window control and real user Desktop access",
+      "state": "BLOCKED_BY_WQ-005",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_ACCEPTANCE",
+      "provider_need": "NONE"
+    },
+    {
+      "id": "WQ-007",
+      "priority": 7,
+      "title": "Inventory and hash the existing Desktop INVENTHOR Main backup read-only",
+      "state": "BLOCKED_BY_WQ-006",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_INVENTORY",
+      "provider_need": "NONE",
+      "acceptance": [
+        "Original backup unchanged",
+        "File/hash/module/project inventory created",
+        "Import staging plan generated"
+      ]
+    },
+    {
+      "id": "WQ-008",
+      "priority": 8,
+      "title": "Import validated INVENTHOR Main backup into staged System of Record",
+      "state": "BLOCKED_BY_WQ-007",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_MIGRATION",
+      "provider_need": "BRAIN_REVIEW_ONLY_FOR_AMBIGUOUS_MAPPING"
+    },
+    {
+      "id": "WQ-009",
+      "priority": 9,
+      "title": "Implement Durable Work Queue scheduler and autonomous work-item loop",
+      "state": "QUEUED_AFTER_P0_RUNTIME",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "LOCAL_DEVELOPMENT",
+      "provider_need": "ARCHITECTURE_REVIEW_ONLY",
+      "acceptance": [
+        "Persists across UI/chat/provider shutdown",
+        "Runs next eligible Work Item automatically",
+        "Checkpoint after meaningful step",
+        "Retry/backoff/wait/dead-letter states",
+        "No provider call for deterministic work"
+      ]
+    },
+    {
+      "id": "WQ-010",
+      "priority": 10,
+      "title": "Complete transport.inventhor end-to-end pairing, sync and evidence return",
+      "state": "BLOCKED_BY_MAIN_RUNTIME_ENDPOINT",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "INTEGRATION",
+      "provider_need": "NONE"
+    },
+    {
+      "id": "WQ-011",
+      "priority": 11,
+      "title": "Implement provider-neutral Gateway/Router/Quota Manager fallback",
+      "state": "QUEUED_AFTER_MAIN_IMPORT",
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "execution_class": "BRAIN_FEATURE",
+      "provider_need": "ONLY_WHEN_TASK_REQUIRES_REASONING",
+      "acceptance": [
+        "Local/deterministic work first",
+        "Quota/cooldown aware",
+        "Official authenticated provider paths only",
+        "No quota/auth bypass",
+        "Handoff Packet instead of full chat history"
+      ]
+    },
+    {
+      "id": "WQ-012",
+      "priority": 12,
+      "title": "Implement deep cleanup with scan, preview, quarantine/reversible policy and zero-residue uninstall where technically possible",
+      "state": "BACKLOG",
+      "project_id": "PC_CONTROL_CENTER",
+      "execution_class": "LOCAL_SYSTEM_MODULE",
+      "provider_need": "NONE_UNLESS_POLICY_DECISION"
+    },
+    {
+      "id": "WQ-013",
+      "priority": 13,
+      "title": "Implement Windows Defender security center, firewall and malware scan controls",
+      "state": "BACKLOG",
+      "project_id": "PC_CONTROL_CENTER",
+      "execution_class": "LOCAL_SYSTEM_MODULE",
+      "provider_need": "NONE"
+    },
+    {
+      "id": "WQ-014",
+      "priority": 14,
+      "title": "Implement healthy-baseline, snapshot, rollback and Deep-Freeze-style recovery layer",
+      "state": "BACKLOG",
+      "project_id": "PC_CONTROL_CENTER",
+      "execution_class": "LOCAL_SYSTEM_MODULE",
+      "provider_need": "ARCHITECTURE_REVIEW_ONLY"
+    },
+    {
+      "id": "WQ-015",
+      "priority": 15,
+      "title": "Implement display, refresh-rate, gaming/FPS and performance profile controls",
+      "state": "BACKLOG",
+      "project_id": "PC_CONTROL_CENTER",
+      "execution_class": "LOCAL_SYSTEM_MODULE",
+      "provider_need": "NONE_UNLESS_HARDWARE_SPECIFIC"
+    },
+    {
+      "id": "WQ-016",
+      "priority": 16,
+      "title": "Implement software/startup/update/removal management with residual scan",
+      "state": "BACKLOG",
+      "project_id": "PC_CONTROL_CENTER",
+      "execution_class": "LOCAL_SYSTEM_MODULE",
+      "provider_need": "NONE"
+    },
+    {
+      "id": "WQ-017",
+      "priority": 17,
+      "title": "Migrate temporary voice/control/provider orchestration from Operator bootstrap to INVENTHOR Main",
+      "state": "BACKLOG_AFTER_MAIN_READY",
+      "project_id": "INVENTHOR_MAIN",
+      "execution_class": "BRAIN_MIGRATION",
+      "provider_need": "ARCHITECTURE_REVIEW_ONLY"
+    },
+    {
+      "id": "WQ-018",
+      "priority": 18,
+      "title": "Final Operator branding, logo and UI polish",
+      "state": "PARKED",
+      "project_id": "WINDOWS_OPERATOR_UI",
+      "execution_class": "DESIGN",
+      "provider_need": "DESIGN_REVIEW"
+    }
+  ]
+}
