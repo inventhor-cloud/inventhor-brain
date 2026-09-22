@@ -1,14 +1,61 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "entries": [
-    {"id": "pre_action_query_route", "purpose": "Check logic, risk and approval before risky actions."},
-    {"id": "provider_quota_memory", "purpose": "Track provider quota, cooldown and live/stale status."},
-    {"id": "smart_provider_router", "purpose": "Choose providers by task, quota, cost, privacy and capability."},
-    {"id": "cloud_role_registry", "purpose": "Separate update cloud, central brain, user brain and archives."},
-    {"id": "core_family_registry", "purpose": "Group same-purpose modules into core families."},
-    {"id": "module_catalog", "purpose": "Selectable modular feature catalog."},
-    {"id": "notification_panel", "purpose": "Status, errors, actions and shortcuts."},
-    {"id": "done_work_logger", "purpose": "Record completed INVENTHOR operations."},
-    {"id": "privacy_policy_rules", "purpose": "Protect private user and owner data."}
+    {
+      "id": "pre_action_query_route",
+      "purpose": "Check logic, risk and approval before risky actions."
+    },
+    {
+      "id": "provider_quota_memory",
+      "purpose": "Track provider quota, cooldown and live/stale status."
+    },
+    {
+      "id": "smart_provider_router",
+      "purpose": "Choose providers by task, quota, cost, privacy and capability."
+    },
+    {
+      "id": "cloud_role_registry",
+      "purpose": "Separate update cloud, central brain, user brain and archives."
+    },
+    {
+      "id": "core_family_registry",
+      "purpose": "Group same-purpose modules into core families."
+    },
+    {
+      "id": "module_catalog",
+      "purpose": "Selectable modular feature catalog."
+    },
+    {
+      "id": "notification_panel",
+      "purpose": "Status, errors, actions and shortcuts."
+    },
+    {
+      "id": "done_work_logger",
+      "purpose": "Record completed INVENTHOR operations."
+    },
+    {
+      "id": "privacy_policy_rules",
+      "purpose": "Protect private user and owner data."
+    },
+    {
+      "id": "continuity_state_manager",
+      "purpose": "Hydrate new AI/provider sessions from canonical Project State, Checkpoints and Handoff Packets."
+    },
+    {
+      "id": "semantic_dedup_router",
+      "purpose": "Detect exact/near duplicate work, knowledge and modules before creating new records; escalate only ambiguous cases."
+    },
+    {
+      "id": "knowledge_graph_registry",
+      "purpose": "Store entities, relations, provenance and revisioned facts with referential-integrity validation."
+    },
+    {
+      "id": "work_item_fingerprint",
+      "purpose": "Create deterministic fingerprints for idempotency and duplicate prevention across tasks/projects."
+    },
+    {
+      "id": "merge_candidate_router",
+      "purpose": "Suggest reuse/merge/link decisions to the Brain while keeping final semantic decisions in INVENTHOR."
+    }
   ]
 }
