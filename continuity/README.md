@@ -25,3 +25,14 @@ GPT, Codex, Gemini or another future provider receives the same resume packet. P
 ## Operator rule
 
 Windows Operator is execution-only. It may mirror current task state and evidence locally for resilience, but INVENTHOR continuity remains canonical.
+
+
+## Standard software vocabulary
+
+Use the names in `STANDARD_TERMINOLOGY.md`: System of Record, Project Registry, Work Item Backlog, Work Queue, Event Log, Checkpoint, Handoff Packet, Architecture Decision Record, Artifact Registry, Evidence Store, Local Replica and Replication.
+
+## Replication
+
+INVENTHOR Main is the System of Record. Windows Operator is an execution Local Replica. Cloud may hold a synchronized replica for cross-device/provider continuity. Provider chats are never canonical state.
+
+The existing INVENTHOR Main desktop backup is a bootstrap source and must be inventoried read-only before import.
