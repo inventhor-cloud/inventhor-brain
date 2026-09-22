@@ -36,5 +36,6 @@
       "note": "INVENTHOR Main System currently exists only in a Desktop backup package; preserve original until validated import."
     }
   ],
-  "work_queue_path": "continuity/work_queue.json"
+  "work_queue_path": "continuity/work_queue.json",
+  "owner_work_intake_policy_path": "continuity/OWNER_WORK_INTAKE_POLICY.md"
 }
