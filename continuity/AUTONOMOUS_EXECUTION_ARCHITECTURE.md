@@ -155,3 +155,38 @@ No provider may bypass:
 - explicit approval requirements
 - protected paths/secrets
 - destructive-action safeguards
+
+
+## Bootstrap-to-Main migration rule
+
+Some control features may temporarily exist on Windows Operator so development can continue before INVENTHOR Main is fully restored/imported.
+
+Temporary Operator-side bootstrap features may include:
+- temporary command entry / control surfaces
+- temporary provider invocation helpers
+- temporary voice-control bridge
+- temporary project/resume controls
+- temporary local orchestration helpers
+
+Final ownership must move to INVENTHOR Main:
+
+INVENTHOR Main owns:
+- voice intent understanding
+- natural-language command interpretation
+- Provider Gateway / Provider Router / Quota Manager
+- Organizer / Workflow Orchestrator / Durable Work Queue
+- Project Registry / Module Registry / Idea Backlog
+- System of Record / Knowledge Graph / Checkpoints / Handoff Packets
+- global policy and Owner authority
+
+Windows Operator keeps only execution-local responsibilities:
+- desktop/session control
+- file/process/service/system operations
+- build/test/package/run
+- local deterministic dedupe/fingerprint checks
+- local cache/replica
+- evidence/artifact collection
+- offline outbox/retry/recovery
+
+Migration principle:
+Temporary bootstrap logic on Operator must be modular, removable and protocol-driven. When INVENTHOR Main gains the corresponding feature, the Operator-side bootstrap module is disabled and purged without changing the execution contract.
