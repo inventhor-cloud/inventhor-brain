@@ -81,6 +81,11 @@
       "id": "P0-7",
       "title": "Run reboot/interruption/repair-host acceptance tests",
       "state": "READY_AFTER_P0-6"
+    },
+    {
+      "id": "P0-8",
+      "title": "Inventory the Desktop INVENTHOR Main backup and stage a read-only import into the System of Record",
+      "state": "READY_AFTER_SESSION_AGENT_DESKTOP_ACCESS"
     }
   ],
   "acceptance_definition": "A user away from the PC can request work; INVENTHOR plans it; Windows Operator performs it; result/evidence returns without manual PC interaction.",
@@ -94,5 +99,10 @@
     "windows/DELIVERY_ROADMAP.md",
     "windows/ARCHITECTURE_BRAIN_BODY_SPLIT.md",
     "windows/ARCHITECTURE_WINDOWS_ONLY_OPERATOR.md"
-  ]
+  ],
+  "bootstrap_context": {
+    "inventhor_main_backup": "Desktop backup package on WINDOWS-INVENTHOR",
+    "status": "KNOWN_NOT_IMPORTED",
+    "handling": "Read-only inventory and hash first; keep original untouched until SoR import is verified."
+  }
 }
