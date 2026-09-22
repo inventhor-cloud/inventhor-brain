@@ -37,30 +37,54 @@
     "desktop control module: app launch / URL open / window focus / user desktop path",
     "software factory: workspace/build/test/package/run/backup export",
     "transactional deploy + rollback",
-    "GitHub Actions Windows CI"
+    "GitHub Actions Windows CI",
+    "continuity guard: fingerprint/dedupe/merge-candidate filtering",
+    "secure transfer module: HTTPS download + artifact staging",
+    "V2.4 CI/deploy source"
   ],
   "current_verification_boundary": [
-    "Source/CI success does not prove deployment on WINDOWS-INVENTHOR.",
-    "V2.3 local deployment has not yet been evidenced in this canonical record.",
+    "V2.4 source and CI passed, but local deployment on WINDOWS-INVENTHOR is not yet evidenced.",
     "transport.inventhor pairing to the final INVENTHOR runtime is not yet evidenced.",
     "Session Agent live desktop control is not yet evidenced on the real PC.",
+    "Live Operator dashboard/work-queue UI is queued but not yet runtime-verified.",
     "Full unattended remote acceptance test is not yet evidenced."
   ],
   "next_tasks": [
     {
       "id": "P0-1",
-      "title": "Finish latest Windows CI and fix any remaining compile/package failures",
-      "state": "NEXT"
+      "title": "Windows Operator V2.4 source/CI validation",
+      "state": "DONE",
+      "evidence": "GitHub Actions success for V2.4 deploy source"
     },
     {
       "id": "P0-2",
-      "title": "Deploy V2.3 to WINDOWS-INVENTHOR with snapshot/rollback",
-      "state": "READY_AFTER_P0-1"
+      "title": "Deploy V2.4 to WINDOWS-INVENTHOR with snapshot/rollback",
+      "state": "NEXT"
     },
     {
       "id": "P0-3",
       "title": "Verify InventhorOperator + InventhorOperatorRepair + Session Agent auto-start",
       "state": "READY_AFTER_P0-2"
+    },
+    {
+      "id": "P0-OBS-1",
+      "title": "Expose live runtime activity state: current project, current work item, queue counts, last action, transport, outbox and recovery status",
+      "state": "READY_AFTER_P0-3"
+    },
+    {
+      "id": "P0-OBS-2",
+      "title": "Build main Operator dashboard with live project/task/activity cards and click-through navigation",
+      "state": "READY_AFTER_P0-OBS-1"
+    },
+    {
+      "id": "P0-OBS-3",
+      "title": "Add Projects / Work Queue / Modules / Evidence / Logs pages with clickable details",
+      "state": "READY_AFTER_P0-OBS-2"
+    },
+    {
+      "id": "P0-OBS-4",
+      "title": "Add optional always-on-top compact status window for foreground monitoring",
+      "state": "READY_AFTER_P0-OBS-2"
     },
     {
       "id": "P0-4",
@@ -73,6 +97,11 @@
       "state": "READY_AFTER_P0-4"
     },
     {
+      "id": "P0-8",
+      "title": "Inventory the Desktop INVENTHOR Main backup read-only and stage import into the System of Record",
+      "state": "READY_AFTER_P0-4"
+    },
+    {
       "id": "P0-6",
       "title": "Pair transport.inventhor and run end-to-end remote task + evidence + reconnect/outbox test",
       "state": "BLOCKED_BY_MAIN_RUNTIME_ENDPOINT"
@@ -81,11 +110,6 @@
       "id": "P0-7",
       "title": "Run reboot/interruption/repair-host acceptance tests",
       "state": "READY_AFTER_P0-6"
-    },
-    {
-      "id": "P0-8",
-      "title": "Inventory the Desktop INVENTHOR Main backup and stage a read-only import into the System of Record",
-      "state": "READY_AFTER_SESSION_AGENT_DESKTOP_ACCESS"
     }
   ],
   "acceptance_definition": "A user away from the PC can request work; INVENTHOR plans it; Windows Operator performs it; result/evidence returns without manual PC interaction.",
