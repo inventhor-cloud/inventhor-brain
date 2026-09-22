@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "INVENTHOR Knowledge Graph Record",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "record_id",
+    "record_type",
+    "namespace",
+    "revision",
+    "status",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer"
+    },
+    "record_id": {
+      "type": "string"
+    },
+    "record_type": {
+      "enum": [
+        "NODE",
+        "EDGE"
+      ]
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "enum": [
+        "ACTIVE",
+        "SUPERSEDED",
+        "MERGED",
+        "AMBIGUOUS",
+        "PENDING_VALIDATION"
+      ]
+    },
+    "node_type": {
+      "type": "string"
+    },
+    "edge_type": {
+      "type": "string"
+    },
+    "from_id": {
+      "type": "string"
+    },
+    "to_id": {
+      "type": "string"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "properties": {
+      "type": "object"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}
