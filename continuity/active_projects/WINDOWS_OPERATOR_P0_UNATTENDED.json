@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+  "title": "Windows Operator — unattended project execution",
+  "owner_system": "INVENTHOR",
+  "executor": "WINDOWS_OPERATOR",
+  "status": "ACTIVE",
+  "priority": "P0",
+  "objective": "User can issue a request from another device and Windows Operator can continue/build/test/package/operate projects without the user sitting at the PC.",
+  "architecture": {
+    "brain": "INVENTHOR main system",
+    "body": "Windows Operator",
+    "transport_final": "transport.inventhor",
+    "transport_temporary": "transport.direct-brain",
+    "android_operator": "RETIRED",
+    "canonical_truth": "INVENTHOR Organizer / continuity system"
+  },
+  "verified_runtime": {
+    "windows_service": "InventhorOperator — Running/Automatic verified before V2.3",
+    "dotnet": "10.0.401 verified",
+    "git": "verified",
+    "java17": "verified",
+    "adb_legacy_path": "verified as legacy Windows-to-Android bridge; not required for final Windows-only Operator"
+  },
+  "implemented_in_source": [
+    "Windows Service execution host",
+    "Repair Service",
+    "transport.inventhor",
+    "task HMAC authentication",
+    "TASK_ID + epoch fencing",
+    "durable task journal",
+    "offline result outbox",
+    "Filesystem/PowerShell/Git/ADB modules",
+    "PC telemetry/cleanup/performance/process/service control modules",
+    "dark desktop UI",
+    "Session Agent source",
+    "desktop control module: app launch / URL open / window focus / user desktop path",
+    "software factory: workspace/build/test/package/run/backup export",
+    "transactional deploy + rollback",
+    "GitHub Actions Windows CI"
+  ],
+  "current_verification_boundary": [
+    "Source/CI success does not prove deployment on WINDOWS-INVENTHOR.",
+    "V2.3 local deployment has not yet been evidenced in this canonical record.",
+    "transport.inventhor pairing to the final INVENTHOR runtime is not yet evidenced.",
+    "Session Agent live desktop control is not yet evidenced on the real PC.",
+    "Full unattended remote acceptance test is not yet evidenced."
+  ],
+  "next_tasks": [
+    {
+      "id": "P0-1",
+      "title": "Finish latest Windows CI and fix any remaining compile/package failures",
+      "state": "NEXT"
+    },
+    {
+      "id": "P0-2",
+      "title": "Deploy V2.3 to WINDOWS-INVENTHOR with snapshot/rollback",
+      "state": "READY_AFTER_P0-1"
+    },
+    {
+      "id": "P0-3",
+      "title": "Verify InventhorOperator + InventhorOperatorRepair + Session Agent auto-start",
+      "state": "READY_AFTER_P0-2"
+    },
+    {
+      "id": "P0-4",
+      "title": "Verify desktop commands: SESSION_AGENT_STATUS, USER_DESKTOP_PATH, URL_OPEN, APP_LAUNCH, WINDOW_FOCUS",
+      "state": "READY_AFTER_P0-3"
+    },
+    {
+      "id": "P0-5",
+      "title": "Verify software factory build/test/package and backup export to real Desktop",
+      "state": "READY_AFTER_P0-4"
+    },
+    {
+      "id": "P0-6",
+      "title": "Pair transport.inventhor and run end-to-end remote task + evidence + reconnect/outbox test",
+      "state": "BLOCKED_BY_MAIN_RUNTIME_ENDPOINT"
+    },
+    {
+      "id": "P0-7",
+      "title": "Run reboot/interruption/repair-host acceptance tests",
+      "state": "READY_AFTER_P0-6"
+    },
+    {
+      "id": "P0-8",
+      "title": "Inventory the Desktop INVENTHOR Main backup and stage a read-only import into the System of Record",
+      "state": "READY_AFTER_SESSION_AGENT_DESKTOP_ACCESS"
+    }
+  ],
+  "acceptance_definition": "A user away from the PC can request work; INVENTHOR plans it; Windows Operator performs it; result/evidence returns without manual PC interaction.",
+  "source_repositories": {
+    "operator": "inventhor-cloud/inventhor-operator-core",
+    "operator_branch": "windows-control-plane-v1",
+    "brain": "inventhor-cloud/inventhor-brain"
+  },
+  "important_files": [
+    "windows/P0_UNATTENDED_ACCEPTANCE.md",
+    "windows/DELIVERY_ROADMAP.md",
+    "windows/ARCHITECTURE_BRAIN_BODY_SPLIT.md",
+    "windows/ARCHITECTURE_WINDOWS_ONLY_OPERATOR.md"
+  ],
+  "bootstrap_context": {
+    "inventhor_main_backup": "Desktop backup package on WINDOWS-INVENTHOR",
+    "status": "KNOWN_NOT_IMPORTED",
+    "handling": "Read-only inventory and hash first; keep original untouched until SoR import is verified."
+  }
+}

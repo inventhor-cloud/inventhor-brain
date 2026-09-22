@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "system": "INVENTHOR",
+  "role": "canonical_resume_index",
+  "updated_at": "2026-09-22T20:40:00+02:00",
+  "active_projects": [
+    {
+      "project_id": "WINDOWS_OPERATOR_P0_UNATTENDED",
+      "state_path": "continuity/active_projects/WINDOWS_OPERATOR_P0_UNATTENDED.json",
+      "priority": "P0"
+    }
+  ],
+  "idea_pool_path": "continuity/idea_pool.json",
+  "resume_protocol_path": "continuity/agent_resume_protocol.md",
+  "schemas": {
+    "project_state": "continuity/project_state.schema.json",
+    "handoff": "continuity/handoff.schema.json"
+  },
+  "rules": [
+    "INVENTHOR_IS_BRAIN",
+    "WINDOWS_OPERATOR_IS_BODY",
+    "ANDROID_OPERATOR_RETIRED",
+    "CANONICAL_STATE_NOT_PROVIDER_CHAT",
+    "MINIMIZE_PROVIDER_USAGE_USE_OPERATOR_FOR_HEAVY_WORK"
+  ],
+  "terminology_path": "continuity/STANDARD_TERMINOLOGY.md",
+  "replication_policy_path": "continuity/SYSTEM_OF_RECORD_AND_REPLICATION.md",
+  "bootstrap_sources": [
+    {
+      "type": "desktop_backup",
+      "owner_device": "WINDOWS-INVENTHOR",
+      "status": "KNOWN_NOT_IMPORTED",
+      "note": "INVENTHOR Main System currently exists only in a Desktop backup package; preserve original until validated import."
+    }
+  ]
+}

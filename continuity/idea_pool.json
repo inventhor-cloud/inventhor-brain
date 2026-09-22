@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-09-22T20:32:00+02:00",
+  "ideas": [
+    {
+      "id": "IDEA-PC-DEEP-CLEAN",
+      "title": "Deep PC cleanup",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "Scan/preview first; safe cleanup; quarantine/reversible where practical; protect projects/user data; no blind registry cleaner."
+    },
+    {
+      "id": "IDEA-SECURITY-CENTER",
+      "title": "Operator security / antivirus control center",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "Integrate Windows Defender first: status, scans, threat history, quarantine, signatures, firewall, persistence inventory."
+    },
+    {
+      "id": "IDEA-HEALTHY-BASELINE",
+      "title": "Deep-Freeze-style healthy baseline / restore",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "Start with last-known-good snapshots, restore points, manifests, integrity baseline and rollback. Do not start with a kernel disk filter."
+    },
+    {
+      "id": "IDEA-VOICE-CONTROL",
+      "title": "Voice-driven INVENTHOR control",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "Voice understanding stays in INVENTHOR; Operator receives structured capabilities/tasks."
+    },
+    {
+      "id": "IDEA-BRANDING",
+      "title": "Inventhor Operator logo and final visual identity",
+      "state": "PARKED",
+      "after": "P0",
+      "notes": "Current logo not accepted. Defer branding and final desktop visual polish until unattended runtime is verified."
+    },
+    {
+      "id": "IDEA-PC-CONTROL-CENTER",
+      "title": "Full PC control center",
+      "state": "IN_PROGRESS",
+      "after": "P0-core",
+      "notes": "Performance, cleanup, processes, services, storage, network, startup, software updates, desktop control and power/system."
+    }
+  ]
+}

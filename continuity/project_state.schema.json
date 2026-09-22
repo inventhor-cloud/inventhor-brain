@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "INVENTHOR Project Continuity State",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_id",
+    "status",
+    "objective",
+    "next_tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer"
+    },
+    "project_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string"
+    },
+    "objective": {
+      "type": "string"
+    },
+    "architecture": {
+      "type": "object"
+    },
+    "verified_runtime": {
+      "type": "object"
+    },
+    "implemented_in_source": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "current_verification_boundary": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_tasks": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "acceptance_definition": {
+      "type": "string"
+    },
+    "source_repositories": {
+      "type": "object"
+    },
+    "important_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
