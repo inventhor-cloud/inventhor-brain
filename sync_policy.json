@@ -1,10 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "read_policy": "Public central brain files may be read without user private tokens.",
   "write_policy": "Central brain writes require filtering, validation, versioning and approval.",
-  "conflict_policy": "Prefer newest valid version with rollback metadata.",
+  "conflict_policy": "Use revision/epoch preconditions and ownership leases. Never rely on last-writer-wins alone. Conflicting valid changes become MERGE_REQUIRED and preserve both provenance chains.",
   "versioning": true,
   "rollback": true,
   "cache_ttl": "24h",
-  "offline_behavior": "Use cached safe manifest and local logic registry."
+  "offline_behavior": "Operator may execute already-leased work and append local events/evidence; synchronize through outbox after reconnect.",
+  "replication_model": "INVENTHOR Main is System of Record; Windows Operator and cloud are versioned replicas.",
+  "idempotency": "All work items and promoted knowledge records require stable IDs plus deterministic fingerprints."
 }
