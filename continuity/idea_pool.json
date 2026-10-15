@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-16T00:54:00+02:00",
+  "updated_at": "2026-10-16T01:00:00+02:00",
   "ideas": [
     {
       "id": "IDEA-PC-DEEP-CLEAN",
@@ -64,6 +64,13 @@
       "state": "IDEA_POOL",
       "after": "P0",
       "notes": "One authoritative WorkOrganizer/task identity; route a request from phone/watch to the right enrolled device/capability; do not duplicate work across devices, ask if target ambiguous. Separate personal device settings and owner identity methods (voice, face, fingerprint via OS); future family onboarding, privilege choices and digital succession to be owner-configured, not enabled by default. Related Architecture Brain PR #1, not a deployed feature."
+    },
+    {
+      "id": "IDEA-INVENTHOR-PER-PROFILE-HYBRID-MEMORY",
+      "title": "Per-person per-device hybrid memory, voice notes and reminders",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "One Mentor with separate private memory for each person's enrolled devices: short-term context, conversation/task checkpoints, notes, reminders and resumable learning/recipe workflows; voice intents use existing Language Brain. Trusted host encryption, backup/sync, restore, scheduled delivery and authorization required later. Duplicate-check against existing P1-CONTINUITY, P1-VOICE and related owner-circle ideas before promotion to canonical WorkOrganizer. No family role/access settings configured. Source references: inventhor-brain-memory PR #1 and inventhor-brain-language PR #1 (not installed)."
     }
   ]
 }
