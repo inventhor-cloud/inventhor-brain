@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-22T20:32:00+02:00",
+  "updated_at": "2026-10-16T00:54:00+02:00",
   "ideas": [
     {
       "id": "IDEA-PC-DEEP-CLEAN",
@@ -43,6 +43,27 @@
       "state": "IN_PROGRESS",
       "after": "P0-core",
       "notes": "Performance, cleanup, processes, services, storage, network, startup, software updates, desktop control and power/system."
+    },
+    {
+      "id": "IDEA-INVENTHOR-OWNER-RELATION-CIRCLE",
+      "title": "One Mentor: owner-centered small family/friends relationship graph",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "One logical INVENTHOR, small invited circle only. Represent spouse, younger/older child, sibling, relatives and friends as owner-relative relationships; recognize each approved person/profile separately, without storing real family names, biometrics or transcripts in GitHub. Owner decides individual permissions and parental settings later. Same Mentor with separate device/profile settings; reconcile with canonical Main/Organizer and existing device federation architecture before work item creation."
+    },
+    {
+      "id": "IDEA-INVENTHOR-PERSONAL-GUIDED-ASSISTANT",
+      "title": "Per-person assistant for learning, hobbies and patient step-by-step voice guidance",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "Adapt support to each family member's selected preferences and age, including future age-appropriate learning/content protections configured by the owner. Cooking guidance: present one step, wait for confirmation before next step, allow pause/repeat/timers; show full text and optionally read aloud. Generalize patient guided mode to lessons, setup and daily tasks; do not preset family permissions, ages or interests."
+    },
+    {
+      "id": "IDEA-INVENTHOR-SINGLE-MENTOR-MULTIDEVICE",
+      "title": "Single Mentor across owner/family phones, PCs, watches, TV and smart home with future continuity",
+      "state": "IDEA_POOL",
+      "after": "P0",
+      "notes": "One authoritative WorkOrganizer/task identity; route a request from phone/watch to the right enrolled device/capability; do not duplicate work across devices, ask if target ambiguous. Separate personal device settings and owner identity methods (voice, face, fingerprint via OS); future family onboarding, privilege choices and digital succession to be owner-configured, not enabled by default. Related Architecture Brain PR #1, not a deployed feature."
     }
   ]
 }
