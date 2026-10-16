@@ -155,6 +155,41 @@ class SharedOrganizerTests(unittest.TestCase):
                   "project_id": "P-A", "task_id": "T2"}]
         self.assertEqual(event_inbox(event, "P-A")["events"], [])
 
+    def test_windows_path_case_conflict(self):
+        r = assess_takeover(candidate(), "gpt", ["path:WINDOWS/Core/Tests"],
+                            [lease(scopes=["path:windows/core"])], "rev7", TIME)
+        self.assertEqual(r["decision"], "CONFLICT")
+
+    def test_module_case_conflict(self):
+        r = assess_takeover(candidate(), "gpt", ["module:Windows.Control"],
+                            [lease(scopes=["module:windows.control"])], "rev7", TIME)
+        self.assertEqual(r["decision"], "CONFLICT")
+
+    def test_cross_module_and_path_needs_authoritative_mapping(self):
+        r = assess_takeover(candidate(), "gpt", ["module:windows.control"],
+                            [lease(scopes=["path:windows/control"])], "rev7", TIME)
+        self.assertEqual(r["decision"], "CONFLICT")
+
+    def test_same_prefix_different_directory_does_not_conflict(self):
+        r = assess_takeover(candidate(), "gpt", ["path:windows/core2"],
+                            [lease(scopes=["path:windows/core"])], "rev7", TIME)
+        self.assertEqual(r["decision"], "HOST_LEASE_REQUIRED")
+
+    def test_path_with_control_char_or_trailing_dot_rejected(self):
+        for scope in ("path:module/file\nother", "path:module/file.", "path:module/ file"):
+            with self.subTest(scope=scope):
+                r = assess_takeover(candidate(), "gpt", [scope], [], "rev7", TIME)
+                self.assertEqual(r["decision"], "BLOCKED")
+
+    def test_agent_and_event_evidence_not_live_attested(self):
+        v = view(PROJECTS, QUEUE, leases=[dict(lease(), task_id="T1")])
+        t = v["projects"][0]["buckets"]["TODO"][0]
+        self.assertEqual(t["assignment_evidence"], "UNVERIFIED_REFERENCE")
+        e = event_inbox([{"event_id":"e5", "kind":"AGENT_STARTED",
+                          "project_id":"P-A", "task_id":"T1"}], "P-A")
+        self.assertEqual(e["events"][0]["source"], "UNATTESTED_EVENT_REFERENCE")
+        self.assertFalse(e["dispatch_authorized"])
+
     def test_review_task_requires_lease(self):
         r = assess_takeover(candidate("REVIEW_PENDING"), "reviewer", ["module:tests"], [], "rev7", TIME)
         self.assertEqual(r["decision"], "HOST_LEASE_REQUIRED")
