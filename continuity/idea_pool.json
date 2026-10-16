@@ -52,7 +52,7 @@
       "priority": "P1_PROPOSED",
       "after": "P0_AUTHENTICATED_MAIN",
       "architecture_ref": "continuity/FAMILY_EDUCATION_ARCHITECTURE_V1.md",
-      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature. Owner additional requirements: strong bidirectional German/Turkish/English translation, instant opt-in chat translation, and opt-in Viktorija-inspired word marking, tap details, fill-in-word and fill-in-letters inside family chat; Main remains authenticated host and no duplicate Viktorija app.",
+      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature. Owner additional requirements: strong bidirectional German/Turkish/English translation, instant opt-in chat translation, and opt-in Viktorija-inspired word marking, tap details, fill-in-word and fill-in-letters inside family chat; Main remains authenticated host and no duplicate Viktorija app. Owner clarification 2026-10-17: primary product goal is TEACHING; translation and Viktorija-inspired chat tools are optional learning aids, not the outcome.",
       "language_priorities": [
         "de",
         "en"
@@ -79,7 +79,26 @@
         "child_guardian_controls": true,
         "existing_language_brain_ref": "inventhor-cloud/inventhor-brain-language:docs/OPTIONAL_CHAT_WORD_LEARNING_V1.md",
         "runtime_status": "SOURCE_ONLY_NOT_INSTALLED"
-      }
+      },
+      "primary_goal": "TEACHING_AND_VERIFIED_LEARNING",
+      "supporting_tools": [
+        "instant_translation",
+        "contextual_word_explanation",
+        "chat_word_markers",
+        "word_completion",
+        "letter_completion",
+        "spoken_practice"
+      ],
+      "teaching_cycle": [
+        "diagnose_level",
+        "explain_small_concept",
+        "guided_practice",
+        "correct_with_reason",
+        "independent_check",
+        "spaced_review",
+        "record_verified_progress"
+      ],
+      "acceptance_criterion": "Learner independently demonstrates understanding on new examples and later review; translation or revealing an answer never counts as mastery."
     }
   ]
 }
