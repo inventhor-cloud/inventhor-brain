@@ -1,5 +1,5 @@
 import unittest
-from shared_organizer.board import view, assess_takeover
+from shared_organizer.board import view, assess_takeover, event_inbox
 
 PROJECTS = [
     {"project_id": "P-A", "title": "Operator", "objective": "Unattended work",
@@ -131,6 +131,29 @@ class SharedOrganizerTests(unittest.TestCase):
         r = assess_takeover(candidate(), "gpt", ["module:ui"],
                             [dict(lease(), scope_keys=[])], "rev7", TIME)
         self.assertEqual(r["reason"], "MALFORMED_LEASE")
+
+    def test_events_per_project_deduplicated(self):
+        events = [
+            {"event_id": "ev1", "kind": "SCOPE_RESERVED", "project_id": "P-A",
+             "task_id": "T1", "agent_id": "codex", "scope_keys": ["module:ui"]},
+            {"event_id": "ev1", "kind": "SCOPE_RESERVED", "project_id": "P-A",
+             "task_id": "T1"},
+            {"event_id": "ev2", "kind": "HANDOFF_READY", "project_id": "P-B",
+             "task_id": "T3"},
+        ]
+        output = event_inbox(events, "P-A")
+        self.assertEqual(len(output["events"]), 1)
+        self.assertFalse(output["dispatch_authorized"])
+
+    def test_seen_events_suppressed(self):
+        event = [{"event_id": "e1", "kind": "REVIEW_REQUESTED",
+                  "project_id": "P-A", "task_id": "T2"}]
+        self.assertEqual(event_inbox(event, "P-A", {"e1"})["events"], [])
+
+    def test_unsupported_event_does_not_notify(self):
+        event = [{"event_id": "e1", "kind": "ARBITRARY_COMMAND",
+                  "project_id": "P-A", "task_id": "T2"}]
+        self.assertEqual(event_inbox(event, "P-A")["events"], [])
 
     def test_review_task_requires_lease(self):
         r = assess_takeover(candidate("REVIEW_PENDING"), "reviewer", ["module:tests"], [], "rev7", TIME)
