@@ -1,5 +1,5 @@
 import unittest
-from shared_organizer.board import view, assess_takeover, event_inbox, review_resume_packet
+from shared_organizer.board import view, assess_takeover, event_inbox, review_resume_packet, advise_next_work
 
 PROJECTS = [
     {"project_id": "P-A", "title": "Operator", "objective": "Unattended work",
@@ -273,6 +273,184 @@ class PortableHandoffTests(unittest.TestCase):
         result = review_resume_packet(p, PROJECTS[0], q, "arch7", "rev7")
         self.assertEqual(result["status"], "WORK_ITEM_NOT_FOUND")
 
+
+
+class NextWorkAdviceTests(unittest.TestCase):
+    PROJECTS = [
+        {"project_id": "P-A", "architecture_snapshot_ref": "arch7"},
+        {"project_id": "P-B", "architecture_snapshot_ref": "arch7"}
+    ]
+
+    def task(self, tid="T1", project="P-A", state="READY", priority="P1",
+             order=10, scope="module:core", deps=None, title=None):
+        return {"project_id": project, "task_id": tid,
+                "state": state, "priority": priority, "order": order,
+                "title": title or f"Task {tid}", "scope_keys": [scope],
+                "depends_on": deps or []}
+
+    def queue(self, rows):
+        return {"schema_version": 1, "system_of_record": "INVENTHOR_MAIN",
+                "snapshot_revision": "rev7", "captured_at": TIME,
+                "work_items": rows}
+
+    def advise(self, rows, *, leases=None, project_id=None, handoffs=None,
+               projects=None, time=TIME, queue=None):
+        return advise_next_work(
+            projects if projects is not None else self.PROJECTS,
+            queue if queue is not None else self.queue(rows),
+            "gpt", leases if leases is not None else [],
+            "rev7", time, project_id=project_id, handoffs=handoffs)
+
+    def test_p0_prioritized_over_p2_without_execute(self):
+        r = self.advise([self.task("T2", priority="P2"),
+                         self.task("T0", priority="P0", order=99)])
+        self.assertEqual(r["candidate"]["task_id"], "T0")
+        self.assertEqual(r["status"], "HOST_LEASE_REQUIRED")
+        self.assertFalse(r["may_execute"])
+        self.assertFalse(r["may_claim_task"])
+
+    def test_explicit_project_scoping(self):
+        r = self.advise([self.task("T1", project="P-A", priority="P0"),
+                         self.task("T2", project="P-B", priority="P1")],
+                        project_id="P-B")
+        self.assertEqual(r["candidate"]["project_id"], "P-B")
+
+    def test_unknown_project_fails_closed(self):
+        self.assertEqual(
+            self.advise([self.task()], project_id="INVENTED")["status"],
+            "PROJECT_NOT_REGISTERED")
+
+    def test_missing_snapshot_revision_is_not_live_queue(self):
+        q = self.queue([self.task()])
+        del q["snapshot_revision"]
+        self.assertEqual(self.advise([], queue=q)["status"],
+                         "UNVERSIONED_OR_MISMATCHED_SNAPSHOT")
+
+    def test_stale_or_future_snapshot_fails(self):
+        q = self.queue([self.task()])
+        q["captured_at"] = "2026-10-16T10:00:00Z"
+        self.assertEqual(self.advise([], queue=q)["status"],
+                         "STALE_QUEUE_REQUIRES_MAIN_REFRESH")
+        q["captured_at"] = "2026-10-16T12:00:00Z"
+        self.assertEqual(self.advise([], queue=q)["status"],
+                         "STALE_QUEUE_REQUIRES_MAIN_REFRESH")
+
+    def test_real_legacy_cloud_queue_has_no_live_authority(self):
+        q = self.queue([self.task()])
+        del q["captured_at"]
+        self.assertEqual(self.advise([], queue=q)["status"],
+                         "UNVERSIONED_OR_MISMATCHED_SNAPSHOT")
+
+    def test_dependency_blocks_until_main_marks_done(self):
+        rows = [self.task("T1", state="READY", priority="P0", deps=["T0"]),
+                self.task("T0", state="CHECKPOINTED", priority="P1")]
+        r = self.advise(rows)
+        self.assertEqual(r["status"], "NO_VERIFIED_ELIGIBLE_WORK")
+        self.assertTrue(any(x["reason"] == "DEPENDENCY_NOT_VERIFIED"
+                            for x in r["diagnostics"]))
+        rows[1] = self.task("T0", state="DONE")
+        r = self.advise(rows)
+        self.assertEqual(r["candidate"]["task_id"], "T1")
+
+    def test_same_task_id_other_project_does_not_satisfy_dependency(self):
+        rows = [self.task("T1", deps=["T0"]),
+                self.task("T0", project="P-B", state="DONE")]
+        r = self.advise(rows, project_id="P-A")
+        self.assertEqual(r["status"], "NO_VERIFIED_ELIGIBLE_WORK")
+
+    def test_unknown_dependency_never_claimed_complete(self):
+        r = self.advise([self.task(deps=["missing"])])
+        self.assertEqual(r["status"], "NO_VERIFIED_ELIGIBLE_WORK")
+        self.assertIn("missing", r["diagnostics"][0]["depends_on"])
+
+    def test_same_task_and_ancestor_scope_conflict_skips(self):
+        rows = [self.task("T1", priority="P0", scope="path:src/core"),
+                self.task("T2", priority="P1", scope="path:src/ui")]
+        r = self.advise(rows, leases=[lease(scopes=["path:src"])])
+        self.assertEqual(r["status"], "NO_VERIFIED_ELIGIBLE_WORK")
+        self.assertTrue(all(x["reason"] == "ANOTHER_AGENT_OWNS_OVERLAPPING_WORK"
+                            for x in r["diagnostics"]))
+
+    def test_disjoint_scope_can_select_alternative_task(self):
+        rows = [self.task("T1", priority="P0", scope="path:src/core"),
+                self.task("T2", priority="P1", scope="path:other/ui")]
+        r = self.advise(rows, leases=[lease(scopes=["path:src/core"])])
+        self.assertEqual(r["candidate"]["task_id"], "T2")
+
+    def test_stale_lease_requires_reconciliation(self):
+        r = self.advise([self.task()], leases=[dict(lease(), snapshot_revision="old")])
+        self.assertEqual(r["status"], "NO_VERIFIED_ELIGIBLE_WORK")
+        self.assertEqual(r["diagnostics"][0]["reason"],
+                         "STALE_OR_EXPIRED_LEASE_REQUIRES_HOST_RECONCILIATION")
+
+    def test_duplicate_titles_block_both_tasks(self):
+        r = self.advise([self.task("T1", title="  Run Unit Tests  "),
+                         self.task("T2", title="run unit tests")])
+        self.assertEqual(r["status"], "NO_VERIFIED_ELIGIBLE_WORK")
+        self.assertEqual([i["reason"] for i in r["diagnostics"]],
+                         ["DUPLICATE_WORK_CANDIDATE"] * 2)
+
+    def test_missing_scope_blocked(self):
+        t = self.task()
+        t["scope_keys"] = []
+        r = self.advise([t])
+        self.assertEqual(r["diagnostics"][0]["reason"],
+                         "TASK_SCOPE_NOT_REGISTERED")
+
+    def test_terminal_never_replayed(self):
+        for state in ("DONE", "BS", "BF", "FAILED_TERMINAL"):
+            with self.subTest(state=state):
+                r = self.advise([self.task(state=state)])
+                self.assertIsNone(r["candidate"])
+
+    def test_blocked_and_waiting_approval_not_started(self):
+        rows = [self.task("T1", state="BLOCKED"),
+                self.task("T2", state="WAITING_APPROVAL"),
+                self.task("T3", state="WAITING_DEPENDENCY")]
+        self.assertIsNone(self.advise(rows)["candidate"])
+
+    def test_checkpointed_requires_exact_handoff(self):
+        t = self.task(state="CHECKPOINTED")
+        r = self.advise([t])
+        self.assertEqual(r["diagnostics"][0]["reason"],
+                         "HANDOFF_MISSING_OR_AMBIGUOUS")
+
+    def test_valid_checkpoint_handoff_still_requires_host(self):
+        t = self.task(state="WAITING_PROVIDER")
+        packet = {
+            "schema_version": 1, "handoff_id": "H1", "project_id": "P-A",
+            "task_id": "T1", "source_revision": "rev7",
+            "architecture_snapshot_ref": "arch7",
+            "next_action": "Resume test", "next_agent_role": "IMPLEMENTER",
+            "created_at": TIME, "scope_keys": ["module:core"],
+            "checkpoint_ref": "checkpoint:source:1"
+        }
+        r = self.advise([t], handoffs=[packet])
+        self.assertEqual(r["status"], "HOST_LEASE_REQUIRED")
+        self.assertEqual(r["candidate"]["next_action"], "RESUME_FROM_ATTESTED_CHECKPOINT")
+        self.assertFalse(r["may_execute"])
+
+    def test_fake_checkpoint_rejected(self):
+        t = self.task(state="CHECKPOINTED")
+        packet = {
+            "schema_version": 1, "handoff_id": "H1", "project_id": "P-A",
+            "task_id": "T1", "source_revision": "rev7",
+            "architecture_snapshot_ref": "arch7",
+            "next_action": "Resume test", "next_agent_role": "IMPLEMENTER",
+            "created_at": TIME, "scope_keys": ["module:core"]
+        }
+        r = self.advise([t], handoffs=[packet])
+        self.assertEqual(r["diagnostics"][0]["reason"], "CHECKPOINT_MISSING")
+
+    def test_invalid_dependency_rejected(self):
+        t = self.task()
+        t["depends_on"] = "T0"
+        self.assertEqual(self.advise([t])["diagnostics"][0]["reason"],
+                         "INVALID_DEPENDENCY_LIST")
+
+    def test_unregistered_work_item_project_blocked(self):
+        r = self.advise([self.task(project="P-UNKNOWN")])
+        self.assertEqual(r["status"], "UNREGISTERED_WORK_ITEM_PROJECT")
 
 if __name__ == "__main__":
     unittest.main()
