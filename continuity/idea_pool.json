@@ -43,6 +43,16 @@
       "state": "IN_PROGRESS",
       "after": "P0-core",
       "notes": "Performance, cleanup, processes, services, storage, network, startup, software updates, desktop control and power/system."
+    },
+    {
+      "id": "IDEA-INVENTHOR-FAMILY-EDUCATION",
+      "project_id": "INVENTHOR_MAIN",
+      "title": "INVENTHOR Family personalized tutoring / Aile Eğitim Asistanı",
+      "state": "IDEA_POOL",
+      "priority": "P1_PROPOSED",
+      "after": "P0_AUTHENTICATED_MAIN",
+      "architecture_ref": "continuity/FAMILY_EDUCATION_ARCHITECTURE_V1.md",
+      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature."
     }
   ]
 }
