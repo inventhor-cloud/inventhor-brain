@@ -1,4 +1,8 @@
 import unittest
+import json
+import subprocess
+import sys
+from shared_organizer.__main__ import evaluate_envelope
 from shared_organizer.board import view, assess_takeover, event_inbox, review_resume_packet, advise_next_work
 
 PROJECTS = [
@@ -451,6 +455,70 @@ class NextWorkAdviceTests(unittest.TestCase):
     def test_unregistered_work_item_project_blocked(self):
         r = self.advise([self.task(project="P-UNKNOWN")])
         self.assertEqual(r["status"], "UNREGISTERED_WORK_ITEM_PROJECT")
+
+
+class ContinueAdapterTests(unittest.TestCase):
+    def packet(self):
+        return {
+            "schema_version": 1,
+            "intent": "WORK_CONTINUE",
+            "projects": [{"project_id": "P-A", "architecture_snapshot_ref": "arch7"}],
+            "queue": {"schema_version": 1, "system_of_record": "INVENTHOR_MAIN",
+                      "snapshot_revision": "rev7", "captured_at": TIME,
+                      "work_items": [{"project_id": "P-A", "task_id": "T1",
+                                      "title": "Verify state", "state": "READY",
+                                      "priority": "P0", "scope_keys": ["module:core"]}]},
+            "candidate_agent": "gpt",
+            "active_leases": [],
+            "snapshot_revision": "rev7",
+            "host_time_iso": TIME,
+        }
+
+    def test_canonical_continue_intent_yields_one_unclaimed_task(self):
+        result = evaluate_envelope(self.packet())
+        self.assertEqual(result["status"], "HOST_LEASE_REQUIRED")
+        self.assertEqual(result["candidate"]["task_id"], "T1")
+        self.assertFalse(result["may_execute"])
+
+    def test_shell_text_not_valid_canonical_intent(self):
+        p = self.packet()
+        p["intent"] = "G; rm -rf /"
+        r = evaluate_envelope(p)
+        self.assertEqual(r["status"], "NOT_A_CANONICAL_CONTINUE_INTENT")
+        self.assertIsNone(r["candidate"])
+
+    def test_missing_main_lease_inventory_never_defaults_empty(self):
+        p = self.packet()
+        del p["active_leases"]
+        self.assertEqual(evaluate_envelope(p)["status"], "MISSING_MAIN_CONTEXT")
+
+    def test_untrusted_execute_flags_blocked(self):
+        p = self.packet()
+        p["execute"] = True
+        self.assertEqual(evaluate_envelope(p)["status"], "UNTRUSTED_EXECUTION_FLAGS")
+
+    def test_advisory_output_contains_no_secrets_or_execution_grant(self):
+        result = evaluate_envelope(self.packet())
+        self.assertEqual(result["state"], "SOURCE_REFERENCE_ONLY")
+        self.assertTrue(result["requires_host_atomic_lease"])
+        self.assertFalse(result["may_mark_done"])
+
+    def test_cli_has_one_machine_readable_json_response(self):
+        p = self.packet()
+        run = subprocess.run([sys.executable, "-m", "shared_organizer"],
+                             input=json.dumps(p, ensure_ascii=False),
+                             capture_output=True, text=True, check=False)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(json.loads(run.stdout)["candidate"]["task_id"], "T1")
+        self.assertEqual(run.stderr, "")
+
+    def test_cli_invalid_json_is_safe_without_stacktrace(self):
+        run = subprocess.run([sys.executable, "-m", "shared_organizer"],
+                             input="{bad json}", capture_output=True,
+                             text=True, check=False)
+        self.assertEqual(run.returncode, 2)
+        self.assertEqual(json.loads(run.stdout)["status"], "INVALID_JSON")
+
 
 if __name__ == "__main__":
     unittest.main()
