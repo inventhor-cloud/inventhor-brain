@@ -64,6 +64,73 @@
       "items": {
         "type": "string"
       }
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_revision": {
+      "type": "string"
+    },
+    "architecture_snapshot_ref": {
+      "type": "string"
+    },
+    "constitution_version": {
+      "type": "string"
+    },
+    "owner_agent_id": {
+      "type": "string"
+    },
+    "owner_lease_ref": {
+      "type": "string"
+    },
+    "source_branch": {
+      "type": "string"
+    },
+    "checkpoint_ref": {
+      "type": "string"
+    },
+    "module_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scope_keys": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_action": {
+      "type": "string"
+    },
+    "next_agent_role": {
+      "type": "string",
+      "enum": [
+        "PLANNER",
+        "IMPLEMENTER",
+        "REVIEWER",
+        "TESTER",
+        "INTEGRATOR",
+        "OPERATOR"
+      ]
+    },
+    "review_required_by": {
+      "type": "string"
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "quality_gate_ref": {
+      "type": "string"
+    },
+    "evidence_level": {
+      "type": "string"
     }
   }
 }
