@@ -121,6 +121,17 @@ class SharedOrganizerTests(unittest.TestCase):
         r = assess_takeover(candidate(), "gpt", ["module:ui"], [], "rev7", "unknown")
         self.assertEqual(r["decision"], "BLOCKED")
 
+    def test_invalid_scope_rejected(self):
+        for path in ("path:../secret", "path:/system", "path:foo//bar", "path:foo\\bar", "module:*"):
+            with self.subTest(path=path):
+                r = assess_takeover(candidate(), "gpt", [path], [], "rev7", TIME)
+                self.assertEqual(r["decision"], "BLOCKED")
+
+    def test_broken_active_lease_scope_rejected(self):
+        r = assess_takeover(candidate(), "gpt", ["module:ui"],
+                            [dict(lease(), scope_keys=[])], "rev7", TIME)
+        self.assertEqual(r["reason"], "MALFORMED_LEASE")
+
     def test_review_task_requires_lease(self):
         r = assess_takeover(candidate("REVIEW_PENDING"), "reviewer", ["module:tests"], [], "rev7", TIME)
         self.assertEqual(r["decision"], "HOST_LEASE_REQUIRED")
