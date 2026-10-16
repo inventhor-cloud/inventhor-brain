@@ -232,3 +232,48 @@ def assess_takeover(task: Mapping, candidate_agent: str, desired_scopes: list[st
         return result("CONFLICT", "ANOTHER_AGENT_OWNS_OVERLAPPING_WORK",
                       sorted(set(conflicts)))
     return result("HOST_LEASE_REQUIRED", "ATOMIC_OWNER_LEASE_AND_POLICY_CHECK_REQUIRED")
+
+
+VISIBLE_EVENTS = frozenset({
+    "AGENT_STARTED", "SCOPE_RESERVED", "HANDOFF_READY",
+    "REVIEW_REQUESTED", "WORK_BLOCKED", "PROVIDER_UNAVAILABLE",
+    "TASK_VERIFICATION_FAILED", "TASK_VERIFIED_BY_HOST"
+})
+
+
+def event_inbox(events: list[Mapping], project_id: str,
+                seen_event_ids: set[str] | None = None) -> dict:
+    """Build UI notification *candidates* from trusted Main Event Log references.
+
+    No push channel, background worker, email or notification permission is created.
+    Do not treat self-declared host verification as trusted proof.
+    """
+    if not isinstance(events, list) or not _ident(project_id):
+        raise ValueError("EVENT_INPUT_INVALID")
+    already = seen_event_ids or set()
+    output = []
+    observed = set()
+    for event in events:
+        if not isinstance(event, Mapping):
+            raise ValueError("EVENT_ROW_INVALID")
+        event_id = event.get("event_id")
+        kind = event.get("kind")
+        task_id = event.get("task_id")
+        if event.get("project_id") != project_id or kind not in VISIBLE_EVENTS:
+            continue
+        if not _ident(event_id) or not _ident(task_id):
+            raise ValueError("EVENT_IDENTITY_MISSING")
+        if event_id in already or event_id in observed:
+            continue
+        observed.add(event_id)
+        output.append({
+            "event_id": event_id, "project_id": project_id, "task_id": task_id,
+            "kind": kind, "agent_id": event.get("agent_id"),
+            "scope_keys": [s for s in _references(event.get("scope_keys"))
+                           if _valid_scope(s)],
+            "evidence_ref": event.get("evidence_ref") if _ident(
+                event.get("evidence_ref")) else None,
+            "source": "MAIN_EVENT_REFERENCE",
+        })
+    return {"events": output, "dispatch_authorized": False,
+            "state": "SOURCE_REFERENCE_ONLY"}
