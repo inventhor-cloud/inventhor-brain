@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime, timezone
+import re
 
 BUCKETS = ("IDEAS", "TODO", "IN_PROGRESS", "REVIEW", "DONE")
 _IN_PROGRESS = frozenset((
@@ -51,6 +52,19 @@ def _time(value: object) -> datetime | None:
         return parsed.astimezone(timezone.utc) if parsed.tzinfo else None
     except ValueError:
         return None
+
+
+def _valid_scope(value: object) -> bool:
+    if not _ident(value):
+        return False
+    if value.startswith("module:"):
+        return re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", value[7:]) is not None
+    if value.startswith("path:"):
+        sub = value[5:]
+        return (bool(sub) and not sub.startswith("/") and
+                "\\" not in sub and ":" not in sub and "//" not in sub and
+                all(part not in ("", ".", "..") for part in sub.split("/")))
+    return False
 
 
 def _scope_conflict(one: str, two: str) -> bool:
@@ -169,7 +183,7 @@ def assess_takeover(task: Mapping, candidate_agent: str, desired_scopes: list[st
     if (not isinstance(task, Mapping) or not _ident(task.get("project_id")) or
         not _ident(task.get("task_id", task.get("id"))) or not _ident(candidate_agent) or
         not _ident(host_snapshot_revision) or not isinstance(desired_scopes, list) or
-        not desired_scopes or any(not _ident(s) for s in desired_scopes)):
+        not desired_scopes or any(not _valid_scope(s) for s in desired_scopes)):
         return result("BLOCKED", "INVALID_IDENTITY_OR_SCOPE")
     if len(desired_scopes) != len(set(desired_scopes)):
         return result("BLOCKED", "DUPLICATE_SCOPE")
@@ -201,9 +215,9 @@ def assess_takeover(task: Mapping, candidate_agent: str, desired_scopes: list[st
             continue
         agent = lease.get("agent_id")
         scope_keys = lease.get("scope_keys")
-        if not _ident(agent) or not isinstance(scope_keys, list):
+        if not _ident(agent) or not isinstance(scope_keys, list) or not scope_keys:
             return result("BLOCKED", "MALFORMED_LEASE")
-        if any(not _ident(s) for s in scope_keys):
+        if any(not _valid_scope(s) for s in scope_keys):
             return result("BLOCKED", "INVALID_LEASE_SCOPE")
         if agent != candidate_agent and any(
             _scope_conflict(requested, occupied)
