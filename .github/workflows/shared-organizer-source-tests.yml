@@ -1,0 +1,26 @@
+name: Source-only Organizer regression checks
+on:
+  pull_request:
+    paths:
+      - "shared_organizer/**"
+      - "tests/**"
+      - "continuity/**"
+      - ".github/workflows/shared-organizer-source-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  organizer-source-tests:
+    name: Pure-Python source preflight (not runtime acceptance)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run deterministic Organizer tests (stdlib, no network calls)
+        shell: bash
+        run: python3 -m unittest discover -s tests -v
+      - name: Parse Organizer modules without importing optional hosts
+        shell: bash
+        run: python3 -m compileall -q shared_organizer
