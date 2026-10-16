@@ -1,5 +1,5 @@
 import unittest
-from shared_organizer.board import view, assess_takeover, event_inbox
+from shared_organizer.board import view, assess_takeover, event_inbox, review_resume_packet
 
 PROJECTS = [
     {"project_id": "P-A", "title": "Operator", "objective": "Unattended work",
@@ -193,6 +193,86 @@ class SharedOrganizerTests(unittest.TestCase):
     def test_review_task_requires_lease(self):
         r = assess_takeover(candidate("REVIEW_PENDING"), "reviewer", ["module:tests"], [], "rev7", TIME)
         self.assertEqual(r["decision"], "HOST_LEASE_REQUIRED")
+
+
+class PortableHandoffTests(unittest.TestCase):
+    def base_packet(self):
+        return {
+            "schema_version": 1, "handoff_id": "handoff-7",
+            "project_id": "P-A", "task_id": "T1",
+            "source_revision": "rev7", "architecture_snapshot_ref": "arch7",
+            "created_at": "2026-10-16T11:00:00+00:00",
+            "next_action": "run unit tests", "next_agent_role": "IMPLEMENTER",
+            "scope_keys": ["module:windows.control"], "checkpoint_ref": "checkpoint:7",
+            "evidence_refs": ["commit:xyz"]
+        }
+
+    def examine(self, packet, state="READY", project=PROJECTS[0]):
+        queue = {"schema_version": 1, "system_of_record": "INVENTHOR_MAIN",
+                 "work_items": [{"id": "T1", "project_id": "P-A", "state": state}]}
+        return review_resume_packet(packet, project, queue, "arch7", "rev7")
+
+    def test_valid_packet_never_grants_authority(self):
+        r = self.examine(self.base_packet())
+        self.assertEqual(r["status"], "HOST_RECONCILIATION_REQUIRED")
+        self.assertFalse(r["may_claim_task"])
+        self.assertFalse(r["may_execute"])
+        self.assertTrue(r["requires_host_lease"])
+
+    def test_stale_architecture(self):
+        p = self.base_packet()
+        p["architecture_snapshot_ref"] = "arch6"
+        self.assertEqual(self.examine(p)["status"], "STALE_ARCHITECTURE")
+
+    def test_stale_source_revision(self):
+        p = self.base_packet()
+        p["source_revision"] = "rev6"
+        self.assertEqual(self.examine(p)["status"], "STALE_TASK_REVISION")
+
+    def test_checkpoint_required_on_interruption(self):
+        p = self.base_packet()
+        del p["checkpoint_ref"]
+        self.assertEqual(self.examine(p, state="WAITING_PROVIDER")["status"],
+                         "CHECKPOINT_MISSING")
+
+    def test_cannot_continue_terminal_task(self):
+        for state in ("DONE", "BS", "BF", "FAILED_TERMINAL"):
+            with self.subTest(state=state):
+                self.assertEqual(self.examine(self.base_packet(), state)["status"],
+                                 "TERMINAL_TASK_REPLAY")
+
+    def test_reviewer_role_and_evidence(self):
+        p = self.base_packet()
+        self.assertEqual(self.examine(p, "REVIEW_PENDING")["status"],
+                         "REVIEW_ROLE_REQUIRED")
+        p["next_agent_role"] = "REVIEWER"
+        p["evidence_refs"] = []
+        self.assertEqual(self.examine(p, "REVIEW_PENDING")["status"],
+                         "REVIEW_EVIDENCE_MISSING")
+        p["evidence_refs"] = ["test:1"]
+        self.assertEqual(self.examine(p, "REVIEW_PENDING")["status"],
+                         "HOST_RECONCILIATION_REQUIRED")
+
+    def test_scope_duplicates_are_case_insensitive(self):
+        p = self.base_packet()
+        p["scope_keys"] = ["module:WINDOWS.Control", "module:windows.control"]
+        self.assertEqual(self.examine(p)["status"], "INVALID_HANDOFF_SCOPE")
+
+    def test_missing_or_invalid_identity_rejected(self):
+        p = self.base_packet()
+        p["task_id"] = ""
+        self.assertEqual(self.examine(p)["status"], "HANDOFF_FIELDS_MISSING")
+        p = self.base_packet()
+        p["project_id"] = "another"
+        self.assertEqual(self.examine(p)["status"], "PROJECT_MISMATCH")
+
+    def test_handoff_does_not_create_missing_task(self):
+        p = self.base_packet()
+        q = {"schema_version": 1, "system_of_record": "INVENTHOR_MAIN",
+             "work_items": []}
+        result = review_resume_packet(p, PROJECTS[0], q, "arch7", "rev7")
+        self.assertEqual(result["status"], "WORK_ITEM_NOT_FOUND")
+
 
 if __name__ == "__main__":
     unittest.main()
