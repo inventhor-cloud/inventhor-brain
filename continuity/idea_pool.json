@@ -52,7 +52,34 @@
       "priority": "P1_PROPOSED",
       "after": "P0_AUTHENTICATED_MAIN",
       "architecture_ref": "continuity/FAMILY_EDUCATION_ARCHITECTURE_V1.md",
-      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature."
+      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature. Owner additional requirements: strong bidirectional German/Turkish/English translation, instant opt-in chat translation, and opt-in Viktorija-inspired word marking, tap details, fill-in-word and fill-in-letters inside family chat; Main remains authenticated host and no duplicate Viktorija app.",
+      "language_priorities": [
+        "de",
+        "en"
+      ],
+      "chat_translation_pairs": [
+        "de-tr",
+        "tr-de",
+        "de-en",
+        "en-de",
+        "tr-en",
+        "en-tr"
+      ],
+      "chat_learning_optional": {
+        "default_enabled": false,
+        "features": [
+          "word_marker_red_unknown",
+          "word_marker_green_user_focus",
+          "tap_word_detail",
+          "word_completion_cloze",
+          "letter_completion",
+          "spaced_review_candidate"
+        ],
+        "independent_student_profiles": true,
+        "child_guardian_controls": true,
+        "existing_language_brain_ref": "inventhor-cloud/inventhor-brain-language:docs/OPTIONAL_CHAT_WORD_LEARNING_V1.md",
+        "runtime_status": "SOURCE_ONLY_NOT_INSTALLED"
+      }
     }
   ]
 }
