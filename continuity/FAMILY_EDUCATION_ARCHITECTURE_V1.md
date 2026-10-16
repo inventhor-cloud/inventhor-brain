@@ -2,6 +2,18 @@
 
 **Durum: SOURCE_ONLY / OWNER IDEA.** Aynı fikir kaydı: `continuity/idea_pool.json#IDEA-INVENTHOR-FAMILY-EDUCATION`. Bu belge gerçek Main kurulumunu, canlı sohbet eklentisini veya çocuk hesabı entegrasyonunu ispatlamaz. INVENTHOR Main tek otoritedir; ikinci bir beyin veya Organizer açılmaz.
 
+## Ana ürün hedefi: öğretim, yalnız çeviri değil
+
+**Owner kararı (2026-10-17): INVENTHOR Family Education'ın birincil amacı her öğrenciye gerçekten bir şey öğretmek, anlamayı ve hatırlamayı geliştirmektir.** Çeviri, sözlük, kelime işaretleme, tamamlama ve sohbet araçları bu amaca hizmet eder; yalnız mesaj çevirmek veya doğru cevabı söylemek öğretimin tamamlandığı anlamına gelmez.
+
+- **Ders modu:** Ön bilgi/seviye belirle → tek küçük konuyu açıkla ve göster → öğrenciye uygulattır → hatayı gerekçesiyle düzelt → benzer yeni soruyla bağımsız anlamayı ölç → sonraki günlerde aralıklı tekrar et → ilerleme kaydını yalnız doğrulanmış öğrenci profiline yaz.
+- **Sohbet modu:** Normal sohbet varsayılan olarak sohbet kalır. Öğrenci kendi seçtiğinde veya aktif eğitim oturumunda açılan kelime açıklaması, kısa quiz, eksik harf/kelime, çeviri, telaffuz ve anlık ipuçları ders hedefiyle ilişkilendirilir. Arkadaş/aile mesajı öğrencinin çalışması için değiştirilmez.
+- **Uyarlanabilir öğretmen:** Seviye, yaş/sınıf, hedef dil/ders, cevap geçmişi ve sık hata türüne göre anlatım biçimini, ipucu düzeyini ve soru zorluğunu ayarlar. Çocuklar için anlaşılır, yaşa uygun, destekleyici anlatım tercih edilir.
+- **Öğrenme ölçüsü:** Tek doğru cevap “öğrendi” değildir. Farklı örneklerde bağımsız doğru yapma ve aralıklı tekrar başarısı gerekir; emin olunmayan konular tekrar kuyruğuna gider. Otomatik çeviri başarı puanı sayılmaz.
+- **Doğruluk ve izin:** Main'in doğruladığı öğretim içeriği/sağlayıcı kullanılır; yanlış veya belirsiz açıklama doğrulanmış ders kaynağına yönlendirilir. Çocuk hesabı, aile erişimi ve kişisel ilerleme yetkileri host tarafında kontrol edilir.
+
+**Ürün kabul kriteri:** “Öğrenci doğru cevabı gördü” değil, “öğrenci daha önce anlamadığı konuyu rehberlikle öğrendi ve sonraki bağımsız ölçmede gösterebildi” olmalıdır. Bu pedagojik davranış henüz canlı uygulamada doğrulanmadı.
+
 ## Kapsam: aileye göre öğretim
 
 - **Hedef yabancı diller V1:** Almanca ve İngilizce; Türkçe başlangıçta açıklama/arayüz ve çift yönlü çeviri dili. Diğer diller ihtiyaç halinde doğrulanmış dil paketleriyle açılır.
