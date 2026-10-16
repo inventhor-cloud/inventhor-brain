@@ -55,7 +55,7 @@ def _time(value: object) -> datetime | None:
 
 
 def _valid_scope(value: object) -> bool:
-    if not _ident(value):
+    if not _ident(value) or any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
         return False
     if value.startswith("module:"):
         return re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", value[7:]) is not None
@@ -63,17 +63,26 @@ def _valid_scope(value: object) -> bool:
         sub = value[5:]
         return (bool(sub) and not sub.startswith("/") and
                 "\\" not in sub and ":" not in sub and "//" not in sub and
-                all(part not in ("", ".", "..") for part in sub.split("/")))
+                all(part not in ("", ".", "..") and
+                    part == part.strip() and not part.endswith(".")
+                    for part in sub.split("/")))
     return False
 
 
 def _scope_conflict(one: str, two: str) -> bool:
-    """Scopes are exact module IDs or slash-delimited path subtrees."""
-    if one == two:
+    """Fail closed for module-vs-path until canonical Inventory maps both.
+
+    Windows filesystem and Operator module identity compare case-insensitively.
+    A false positive is safer than simultaneous writes to the same object.
+    """
+    if one.casefold() == two.casefold():
         return True
     if one.startswith("path:") and two.startswith("path:"):
-        a, b = one[5:].strip("/"), two[5:].strip("/")
-        return bool(a and b and (a.startswith(b + "/") or b.startswith(a + "/")))
+        a, b = one[5:].casefold(), two[5:].casefold()
+        return a.startswith(b + "/") or b.startswith(a + "/")
+    if ((one.startswith("module:") and two.startswith("path:")) or
+        (one.startswith("path:") and two.startswith("module:"))):
+        return True  # Unknown module directory mapping: ask Main/Inventory.
     return False
 
 
@@ -135,6 +144,7 @@ def view(projects: list[Mapping], queue: Mapping,
             groups[_bucket(state)].append({
                 "task_id": task_id, "title": task.get("title", ""),
                 "state": state, "priority": task.get("priority", ""),
+                "assignment_evidence": "UNVERIFIED_REFERENCE",
                 "assigned_agents": sorted({a.get("agent_id") for a in assignees
                                            if _ident(a.get("agent_id"))}),
                 "active_scopes": sorted({scope for a in assignees
@@ -273,7 +283,7 @@ def event_inbox(events: list[Mapping], project_id: str,
                            if _valid_scope(s)],
             "evidence_ref": event.get("evidence_ref") if _ident(
                 event.get("evidence_ref")) else None,
-            "source": "MAIN_EVENT_REFERENCE",
+            "source": "UNATTESTED_EVENT_REFERENCE",
         })
     return {"events": output, "dispatch_authorized": False,
             "state": "SOURCE_REFERENCE_ONLY"}
