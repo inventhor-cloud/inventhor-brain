@@ -287,3 +287,86 @@ def event_inbox(events: list[Mapping], project_id: str,
         })
     return {"events": output, "dispatch_authorized": False,
             "state": "SOURCE_REFERENCE_ONLY"}
+
+
+def review_resume_packet(packet: Mapping, project: Mapping, queue: Mapping,
+                         expected_architecture_ref: str,
+                         expected_source_revision: str) -> dict:
+    """Validate a portable handoff against a pinned Organizer *reference*.
+
+    All inputs are untrusted source snapshots. Only Main may attest that these
+    were read from its authoritative registry and grant a new atomic lease.
+    """
+    def result(code: str, details: list[str] | None = None) -> dict:
+        return {
+            "status": code,
+            "details": details or [],
+            "source_only": True,
+            "may_claim_task": False,
+            "may_execute": False,
+            "requires_host_lease": True,
+        }
+
+    if not isinstance(packet, Mapping) or not isinstance(project, Mapping):
+        return result("INVALID_HANDOFF")
+    if not all(_ident(packet.get(k)) for k in (
+        "handoff_id", "project_id", "task_id", "source_revision",
+        "architecture_snapshot_ref", "next_action", "next_agent_role"
+    )) or packet.get("schema_version") != 1:
+        return result("HANDOFF_FIELDS_MISSING")
+    if packet["project_id"] != project.get("project_id"):
+        return result("PROJECT_MISMATCH")
+    if not _ident(expected_architecture_ref) or not _ident(expected_source_revision):
+        return result("NO_PINNED_INVENTORY")
+    if packet["architecture_snapshot_ref"] != expected_architecture_ref:
+        return result("STALE_ARCHITECTURE")
+    if packet["source_revision"] != expected_source_revision:
+        return result("STALE_TASK_REVISION")
+    if packet.get("next_agent_role") not in (
+        "PLANNER", "IMPLEMENTER", "REVIEWER", "TESTER", "INTEGRATOR", "OPERATOR"
+    ):
+        return result("UNSUPPORTED_AGENT_ROLE")
+    scopes = packet.get("scope_keys")
+    if (not isinstance(scopes, list) or not scopes or len(scopes) > 64 or
+        any(not _valid_scope(scope) for scope in scopes) or
+        len({str(scope).casefold() for scope in scopes}) != len(scopes)):
+        return result("INVALID_HANDOFF_SCOPE")
+    if _time(packet.get("created_at")) is None:
+        return result("HANDOFF_TIME_INVALID")
+
+    try:
+        work_items = _queue_rows(queue)
+    except ValueError:
+        return result("QUEUE_INVALID")
+    matching = [row for row in work_items if (
+        row["project_id"] == packet["project_id"] and
+        row.get("task_id", row.get("id")) == packet["task_id"]
+    )]
+    if len(matching) != 1:
+        return result("WORK_ITEM_NOT_FOUND")
+    task = matching[0]
+    state = task.get("state")
+    if state in _TERMINAL_NO_REPLAY:
+        return result("TERMINAL_TASK_REPLAY")
+    if state not in ("READY", "QUEUED", "CHECKPOINTED",
+                     "WAITING_PROVIDER", "REVIEW_PENDING"):
+        return result("HANDOFF_NOT_ELIGIBLE")
+
+    if state in ("CHECKPOINTED", "WAITING_PROVIDER") and not _ident(
+        packet.get("checkpoint_ref")
+    ):
+        return result("CHECKPOINT_MISSING")
+    if state == "REVIEW_PENDING" and packet.get("next_agent_role") not in (
+        "REVIEWER", "TESTER", "INTEGRATOR"
+    ):
+        return result("REVIEW_ROLE_REQUIRED")
+    if state == "REVIEW_PENDING" and not _references(packet.get("evidence_refs")):
+        return result("REVIEW_EVIDENCE_MISSING")
+    if packet.get("owner_agent_id") and not _ident(packet["owner_agent_id"]):
+        return result("OWNER_REFERENCE_INVALID")
+    return result("HOST_RECONCILIATION_REQUIRED", [
+        "Confirm live Main Work Item revision/lease/epoch",
+        "Confirm architecture and permitted module ownership",
+        "Atomically transfer or acquire scope lease",
+        "Confirm task-specific quality and evidence requirements",
+    ])
