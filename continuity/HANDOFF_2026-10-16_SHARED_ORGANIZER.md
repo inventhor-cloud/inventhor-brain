@@ -21,3 +21,10 @@ Not a canonical Main Work Item or run record. GitHub replica/reference only; ver
 One common Organizer screen, project-by-project architecture/context, ideas/TODO/in-flight/review/done, ownership and file/module scopes, agent presence, clear handoff with checkpoint and next action, cross-agent notifications, conflict prevention and Codex quota fallback. Main remains the sole system of record. Any agent can take over after trusted host policy/lease transfer without losing verified prior work. No advertising, SDKs or promotional links in INVENTHOR. No costly infrastructure without necessity.
 
 - **Language intent continuation**: existing Language Brain draft PR #1 now has candidate intent patterns for Organizer project views, current ownership, work handoff, Inventory, Quality Factory, tests, ad scan/repair and Settings. New tests authored; NOT EXECUTED/INSTALLED. Bind only through canonical Main intent router and Owner policy gate, never direct dispatch.
+
+## 2026-10-16 continuation verification (same draft, no second Organizer)
+
+- GitHub source branch `feat/shared-organizer-handoff-20261016` now includes cross-case Windows path/module conflict protection, fail-closed module-to-file mapping, clear unverified assignment/activity labels, and `review_resume_packet` requiring exact project/task, architecture/source revision, role, scoped claim, checkpoint/evidence and no terminal replay.
+- Public GitHub Actions unit/syntax workflow `.github/workflows/shared-organizer-source-tests.yml` was added with `contents: read` and no long-lived checkout credentials.
+- **Verified GitHub Actions source-only:** 39 Python unittest cases PASS; `compileall` PASS. Run #1 `38894639460`, run #2 with checkout v7 `38894744881` PASS. This proves the source checks, **not Main/Operator live acceptance**. No payment, no DC/Codex, no protected owner data used.
+- Pending authoritative gate: read current live Main/Organizer snapshot and active agent leases; implement installed atomic owner lease CAS and notifications; verify provider failover and UI; trust only deployed verifier evidence. Do not mark P0/P1 or source PR as canonical DONE from this GitHub check.
