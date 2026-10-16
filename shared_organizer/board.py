@@ -370,3 +370,159 @@ def review_resume_packet(packet: Mapping, project: Mapping, queue: Mapping,
         "Atomically transfer or acquire scope lease",
         "Confirm task-specific quality and evidence requirements",
     ])
+
+
+
+def advise_next_work(projects: list[Mapping], queue: Mapping, candidate_agent: str,
+                     active_leases: list[Mapping], host_snapshot_revision: str,
+                     host_time_iso: str, project_id: str | None = None,
+                     handoffs: list[Mapping] | None = None) -> dict:
+    """Choose one *candidate*, never schedule, execute or create Main Work Items.
+
+    Designed for short owner commands such as "devam et": inspect the *existing*
+    revisioned Main queue, dependency graph and scope leases. No second scheduler,
+    state mutation, local lease authority, or fabricated approval is introduced.
+    A provider can use the result only to ask the trusted Main host to perform a
+    current-revision compare-and-swap acquisition with owner policy checks.
+    """
+    def answer(status: str, candidate: dict | None = None,
+               diagnostics: list[dict] | None = None) -> dict:
+        return {
+            "status": status, "candidate": candidate,
+            "diagnostics": diagnostics or [],
+            "state": "SOURCE_REFERENCE_ONLY", "may_execute": False,
+            "may_claim_task": False, "may_mark_done": False,
+            "requires_main_snapshot_attestation": True,
+            "requires_host_atomic_lease": True,
+        }
+
+    if (not isinstance(queue, Mapping) or not isinstance(projects, list)
+        or not _ident(candidate_agent) or not _ident(host_snapshot_revision)
+        or not isinstance(active_leases, list)
+        or (project_id is not None and not _ident(project_id))):
+        return answer("INVALID_INPUT")
+    snapshot_time = _time(queue.get("captured_at"))
+    host_time = _time(host_time_iso)
+    if (not _ident(queue.get("snapshot_revision"))
+        or queue["snapshot_revision"] != host_snapshot_revision
+        or snapshot_time is None or host_time is None):
+        return answer("UNVERSIONED_OR_MISMATCHED_SNAPSHOT")
+    age = (host_time - snapshot_time).total_seconds()
+    if age < -5 or age > 120:
+        return answer("STALE_QUEUE_REQUIRES_MAIN_REFRESH")
+
+    try:
+        rows = _queue_rows(queue)
+    except ValueError as ex:
+        return answer("UNTRUSTED_WORK_QUEUE", diagnostics=[{"reason": str(ex)}])
+    registered: dict[str, Mapping] = {}
+    for project in projects:
+        if not isinstance(project, Mapping) or not _ident(project.get("project_id")):
+            return answer("INVALID_PROJECT_REGISTRY")
+        pid = project["project_id"]
+        if pid in registered:
+            return answer("DUPLICATE_PROJECT_REGISTRY")
+        registered[pid] = project
+    if project_id is not None and project_id not in registered:
+        return answer("PROJECT_NOT_REGISTERED")
+    if any(row["project_id"] not in registered for row in rows):
+        return answer("UNREGISTERED_WORK_ITEM_PROJECT")
+
+    by_key = {(row["project_id"], row.get("task_id", row.get("id"))): row for row in rows}
+    issues: list[dict] = []
+    ranked: list[tuple[int, int, str, str, Mapping]] = []
+    priorities = {"P0": 0, "P1": 1, "P2": 2, "P3": 3, "P4": 4}
+    eligible = frozenset({"READY", "QUEUED", "CHECKPOINTED", "WAITING_PROVIDER"})
+
+    # No silent replay: state must be eligible and all dependencies verified by Main.
+    for index, row in enumerate(rows):
+        pid = row["project_id"]
+        task_id = row.get("task_id", row.get("id"))
+        state = row.get("state")
+        if project_id is not None and pid != project_id:
+            continue
+        if state not in eligible:
+            continue
+        dependencies = row.get("depends_on", [])
+        if not isinstance(dependencies, list) or any(not _ident(d) for d in dependencies):
+            issues.append({"task_id": task_id, "reason": "INVALID_DEPENDENCY_LIST"})
+            continue
+        if len(dependencies) != len(set(dependencies)) or task_id in dependencies:
+            issues.append({"task_id": task_id, "reason": "CYCLIC_OR_DUPLICATE_DEPENDENCY"})
+            continue
+        unresolved = []
+        for dependency in dependencies:
+            other = by_key.get((pid, dependency))
+            if other is None or other.get("state") not in ("DONE", "BS"):
+                unresolved.append(dependency)
+        if unresolved:
+            issues.append({"task_id": task_id, "reason": "DEPENDENCY_NOT_VERIFIED",
+                           "depends_on": unresolved[:16]})
+            continue
+
+        scopes = row.get("scope_keys")
+        if not isinstance(scopes, list) or not scopes:
+            issues.append({"task_id": task_id, "reason": "TASK_SCOPE_NOT_REGISTERED"})
+            continue
+        if len(scopes) > 64 or any(not _valid_scope(s) for s in scopes):
+            issues.append({"task_id": task_id, "reason": "INVALID_TASK_SCOPE"})
+            continue
+        priority = row.get("priority", "P4")
+        if not isinstance(priority, str) or priority not in priorities:
+            issues.append({"task_id": task_id, "reason": "INVALID_PRIORITY"})
+            continue
+        order = row.get("order", index)
+        if type(order) is not int or order < 0:
+            issues.append({"task_id": task_id, "reason": "INVALID_QUEUE_ORDER"})
+            continue
+        ranked.append((priorities[priority], order, pid, task_id, row))
+
+    # Equal canonical project + exact normalized task title may indicate an
+    # accidental second Work Item. Never choose either until Main reconciles.
+    titles: dict[tuple[str, str], list[str]] = {}
+    for _, _, pid, tid, row in ranked:
+        title = row.get("title", "")
+        if isinstance(title, str) and title.strip():
+            normalized = " ".join(title.casefold().split())
+            titles.setdefault((pid, normalized), []).append(tid)
+    duplicates = {(pid, tid) for (pid, _), tids in titles.items()
+                  if len(tids) > 1 for tid in tids}
+
+    for _, _, pid, task_id, row in sorted(ranked):
+        if (pid, task_id) in duplicates:
+            issues.append({"task_id": task_id, "reason": "DUPLICATE_WORK_CANDIDATE"})
+            continue
+        if row["state"] in ("CHECKPOINTED", "WAITING_PROVIDER"):
+            packets = [h for h in (handoffs or [])
+                       if isinstance(h, Mapping)
+                       and h.get("project_id") == pid and h.get("task_id") == task_id]
+            if len(packets) != 1:
+                issues.append({"task_id": task_id, "reason": "HANDOFF_MISSING_OR_AMBIGUOUS"})
+                continue
+            architecture_ref = registered[pid].get("architecture_snapshot_ref")
+            review = review_resume_packet(packets[0], registered[pid], queue,
+                                          architecture_ref, host_snapshot_revision)
+            if review["status"] != "HOST_RECONCILIATION_REQUIRED":
+                issues.append({"task_id": task_id, "reason": review["status"]})
+                continue
+
+        collision = assess_takeover(
+            row, candidate_agent, row["scope_keys"],
+            active_leases, host_snapshot_revision, host_time_iso,
+        )
+        if collision["decision"] != "HOST_LEASE_REQUIRED":
+            issues.append({"task_id": task_id, "reason": collision["reason"],
+                           "conflicting_agents": collision["conflicting_agents"]})
+            continue
+        return answer("HOST_LEASE_REQUIRED", {
+            "project_id": pid, "task_id": task_id,
+            "title": row.get("title", ""),
+            "priority": row["priority"], "queue_revision": host_snapshot_revision,
+            "scope_keys": list(row["scope_keys"]),
+            "next_action": ("RESUME_FROM_ATTESTED_CHECKPOINT"
+                            if row["state"] in ("CHECKPOINTED", "WAITING_PROVIDER")
+                            else "REVALIDATE_AND_ACQUIRE_HOST_LEASE"),
+            "reason": "Highest eligible owner-priority task; Main must recheck",
+            "may_execute": False,
+        }, issues)
+    return answer("NO_VERIFIED_ELIGIBLE_WORK", diagnostics=issues)
