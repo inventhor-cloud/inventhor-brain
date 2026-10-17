@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-22T20:32:00+02:00",
+  "updated_at": "2026-10-17T20:56:00+02:00",
   "ideas": [
     {
       "id": "IDEA-PC-DEEP-CLEAN",
@@ -135,6 +135,85 @@
         "owner": "INVENTHOR_MAIN",
         "runtime_status": "NOT_INSTALLED"
       }
+    },
+    {
+      "id": "IDEA-INVENTHOR-UNIVERSAL-REPAIR",
+      "project_id": "INVENTHOR_MAIN",
+      "title": "INVENTHOR Universal Repair & Vehicle Diagnostics / Evrensel Tamir ve Araç Bağlantısı",
+      "state": "IDEA_POOL",
+      "priority": "P1_PROPOSED",
+      "after": "P0_AUTHENTICATED_MAIN",
+      "architecture_ref": "continuity/UNIVERSAL_REPAIR_VEHICLE_ARCHITECTURE_V1.md",
+      "owner_intent": "Any device from electronics and appliances to automotive, heavy vehicle, bicycle and industrial machinery; build best extensible adapter platform, not brand-restricted.",
+      "capability_domains": [
+        "electronics",
+        "computer_phone",
+        "home_appliance",
+        "home_electrical",
+        "hvac",
+        "plumbing",
+        "audio",
+        "vehicle",
+        "motorcycle",
+        "bicycle",
+        "power_tool",
+        "industrial"
+      ],
+      "visual_policy": {
+        "priority": [
+          "user_photo_with_consent",
+          "verified_model_and_revision_service_reference",
+          "existing_approved_visual",
+          "labeled_generic_generated_explanation_only_if_needed"
+        ],
+        "never_invent": [
+          "pinouts",
+          "wiring_geometry",
+          "measurement_test_points",
+          "component_location",
+          "torque_values",
+          "safety_critical_procedure"
+        ],
+        "default_generate": false
+      },
+      "vehicle_connection": {
+        "adapters": [
+          "OBD_GENERIC",
+          "OBDONUDS",
+          "UDS_CAN",
+          "DOIP",
+          "J2534",
+          "J1939",
+          "OEM_TOOL",
+          "OTHER_VERIFIED"
+        ],
+        "read": [
+          "DISCOVER",
+          "READ_IDENTIFICATION",
+          "READ_DTC",
+          "READ_FREEZE_FRAME",
+          "READ_LIVE_DATA",
+          "READ_OEM_MODULE_STATUS"
+        ],
+        "advanced": [
+          "CLEAR_DTC",
+          "SERVICE_RESET",
+          "ACTUATOR_TEST",
+          "CALIBRATION",
+          "ADAPTATION",
+          "ECU_CODING",
+          "ECU_PROGRAMMING",
+          "SECURITY_SERVICE"
+        ],
+        "authority": "INVENTHOR_MAIN per-session/policy/owner attestation and supported OEM/hardware capability",
+        "status": "SOURCE_PLAN_ONLY_NO_VEHICLE_LINK"
+      },
+      "source_modules": [
+        "repair/triage.py",
+        "repair/vehicle_policy.py",
+        "education/repair_visual_policy.py"
+      ],
+      "notes": "User requested fullest future feature range and vehicle connection without arbitrary vendor/category limits. Preserve one Main and Organizer. Actual device compatibility, OEM access, qualified hazardous work, backups, Main session leases and hardware tests remain required; no bus write or hardware session is implemented. User-visible SOURCE_ONLY."
     }
   ]
 }
