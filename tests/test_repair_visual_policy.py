@@ -141,3 +141,19 @@ class RepairVisualPolicyTests(unittest.TestCase):
         a = choose_repair_visual(self.context(visual_goal="UNKNOWN_OPERATION"))
         self.assertEqual(a.status, "BLOCKED")
         self.assertFalse(a.can_generate_illustrative_image)
+
+    def test_multiple_repair_domains_use_one_image_preference(self):
+        for domain in ("AUTOMOTIVE", "BICYCLE", "HOME_APPLIANCE", "PLUMBING",
+                       "INDUSTRIAL", "COMPUTER", "MOTORCYCLE"):
+            with self.subTest(domain=domain):
+                a = choose_repair_visual(self.context(
+                    domain=domain, user_photo_exists=True,
+                    user_photo_authorized=True, photo_shows_required_area=True))
+                self.assertEqual(a.next_visual_action, "ANNOTATE_COPY_OF_USER_PHOTO")
+                self.assertFalse(a.can_generate_illustrative_image)
+
+    def test_vehicle_safety_hazard_stops_illustration_workflow(self):
+        a = choose_repair_visual(self.context(
+            domain="AUTOMOTIVE", hazard_flags=("CRITICAL_BRAKE_STEERING",)))
+        self.assertEqual(a.status, "STOP_REFER")
+        self.assertFalse(a.may_instruct_physical_repair)
