@@ -52,7 +52,7 @@
       "priority": "P1_PROPOSED",
       "after": "P0_AUTHENTICATED_MAIN",
       "architecture_ref": "continuity/FAMILY_EDUCATION_ARCHITECTURE_V1.md",
-      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature. Owner additional requirements: strong bidirectional German/Turkish/English translation, instant opt-in chat translation, and opt-in Viktorija-inspired word marking, tap details, fill-in-word and fill-in-letters inside family chat; Main remains authenticated host and no duplicate Viktorija app. Owner clarification 2026-10-17: primary product goal is TEACHING; translation and Viktorija-inspired chat tools are optional learning aids, not the outcome.",
+      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature. Owner additional requirements: strong bidirectional German/Turkish/English translation, instant opt-in chat translation, and opt-in Viktorija-inspired word marking, tap details, fill-in-word and fill-in-letters inside family chat; Main remains authenticated host and no duplicate Viktorija app. Owner clarification 2026-10-17: primary product goal is TEACHING; translation and Viktorija-inspired chat tools are optional learning aids, not the outcome. Owner addition 2026-10-17: optional music teaching and vocal coach, guided pitch/rhythm/voice practice, virtual instruments, supportive DE/EN pronunciation activities; permissions, child vocal comfort and no default recording required.",
       "language_priorities": [
         "de",
         "en"
@@ -98,7 +98,43 @@
         "spaced_review",
         "record_verified_progress"
       ],
-      "acceptance_criterion": "Learner independently demonstrates understanding on new examples and later review; translation or revealing an answer never counts as mastery."
+      "acceptance_criterion": "Learner independently demonstrates understanding on new examples and later review; translation or revealing an answer never counts as mastery.",
+      "music_teaching_optional": {
+        "status": "IDEA_POOL_SOURCE_ONLY",
+        "primary_goal": "MUSIC_SKILL_TEACHING_AND_VERIFIED_PROGRESS",
+        "subject_modes": [
+          "music_theory_rhythm_pitch",
+          "vocal_coach",
+          "virtual_instruments",
+          "music_supported_language_practice"
+        ],
+        "vocal_coach_v1": [
+          "gentle_warmup",
+          "listen_repeat_notes",
+          "approximate_pitch_high_low_feedback",
+          "timing_and_rhythm",
+          "short_positive_guided_retry"
+        ],
+        "later": [
+          "midi_instrument_adapter",
+          "real_time_pitch_analysis",
+          "composition",
+          "repertoire"
+        ],
+        "requirements": [
+          "age_appropriate",
+          "no_strained_singing",
+          "microphone_opt_in",
+          "guardian_permission_for_children",
+          "local_processing_first",
+          "no_default_voice_recording",
+          "no_medical_diagnosis",
+          "licensed_or_original_music_content",
+          "independent_delayed_progress_check"
+        ],
+        "owner": "INVENTHOR_MAIN",
+        "runtime_status": "NOT_INSTALLED"
+      }
     }
   ]
 }
