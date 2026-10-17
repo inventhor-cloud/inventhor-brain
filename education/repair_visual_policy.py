@@ -13,7 +13,10 @@ from dataclasses import dataclass
 HAZARDS = frozenset({
     "MAINS_POWER", "ENERGIZED", "HIGH_VOLTAGE", "UNKNOWN_STORED_ENERGY",
     "LARGE_CAPACITOR", "SWOLLEN_BATTERY", "DAMAGED_LITHIUM_CELL",
-    "BATTERY_LEAK", "FIRE_SMOKE", "EXPOSED_WIRING", "UNKNOWN_HAZARD",
+    "BATTERY_LEAK", "FIRE_SMOKE", "EXPOSED_WIRING",
+    "GAS_LEAK", "PRESSURIZED_SYSTEM", "MOVING_MACHINERY",
+    "CRITICAL_BRAKE_STEERING", "HYBRID_EV_HV", "LIFTING_OR_CRUSH_HAZARD",
+    "UNKNOWN_HAZARD",
 })
 VISUAL_GOALS = frozenset({
     "GENERAL_CONCEPT", "PART_IDENTIFICATION", "COMPONENT_LOCATION",
@@ -47,6 +50,7 @@ class RepairVisualContext:
     low_risk_disconnected: bool = False
     hazard_flags: tuple[str, ...] = ()
     illustration_adds_clarity: bool = False
+    domain: str = "ELECTRONICS"
 
 
 @dataclass(frozen=True)
@@ -95,6 +99,13 @@ def choose_repair_visual(context: RepairVisualContext) -> RepairVisualAdvice:
         return advise("BLOCKED", "NO_VISUAL", "INVALID_POLICY_FLAGS")
     if not context.authorized_session:
         return advise("BLOCKED", "NO_VISUAL", "MAIN_AUTHORIZATION_REQUIRED")
+    if context.domain not in {
+        "ELECTRONICS", "AUTOMOTIVE", "MOTORCYCLE", "BICYCLE",
+        "COMPUTER", "PHONE", "TABLET", "HOME_APPLIANCE",
+        "HOME_ELECTRICAL", "HVAC", "PLUMBING", "AUDIO",
+        "INDUSTRIAL", "POWER_TOOL", "OTHER",
+    }:
+        return advise("BLOCKED", "NO_VISUAL", "UNKNOWN_REPAIR_DOMAIN")
     if context.visual_goal not in VISUAL_GOALS:
         return advise("BLOCKED", "NO_VISUAL", "UNKNOWN_VISUAL_GOAL")
     if not isinstance(context.hazard_flags, (tuple, list)) or any(
