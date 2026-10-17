@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
-SUBJECTS = frozenset({"german", "english", "mathematics", "science"})
+SUBJECTS = frozenset({"german", "english", "mathematics", "science", "music"})
 PHASES = frozenset({"ASSESS", "EXPLAIN", "GUIDED", "INDEPENDENT", "REVIEW"})
 REVIEW_DELAY = timedelta(hours=24)
 
