@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - "shared_organizer/**"
+      - "education/**"
       - "tests/**"
       - "continuity/**"
       - ".github/workflows/shared-organizer-source-tests.yml"
@@ -25,4 +26,4 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Parse Organizer modules without importing optional hosts
         shell: bash
-        run: python3 -m compileall -q shared_organizer
+        run: python3 -m compileall -q shared_organizer education
