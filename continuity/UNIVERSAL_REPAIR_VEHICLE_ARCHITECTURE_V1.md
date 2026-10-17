@@ -77,3 +77,11 @@ Gerekli Quality Factory senaryoları: yanlış araç revizyonu; başka kullanıc
 - Bu tasarım `continuity/idea_pool.json` içinde aynı Main projesine bağlı **ayrı çalışma fikri** olarak tutulur; yeni repo ve paralel Organizer açılmaz.
 
 **Canlı entegrasyon, USB/BLE/OBD bağlantısı, üretici API kimlik bilgileri, gerçek cihazda ölçüm, servis verisi ve saha testleri henüz yok.** Kanıt olmadan `ACTIVE` ya da `FULLY_INTEGRATED` gösterilmez.
+
+## Multi-platform internet araştırması ve ekran içi medya
+
+Owner gereksinimi: INVENTHOR bir arızayı sadece kendi model bilgisiyle yanıtlamayacak; gerektiğinde **YouTube, Google, Yandex, üretici kaynakları, forumlar ve izinli diğer platformlarda** arama yapabilmeli. Video, görsel ve şemayı mevcut INVENTHOR ekranında, tamir adımlarının yanında, kaynak bağlantısıyla birlikte sunabilmeli. Uygun video gömülebilir değilse kaynak sayfayı açabilmeli. Başka bir beyin/Organizer/sahte video proxy sistemi kurulmaz.
+
+**Kaynak sözleşme:** `continuity/RESEARCH_MEDIA_CENTER_V1.md`; `repair/research_media.py` ortak provider planı ve medya kartları sunar. Kaynak türü, eşleşen cihaz revizyonu, araştırma/kullanım izni, güven seviyesi ve video oynatma hakkı ayrı doğrulanır. Google eski Custom Search JSON API'sine zorunlu bağlılık yok (yeni müşteri erişimi kapalı); Yandex için güncel Search API erişimi ve ücretsiz/ücretli kota host üzerinde doğrulanır. YouTube içi oynatma resmî IFrame/uygun gömme şartlarıyla sınırlıdır.
+
+**Tamire entegrasyon:** fotoğrafta gerçek bileşen konumu; sembol, kısaltma ve ölçümlerde doğrulanmış datasheet, OEM kılavuzu, bilinen referans aralıkları; video ile kaynak karşılaştırması; kanıt olmayan adım için açık belirsizlik. Hiçbir YouTube videosu tek başına fren, yüksek gerilim veya ECU işleminin güvenilir uygulama kanıtı değildir. `SOURCE_CARDS_ONLY` ≠ canlı web araması ≠ INVENTHOR ekranına gerçek oynatma. Gerçek platform adapter'leri ve kullanıcı arayüzü henüz bağlı değildir.
