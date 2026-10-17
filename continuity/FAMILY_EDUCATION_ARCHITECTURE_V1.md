@@ -65,3 +65,21 @@ Bu özellik, **mevcut chat ve Language Brain** içinde isteğe bağlı bir moddu
 Akış: `ASSESS` (seviye/eksik ölç) → `EXPLAIN` (kısa kavram ve örnek) → `GUIDED` (ipucuyla çalışma) → `INDEPENDENT` (yeni soruyu tek başına çözme) → en az 24 saat sonra `REVIEW`. Yanlış cevap farklı örnekle yeniden anlatıma döner; ipucuyla doğru cevap tam öğrenme sayılmaz. Gecikmeli, yeni ve ipucusuz doğru tekrar yalnızca `REQUEST_MAIN_MASTERY_REVIEW` adayı üretir. Öğrencinin kalıcı seviyesini ve çalışma hafızasını yazma Main host, kimlik ve Quality Factory doğrulamasına bağlıdır.
 
 Kaynak testleri gözlem/öğrenci kimliği, veli izni, tanımlı müfredat, ayrı soru ve doğru zaman kanıtı ister. *Host tarafından işaretlenmiş kaynak alanları kendi başına kimlik doğrulaması değildir.* Gerçek UI/çocuk profili/kalıcılık/Model doğruluğu henüz bağlanmadı; `SOURCE_TESTED` ile `INSTALLED` karıştırılmamalı.
+
+## Müzik ve ses eğitmenliği — konu paketi (Owner önerisi, 2026-10-17)
+
+**Durum: IDEA_POOL / SOURCE_DESIGN_ONLY.** Müzik, mevcut Main Family Education içinde ayrı ders alanı; kendi beynini, Organizer'ını veya aile veri deposunu açmaz. Kullanıcının hedefi sadece müzik çalmak veya şarkı dinlemek değil **öğretmek**. Yetişkin/çocuk için bireysel hedef ve seviye kayıtları Main'in yetki doğrulamalı eğitim hafızasında tutulur.
+
+**İki mod:**
+1. **Müziği öğrenme:** ritim/tempo, ses ayrımı, kulak, nota, basit melodi, sanal piyano ve ritim pad'leri, şarkı söyleme/şan, gerçek enstrümana geçiş, basit beste.
+2. **Müzikle diğer dersleri destekleme:** Almanca/İngilizce hece, vurgu, telaffuz ve tekrar şarkıları; küçük yaş için sayma/ritim oyunları. Dil ile müzik ilerlemesi birbirinden ayrılır; ezber şarkı, tek başına yabancı dilde ustalık kanıtı değildir.
+
+**Ses eğitmeni V1:** Kısa ve yaşa uygun ısınma; örnek tek sesi/melodiyi dinletme; öğrencinin isteğe bağlı mikrofon ile söylediği notanın temel frekansını tahmin edip hedefle karşılaştırma (tiz/pes/yakın), ritim/giriş zamanı, ses sürdürme ve dinamik aralık için yapıcı geri bildirim. “Güzel/çirkin ses” puanı yoktur. Telefon mikrofonunun gürültü/eko ve otomatik ses işlemesi nedeniyle ölçüm belirsiz olabilir; *ölçülemedi* durumu açıkça gösterilir. Müzik teorisi/şan tekniği, sanal enstrüman, vokal ve dil telaffuz modları ayrı egzersiz ama tek Main öğrenci hedefinde birleştirilir.
+
+**Öğretim akışı:** öğrencinin ilgi/deneyimini öğren → kısa açıklama ve ses örneği → birlikte çal/söyle → bağımsız yeni ritim/nota örneği → yapıcı geri bildirim → başka gün bağımsız tekrar → yalnız doğrulanmış ilerleme. Yanlış veya belirsiz tespit otomatik “başarısız” ya da ustalık yazmaz. Sessiz/erişilebilir seçenek: dinlemek, dokunmatik tuşlarla ritim, görsel nota ve titreşim/metronom; mikrofon kullanmak şart değil. Enstrüman/MIDI ileriki aşamada bağlanabilir.
+
+**Güvenlik/yaş/mahremiyet:** Çocuklarda yüksek sesle bağırmaya, aşırı nota genişliğine, yorucu uzun tutuşa, zorlama nefes tutmaya teşvik yok; rahatsızlık/acı/kısıklıkta sesli çalışmayı durdurup dinlenmeyi öner. Tıbbi teşhis veya tedavi yapmaz; süregelen ses yakınması için sağlık uzmanına başvurmayı öner. Mikrofona açık, oturum temelli izin; arka planda dinleme/kayıt yok. İzinli gerçek zamanlı özellik çıkarımı mümkünse cihazda; ham çocuk/aile sesleri varsayılan kaydedilmez veya sağlayıcıya gönderilmez. Kayıt/paylaşım ayrıca açık rıza, veli izni ve Main kimlik kontrolü ister. Ticari şarkı/kayıtların telif ve lisansını doğrulamadan kopyalama/dağıtma yok; temel öğretim örnekleri özgün veya uygun lisanslıdır.
+
+**Aşamalar ve test:** V1 metronom/ritim kopyalama, 3–5 nota dinle–tekrar et, basit ses eğitmeni ekranı ve öğrenciye göre görev; V2 gerçek zamanlı pitch/tempo analizi ve MIDI/enstrüman; V3 kişisel repertuvar, birlikte söyleme, basit beste. Quality Factory yaş uygunluğu, izinli mikrofon, yanlış pitch/ölçülemiyor geri bildirimi, ses sağlığı, dil müzik hedeflerinin ayrımı, gerçek mikrofon gecikmesi/cihaz uyumu, telif ve Main profil izolasyonunu test etmeden **ACTIVE** olamaz.
+
+**Teknik sahiplik:** Main, öğrenci ve ders yönetimi ve izin/kanıt; mevcut eğitim ders politikası aşamaları kullanılır. Audio/DSP/MIDI işlevleri mevcut Operator modül standardını izleyen ileriki *skill/adapter* olarak tasarlanır; gerçek zamanda ses işlemeyi veya öğretmen modelinin bağlı olduğunu bu doküman iddia etmez.
