@@ -28,7 +28,7 @@ def _relative(path: object) -> bool:
     if path.startswith(("/", "~")) or "\\" in path or ":" in path or "\0" in path:
         return False
     pieces = path.split("/")
-    return all(_id(part) and part not in (".", "..")
+    return all(_id(part) and part not in (".", "..") and not part.startswith(".")
                for part in pieces)
 
 
@@ -78,7 +78,9 @@ def review_artifact_catalog(catalog: object, *, known_project_ids: set[str],
         if not isinstance(version, str) or VERSION.fullmatch(version) is None:
             issues.append({"index": index, "reason": "INVALID_VERSION"})
             continue
-        if kind not in KINDS or store not in STORES or channel not in CHANNELS:
+        if (not isinstance(kind, str) or not isinstance(store, str) or
+            not isinstance(channel, str) or kind not in KINDS or
+            store not in STORES or channel not in CHANNELS):
             issues.append({"index": index, "reason": "INVALID_KIND_STORE_OR_CHANNEL"})
             continue
         if not _relative(path):
