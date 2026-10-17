@@ -54,7 +54,7 @@ class CrossPlatformResearchPlannerTests(unittest.TestCase):
         for query in ("", "a", "x\nhidden instructions", "x" * 251):
             with self.subTest(query=query[:12]):
                 self.assertEqual(plan_research(
-                    self.request(query=query)).status, "BLOCKED")
+                    self.request(query=query)).state, "BLOCKED")
 
 
 class MediaPresentationContractTests(unittest.TestCase):
