@@ -63,3 +63,13 @@ D:\INVENTHOR\
 - UI'daki Katalog: Projeler / Uygulamalar / Modüller / Güncellemeler / Yedekler / Kanıtlar; gerçek çalışır sürümler yalnız host tarafından doğrulandığında ACTIVE gösterilir.
 
 Bu bir mimari + test edilebilir kaynak sözleşmesidir; gerçek dosya taşıma, kurulum ve canlı INVENTHOR arşivi henüz **yapılmadı**.
+
+## Üretilecek modül standardı — tam entegrasyon
+
+**Owner kararı (2026-10-17):** Kullanıcı kendi veya üçüncü taraf modüllerini kurma özgürlüğüne sahiptir. Modüller keyfi marka/önek sınırlamasına değil, **ortak mimari ve Quality Factory kabulüne** tabidir. Bir modül sadece DLL olarak kurulunca veya bir fonksiyonu çalışınca **%100 entegre** sayılamaz.
+
+Var olan Operator kaynağı `inventhor-cloud/inventhor-operator-core:windows/MODULE_INTEGRATION_STANDARD_V1.md` sözleşmesine göre yeni modüllerde `module.json` + `integration.json` birlikte kontrol edilir: gerçek PROJECT_ID/MODULE_ID, sürüm, host API uyumu, bütün capabilities/actions, giriş/çıkış/hata protokolü, Main yetki politikası, bağımlılıklar, health check ve rollback. **Eksik fonksiyon, dependency, yetki veya duplicate capability** kabulü engeller; yanlış modüle sessiz yönlendirme yapılmaz.
+
+**Main / Organizer sorumluluğu:** Proje/kimlik, izin-scope, dependency/değişiklik onayı, sürüm kabulü ve merkezi Artifact Registry metadata. **Operator sorumluluğu:** Modül yükleme, gerçek handler/capability eşleşmesi, hatasız yürütme ve evidence. **Quality Factory sorumluluğu:** Bütün fonksiyonların logic/UI/e2e testleri, kalite metrikleri, rollback ve son `QUALITY_ACCEPTED_FULLY_INTEGRATED` durumu. Sadece Main runtime tarafından doğrulanmış sonuçlar kullanıcıya `ACTIVE` olarak sunulabilir.
+
+**Kaynak durumu:** Mevcut Operator'un eski yerleşik modülleri henüz yeni sözleşmeye otomatik geçirilmedi; yeni modül kaynak denetleyicisi gerçekte kurulum veya uçtan uca test yapmaz. Eski modüller izinsiz silinmez, kopyalanmaz; geçişte birer birer test edilip uzlaştırılır. Çalışır modül garantisi yalnız Main bağlantısı + cihazda Quality Factory kabul kanıtıyla sağlanabilir.
