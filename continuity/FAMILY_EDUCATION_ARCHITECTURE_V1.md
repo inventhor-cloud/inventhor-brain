@@ -57,3 +57,11 @@ Bu özellik, **mevcut chat ve Language Brain** içinde isteğe bağlı bir moddu
 4. Öğrenci hafızası, aralıklı tekrar, gelişim raporu; çocuklar için okul derslerine genişleme.
 
 **Mevcut kaynak referansı:** `inventhor-cloud/inventhor-brain-language:docs/OPTIONAL_CHAT_WORD_LEARNING_V1.md`. İçerik kullanılabilir kaynak/plan olarak kayıtlıdır, çalışır ürün olarak değil.
+
+## Öğretim karar katmanı — kaynak prototip
+
+**Ana beyin sahipliğinde**, `education/lesson_policy.py` yalnızca **bir sonraki öğretim adımını önerir**. Almanca/İngilizce yanında matematik/fen için ortak, küçük bir pedagojik durum sözleşmesidir; ayrı AI beyni, ikinci öğretmen sunucusu veya kayıt deposu değildir.
+
+Akış: `ASSESS` (seviye/eksik ölç) → `EXPLAIN` (kısa kavram ve örnek) → `GUIDED` (ipucuyla çalışma) → `INDEPENDENT` (yeni soruyu tek başına çözme) → en az 24 saat sonra `REVIEW`. Yanlış cevap farklı örnekle yeniden anlatıma döner; ipucuyla doğru cevap tam öğrenme sayılmaz. Gecikmeli, yeni ve ipucusuz doğru tekrar yalnızca `REQUEST_MAIN_MASTERY_REVIEW` adayı üretir. Öğrencinin kalıcı seviyesini ve çalışma hafızasını yazma Main host, kimlik ve Quality Factory doğrulamasına bağlıdır.
+
+Kaynak testleri gözlem/öğrenci kimliği, veli izni, tanımlı müfredat, ayrı soru ve doğru zaman kanıtı ister. *Host tarafından işaretlenmiş kaynak alanları kendi başına kimlik doğrulaması değildir.* Gerçek UI/çocuk profili/kalıcılık/Model doğruluğu henüz bağlanmadı; `SOURCE_TESTED` ile `INSTALLED` karıştırılmamalı.
