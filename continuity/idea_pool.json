@@ -134,6 +134,11 @@
         ],
         "owner": "INVENTHOR_MAIN",
         "runtime_status": "NOT_INSTALLED"
+      },
+      "research_media_optional": {
+        "reused_from": "INVENTHOR_MAIN repair/research_media.py",
+        "purpose": "teacher-approved video/images/reference explanations when they materially assist learning",
+        "status": "SOURCE_ONLY_NOT_RENDERED"
       }
     },
     {
@@ -213,7 +218,31 @@
         "repair/vehicle_policy.py",
         "education/repair_visual_policy.py"
       ],
-      "notes": "User requested fullest future feature range and vehicle connection without arbitrary vendor/category limits. Preserve one Main and Organizer. Actual device compatibility, OEM access, qualified hazardous work, backups, Main session leases and hardware tests remain required; no bus write or hardware session is implemented. User-visible SOURCE_ONLY."
+      "notes": "User requested fullest future feature range and vehicle connection without arbitrary vendor/category limits. Preserve one Main and Organizer. Actual device compatibility, OEM access, qualified hazardous work, backups, Main session leases and hardware tests remain required; no bus write or hardware session is implemented. User-visible SOURCE_ONLY. Owner addition: INVENTHOR researches YouTube/Google/Yandex/other allowed providers itself and displays sourced videos/images/technical manuals in its own screen when platform allows, preserving OEM provenance and avoiding invented circuit details. Main gateway/provider integration and WebView not yet built.",
+      "research_media_center": {
+        "architecture_ref": "continuity/RESEARCH_MEDIA_CENTER_V1.md",
+        "source_module": "repair/research_media.py",
+        "test_module": "tests/test_research_media.py",
+        "provider_targets": [
+          "YOUTUBE",
+          "GOOGLE",
+          "YANDEX",
+          "OEM",
+          "TECHNICAL_FORUM",
+          "GENERAL_WEB",
+          "OTHER_VERIFIED"
+        ],
+        "media_kinds": [
+          "VIDEO",
+          "IMAGE",
+          "DOCUMENT",
+          "WEBPAGE"
+        ],
+        "presentation": "INVENTHOR existing repair/chat UI: step-by-step guidance beside sourced video, image, schematic, web tabs; official embedded video only when provider permissions and UI runtime confirm",
+        "prioritization": "exact-device-and-revision manufacturer source outranks user video; no fabricated measurement points or pinouts",
+        "cost_policy": "free-tier-first; Main approved provider quotas; no automatic media downloading",
+        "status": "SOURCE_ONLY_NOT_SEARCHING_OR_RENDERING"
+      }
     }
   ]
 }
