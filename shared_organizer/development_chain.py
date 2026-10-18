@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 import hashlib
 import re
 
-from .agent_learning import review_agent_lessons
+from .agent_learning import review_agent_lessons, advise_fix_memory_promotion
 from .inventory import review_module_inventory
 from .board import advise_next_work, _queue_rows
 
@@ -45,7 +45,8 @@ def review_development_chain(projects: object, queue: object, settings: object,
                              project_id: str | None = None,
                              handoffs: list[Mapping] | None = None,
                              module_catalog: object = None,
-                             module_observations: object = None) -> dict:
+                             module_observations: object = None,
+                             fix_memory_snapshot: object = None) -> dict:
     """Suggest at most one next canonical work item based on verified prerequisites.
 
     Settings are an owner-adjustable Main-snapshot policy *reference*, never
@@ -56,13 +57,15 @@ def review_development_chain(projects: object, queue: object, settings: object,
                  diagnostics: list[dict] | None = None,
                  learning: list[dict] | None = None,
                  budget: dict | None = None,
-                 inventory_gap: dict | None = None) -> dict:
+                 inventory_gap: dict | None = None,
+                 fix_memory_proposals: list[dict] | None = None) -> dict:
         return {
             "status": status, "reason": reason,
             "candidate": candidate, "diagnostics": diagnostics or [],
             "learning_suggestions": learning or [],
             "budget": budget or {},
             "inventory_gap_for_main_intake": inventory_gap,
+            "fix_memory_promotion_proposals": fix_memory_proposals or [],
             "state": "SOURCE_REFERENCE_ONLY",
             "may_execute": False, "may_claim_task": False,
             "may_create_task": False, "may_install": False,
@@ -145,6 +148,17 @@ def review_development_chain(projects: object, queue: object, settings: object,
     )
     if lessons["status"] != "LESSONS_REVIEW_READY":
         return response("BLOCKED", "AGENT_EVIDENCE_" + lessons["reason"], budget=budget)
+    memory_proposals: list[dict] = []
+    if fix_memory_snapshot is not None:
+        promotions = advise_fix_memory_promotion(
+            lessons, fix_memory_snapshot,
+            host_snapshot_revision=host_snapshot_revision,
+            max_candidates=4,
+        )
+        if promotions["status"] != "FIX_MEMORY_INTAKE_ADVISORY":
+            return response("BLOCKED", "FIX_MEMORY_" + promotions["reason"],
+                            budget=budget)
+        memory_proposals = promotions["proposals"]
 
     try:
         rows = _queue_rows(queue)
@@ -264,7 +278,8 @@ def review_development_chain(projects: object, queue: object, settings: object,
     if advice["status"] != "HOST_LEASE_REQUIRED":
         return response("NO_SAFE_STEP", advice["status"], diagnostics=diagnostics,
                         learning=lessons["lessons"], budget=budget,
-                        inventory_gap=gap)
+                        inventory_gap=gap,
+                        fix_memory_proposals=memory_proposals)
     choice = dict(advice["candidate"])
     task = by_key[(choice["project_id"], choice["task_id"])]
     failure = task.get("last_failure_fingerprint")
@@ -277,7 +292,8 @@ def review_development_chain(projects: object, queue: object, settings: object,
                     "MAIN_HOST_MUST_REVALIDATE_AND_ACQUIRE_LEASE",
                     candidate=choice, diagnostics=diagnostics,
                     learning=lessons["lessons"], budget=budget,
-                    inventory_gap=gap)
+                    inventory_gap=gap,
+                    fix_memory_proposals=memory_proposals)
 
 
 
