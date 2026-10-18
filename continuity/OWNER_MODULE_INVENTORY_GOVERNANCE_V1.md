@@ -23,6 +23,13 @@ A bare `requester_role=OWNER` field does not authenticate the caller. Actual ins
 
 The source planner does **not** change Windows security configuration, disable OS policy, grant access to others' files, sign packages, deploy software, bypass Organizer active leases, or perform covert background actions. If a concrete module cannot be installed yet, it reports what integration/runtime prerequisite is missing and lets the owner decide the next product direction; it must not pretend installation was completed.
 
+
+## Existing Brain CLI host integration
+
+The existing `python3 -m shared_organizer` source-only adapter accepts host-selected canonical intents `MODULE_INVENTORY_REVIEW` and `OWNER_MODULE_REQUEST` in addition to `WORK_CONTINUE`. The envelope carries `schema_version=1`, `catalog`, `snapshot_revision` and `host_time_iso`; Inventory additionally takes `observations` and optional `project_id`, while owner module planning takes `module_request`. No alternate scheduler or arbitrary shell-command intent is registered. Structured results always deny install/write/owner-attestation.
+
+The Inventory now returns a **finite `next_action` per module**, from `REQUEST_FRESH_OPERATOR_INVENTORY`, `INSPECT_MODULE_RUNTIME_STATE`, `RUN_MISSING_CAPABILITY_QA_AND_VERIFY`, `ASK_OWNER_TO_SELECT_CAPABILITY_ROUTE`, or `HOST_VALIDATE_REFERENCED_QA_EVIDENCE`. These are deterministic suggestions, **not** issued system actions.
+
 ## Minimum on-device integration acceptance
 
 1. Map each Owner request to the **existing** Main project and Organizer work item, or ask for explicit project choice only if genuinely unresolved. Do not create duplicate projects or replay completed tasks.
