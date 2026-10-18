@@ -11,6 +11,8 @@ from collections.abc import Mapping
 import hashlib
 import re
 
+from .board import _valid_scope
+
 _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}\Z")
 _SHA256 = re.compile(r"[0-9a-fA-F]{64}\Z")
 _COMMIT = re.compile(r"[0-9a-fA-F]{40}\Z")
@@ -64,10 +66,8 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
     if (not _valid_id(pid) or not _valid_id(tid)
         or revision != host_snapshot_revision
         or not isinstance(scopes, list) or not 0 < len(scopes) <= 64
-        or any(not isinstance(s, str) or
-               not (s.startswith("module:") or s.startswith("path:"))
-               or len(s) > 250 or not s.split(":", 1)[1] for s in scopes)
-        or len(set(scopes)) != len(scopes)):
+        or any(not _valid_scope(s) for s in scopes)
+        or len({s.casefold() for s in scopes}) != len(scopes)):
         return answer("BLOCKED", "STALE_OR_UNSCOPED_CANDIDATE")
 
     kind, plan_project, plan_task = (source_plan.get("step_kind"),
@@ -116,7 +116,8 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
     # purely an idempotency/deduplication hint until the host binds its epoch.
     raw = "\0".join((
         "inventhor-work-packet-v1", pid, tid, revision,
-        action_hash.lower(), source_hash.lower(),
+        kind, "\x1e".join(sorted(s.casefold() for s in scopes)),
+        str(changed), str(cost), action_hash.lower(), source_hash.lower(),
         base_commit.lower(), pr_commit.lower(),
     ))
     packet_hash = hashlib.sha256(raw.encode("utf-8")).hexdigest()
