@@ -81,6 +81,8 @@ def evaluate_envelope(envelope: object) -> dict:
                 host_time_iso=envelope["host_time_iso"],
                 project_id=envelope.get("project_id"),
                 handoffs=envelope.get("handoffs"),
+                module_catalog=envelope.get("module_catalog"),
+                module_observations=envelope.get("module_observations"),
             )
         except (TypeError, ValueError, KeyError, OverflowError):
             return _blocked("INVALID_MAIN_CONTEXT")
