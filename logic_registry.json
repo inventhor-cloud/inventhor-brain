@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "entries": [
     {
       "id": "pre_action_query_route",
@@ -76,6 +76,10 @@
     {
       "id": "inventory_gap_owner_intake_bridge",
       "purpose": "Deterministically identify missing module capability and match stable fingerprint against existing Main Work Items before proposing a new intake; never silently create a task."
+    },
+    {
+      "id": "pinned_main_operator_work_handoff",
+      "purpose": "Produce source-only, project-and-task pinned single-step Main→Operator handoff fingerprint; enforce owner file/provider limits, failed action dedupe and required Main atomic lease/Quality Factory gates."
     }
   ]
 }
