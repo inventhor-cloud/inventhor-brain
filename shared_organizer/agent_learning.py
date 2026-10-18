@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Mapping
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import re
 
@@ -91,7 +91,7 @@ def review_agent_lessons(report: object, *, host_snapshot_revision: str,
         if (not all(_id(v) for v in (eid, pid, tid, agent, evidence))
             or not isinstance(step, str) or step not in _STEPS
             or not isinstance(outcome, str) or outcome not in _OUTCOMES
-            or when is None or when > now or when < captured - __import__("datetime").timedelta(days=30)
+            or when is None or when > now or when < captured - timedelta(days=30)
             or (fingerprint is not None and not _hash(fingerprint))
             or (resolved is not None and not _hash(resolved))
             or type(quality) is not bool):
