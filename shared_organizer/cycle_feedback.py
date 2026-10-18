@@ -61,11 +61,11 @@ def review_cycle_feedback(packet: object, feedback: object, ledger: object, *,
     if (now is None or captured is None or completed is None
         or not -5 <= (now-captured).total_seconds() <= 120
         or not -5 <= (now-completed).total_seconds() <= 120
-        or captured.date() != now.date()
         or ledger.get("owner_local_date") != now.date().isoformat()):
         return output("BLOCKED", "STALE_LEDGER_OR_FEEDBACK")
 
-    if (packet.get("schema_version") != 1
+    if (type(packet.get("schema_version")) is not int
+        or packet.get("schema_version") != 1
         or packet.get("queue_revision") != host_snapshot_revision
         or packet.get("execution_allowed") is not False
         or packet.get("host_authentication_receipt") is not None
@@ -83,15 +83,19 @@ def review_cycle_feedback(packet: object, feedback: object, ledger: object, *,
         or feedback.get("snapshot_revision") != host_snapshot_revision
         or feedback.get("project_id") != packet["project_id"]
         or feedback.get("task_id") != packet["task_id"]
-        or feedback.get("handoff_fingerprint", "").lower()
+        or not _hash(feedback.get("handoff_fingerprint"))
+        or feedback["handoff_fingerprint"].lower()
            != packet["handoff_fingerprint"].lower()
-        or feedback.get("action_sha256", "").lower() != packet["action_sha256"].lower()
-        or feedback.get("before_tree_sha256", "").lower()
+        or not _hash(feedback.get("action_sha256"))
+        or feedback["action_sha256"].lower() != packet["action_sha256"].lower()
+        or not _hash(feedback.get("before_tree_sha256"))
+        or feedback["before_tree_sha256"].lower()
            != packet["source_tree_sha256"].lower()
         or not _id(feedback.get("quality_evidence_ref"))
         or not _id(feedback.get("backup_ref"))
         or not _id(feedback.get("rollback_plan_ref"))
-        or feedback.get("outcome") not in ("VERIFIED_DONE", "VERIFIED_FAILURE")
+        or not isinstance(feedback.get("outcome"), str)
+        or feedback["outcome"] not in ("VERIFIED_DONE", "VERIFIED_FAILURE")
         or type(feedback.get("tests_passed")) is not int
         or feedback["tests_passed"] < 0
         or type(feedback.get("tests_failed")) is not int
