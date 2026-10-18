@@ -15,6 +15,7 @@ import sys
 from .board import advise_next_work
 from .agent_learning import review_agent_lessons
 from .development_chain import review_development_chain
+from .execution_packet import review_operator_handoff
 from .inventory import review_module_inventory
 from .owner_modules import review_owner_module_request
 
@@ -88,6 +89,18 @@ def evaluate_envelope(envelope: object) -> dict:
         except (TypeError, ValueError, KeyError, OverflowError):
             return _blocked("INVALID_MAIN_CONTEXT")
 
+    if intent == "OPERATOR_HANDOFF_REVIEW":
+        required = ("chain_advice", "source_plan", "snapshot_revision")
+        if any(key not in envelope for key in required):
+            return _blocked("MISSING_MAIN_CONTEXT")
+        try:
+            return review_operator_handoff(
+                envelope["chain_advice"], envelope["source_plan"],
+                host_snapshot_revision=envelope["snapshot_revision"],
+            )
+        except (TypeError, ValueError, KeyError, OverflowError):
+            return _blocked("INVALID_MAIN_CONTEXT")
+
     if intent != "WORK_CONTINUE":
         return _blocked("NOT_A_CANONICAL_CONTINUE_INTENT")
     required = (
@@ -144,7 +157,7 @@ def main() -> int:
         "OWNER_CHOICE_READY_FOR_HOST_VALIDATION",
         "REVIEW_EXISTING_MODULE_EXTENSION",
         "LESSONS_REVIEW_READY", "NEXT_DEVELOPMENT_STEP_ADVISORY",
-        "NO_SAFE_STEP", "PAUSED",
+        "NO_SAFE_STEP", "PAUSED", "HOST_HANDOFF_PACKET_READY",
     ) else 2
 
 
