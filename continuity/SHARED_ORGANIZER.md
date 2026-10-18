@@ -55,3 +55,13 @@ UI ve bildirimler Organizer'ın mevcut durum ve event kanalından türetilir. Sa
 **Kabul kapısı:** Gerçek Main/Operator, iki bağımsız ajanla aynı dosyaya çift yazmayı reddetmeli; ayrı modülleri paralel yürütmeli; ağ kopması/codex kotası sonrası checkpoint'i doğru devretmeli; reviewer'ın sonucun hangi testini çalıştıracağını otomatik gösterebilmeli; UI herhangi bir kaynak testini runtime çalışıyor gibi sunmamalıdır.
 
 Komut/evidence sınıfları: `REQUESTED` ≠ `SOURCE_IMPLEMENTED` ≠ `SOURCE_TESTED` ≠ `LOCAL_DEPLOYED` ≠ `END_TO_END_VERIFIED`. 
+
+## Salt-okunur kaynak karşılaştırması, TODO döngüsünden bağımsızdır
+
+**Codex kilitlenme düzeltmesi (2026-10-18):** Canlı Main görevi `TODO` durumuna döndüyse bu, başkasının sahipliğini devralma veya bir PR'ı kurma yetkisi değildir. Kaynak `assess_takeover` bunu genel başarısızlık yerine `HOST_MUST_ACTIVATE_TODO_BEFORE_WRITE_LEASE` nedeni ile bildirir. Ana Main host gerçek görev revision/epoch ve izin/scope doğrulamasını yapıp meşru şekilde `READY` durumuna geçirmedikçe **yazma/merge/deploy olmaz**.
+
+Ancak var olan kullanıcının erişme yetkisi bulunan dosyalarının **salt-okunur SHA-256 karşılaştırması**, bir Work Item mutasyonu/lease devri değildir. `advise_read_only_source_comparison` bunun yalnızca kaynak önerisini verir: `may_read_private_files=false`, `may_mutate_files=false`, `may_take_ownership=false`; gerçek dosya okuma hakkını güvenilir yerel host ve kullanıcı izni denetler. Böylece sorunu teşhis etmek için aynı eski sahiplik kaydı art arda yazılmaz.
+
+Yerel Main bir Git deposu değilse Operator PR #3 içindeki `windows/bootstrap/Compare-SourceTriplet.ps1` mevcut yetkili klasör, sabitlenmiş Operator tabanı ve sabitlenmiş PR başı arasında 3-yönlü salt-okunur hash envanteri üretir. Örnek kullanım ve çözüm tablosu `windows/SOURCE_RECONCILIATION_RUNBOOK.md` içinde. Referans: https://github.com/inventhor-cloud/inventhor-operator-core/pull/3 .
+
+**Çakışma sözleşmesi:** Aynı hash = yeniden yapma; yalnız PR değişmiş = aday, yerel değişikliği koru; iki taraf değişmiş = insan/kod incelemesi ve yetkili geçici worktree; herhangi taban/kimlik belirsiz = fail closed. Kaynak aracı hiçbir dosyayı değiştirmez. Karşılaştırma başarmak canlı kurulum/eşitleme kanıtı değildir.
