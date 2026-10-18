@@ -45,3 +45,12 @@ The Inventory now returns a **finite `next_action` per module**, from `REQUEST_F
 `tests/test_module_inventory.py` verifies partial coverage, stale/unverified observations, duplicate data and route collisions. `tests/test_owner_modules.py` verifies unlimited product-category choices, project isolation, non-duplicating extensions, explicit routing ambiguity and lack of unilateral host authority. CI uses Python stdlib and no paid provider.
 
 These are **source acceptance tests**, not confirmation that the Owner's installed INVENTHOR Brain/Windows Operator currently invokes these functions. Integration must be performed by the authorized current Main host after Code Review, atomic task/scope lease validation and UI/runtime acceptance. The existing Desktop/Service update task remains separate.
+
+
+## Distinct Main health and module load health (2026-10-18)
+
+The Main `/health` answer `READY` and `operatorConnected=true` establish only their own scope. They **do not** override a failed Operator module-loader heartbeat. When mapping live Operator heartbeat data to the existing Inventory envelope, the **authenticated Main host** must normalize module-specific load failures into the matching `observations.modules[]` row as a bounded `load_error_codes` list, e.g. `["MODULE_CONTRACT_MISMATCH"]` for the affected `project_id` + `module_id`. Do not copy another project's error by shared module name. The raw `MODULE_CONTRACT_MISMATCH:windows.ai-team` string is NOT itself a signed runtime receipt; resolve identity from the authoritative Main catalog.
+
+When errors are supplied, the Inventory conservatively reports `RUNTIME_LOAD_BLOCKED`, **zero reportable PASS capabilities**, and `REVIEW_OPERATOR_MODULE_LOAD_ISSUES`. Its issue record includes only validated error codes (not paths, hashes, tokens or private payloads). An error-flagged module does not claim capability routing ownership. Malformed or duplicated error lists block the audit. This is advisory classification, not proof of a corrupted DLL or permission to rewrite a manifest.
+
+**Absence of `load_error_codes` is not a health verification.** Existing `REPORTED_COMPLETE` remains an unverified claim requiring Main host to correlate a fresh attested Operator loader heartbeat, exact signed package payload/manifest, release identity, Quality Factory evidence, and authorized scope/rollback. AI-Team package repair remains with its existing Codex owner; this Brain-source change creates no parallel recovery task and does not access or update installed files.

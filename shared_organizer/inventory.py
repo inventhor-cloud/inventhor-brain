@@ -105,7 +105,7 @@ def review_module_inventory(catalog: object, observations: object, *,
         return answer("BLOCKED", "INVALID_INVENTORY_ITEMS")
 
     known: dict[tuple[str, str], tuple[str, ...]] = {}
-    live: dict[tuple[str, str], tuple[str, dict[str, tuple[str, str]]]] = {}
+    live: dict[tuple[str, str], tuple[str, dict[str, tuple[str, str]], tuple[str, ...]]] = {}
     for entry in expected:
         if not isinstance(entry, Mapping):
             return answer("BLOCKED", "INVALID_CATALOG_MODULE")
@@ -124,9 +124,18 @@ def review_module_inventory(catalog: object, observations: object, *,
         pid, mid = entry.get("project_id"), entry.get("module_id")
         state = entry.get("status")
         capabilities = entry.get("capabilities")
+        # Main READY / operatorConnected do not attest each loadable module.
+        # An authenticated host must normalize its module heartbeat errors to
+        # this per-project row; an absent field is NOT a clean health receipt.
+        load_errors = entry.get("load_error_codes", [])
         if (not _identity(pid) or not _identity(mid) or not isinstance(state, str) or state not in _STATES
             or not isinstance(capabilities, list) or len(capabilities) > 64):
             return answer("BLOCKED", "INVALID_OPERATOR_OBSERVATION")
+        if (not isinstance(load_errors, list) or len(load_errors) > 16
+            or any(not isinstance(code, str) or not _CAP.fullmatch(code)
+                   for code in load_errors)
+            or len(set(load_errors)) != len(load_errors)):
+            return answer("BLOCKED", "INVALID_MODULE_LOAD_ERRORS")
         key = (pid, mid.casefold())
         if key in live:
             return answer("BLOCKED", "DUPLICATE_OPERATOR_OBSERVATION")
@@ -145,19 +154,19 @@ def review_module_inventory(catalog: object, observations: object, *,
             # Only a PASS with an evidence reference is countable as reported.
             # Even then, a trusted host must independently validate the receipt.
             by_cap[name] = (result, evidence or "")
-        live[key] = (state, by_cap)
+        live[key] = (state, by_cap, tuple(sorted(load_errors)))
 
     issues: list[dict] = []
     modules: list[dict] = []
     owners: dict[tuple[str, str], list[str]] = defaultdict(list)
-    for (pid, mid), (state, evidence) in live.items():
+    for (pid, mid), (state, evidence, load_errors) in live.items():
         if project_id is not None and pid != project_id:
             continue
         if (pid, mid) not in known:
             issues.append({"project_id": pid, "module_id": mid,
                            "reason": "UNREGISTERED_MODULE_OBSERVATION"})
             continue
-        if state == "ACTIVE":
+        if state == "ACTIVE" and not load_errors:
             for cap, (result, receipt) in evidence.items():
                 if result == "PASS" and receipt and cap in known[(pid, mid)]:
                     owners[(pid, cap)].append(mid)
@@ -171,20 +180,23 @@ def review_module_inventory(catalog: object, observations: object, *,
         if project_id is not None and pid != project_id:
             continue
         observation = live.get((pid, mid))
-        state, cap_results = observation if observation else ("NOT_REPORTED", {})
+        state, cap_results, load_errors = observation if observation else ("NOT_REPORTED", {}, ())
         passes = sorted(c for c in declared
-                        if state == "ACTIVE" and cap_results.get(c, ())[:1] == ("PASS",)
+                        if state == "ACTIVE" and not load_errors
+                        and cap_results.get(c, ())[:1] == ("PASS",)
                         and cap_results[c][1])
         missing = sorted(set(declared) - set(passes))
         unexpected = sorted(set(cap_results) - set(declared))
         ambiguous = sorted(c for c in passes if (pid, c) in conflicts)
         status = ("NOT_REPORTED" if observation is None
+                  else "RUNTIME_LOAD_BLOCKED" if load_errors
                   else "INACTIVE" if state != "ACTIVE"
                   else "AMBIGUOUS_OWNER" if ambiguous
                   else "REPORTED_COMPLETE" if not missing and not unexpected
                   else "PARTIAL_OR_UNVERIFIED")
         next_action = {
             "NOT_REPORTED": "REQUEST_FRESH_OPERATOR_INVENTORY",
+            "RUNTIME_LOAD_BLOCKED": "REVIEW_OPERATOR_MODULE_LOAD_ISSUES",
             "INACTIVE": "INSPECT_MODULE_RUNTIME_STATE",
             "AMBIGUOUS_OWNER": "ASK_OWNER_TO_SELECT_CAPABILITY_ROUTE",
             "PARTIAL_OR_UNVERIFIED": "RUN_MISSING_CAPABILITY_QA_AND_VERIFY",
@@ -202,6 +214,10 @@ def review_module_inventory(catalog: object, observations: object, *,
         if observation is None:
             issues.append({"project_id": pid, "module_id": mid,
                            "reason": "MODULE_OBSERVATION_MISSING"})
+        if load_errors:
+            issues.append({"project_id": pid, "module_id": mid,
+                           "reason": "MODULE_LOAD_ERRORS_REPORTED",
+                           "error_codes": list(load_errors)})
         if unexpected:
             issues.append({"project_id": pid, "module_id": mid,
                            "reason": "UNDECLARED_CAPABILITY_CLAIM", "capabilities": unexpected})

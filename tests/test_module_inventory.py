@@ -223,6 +223,51 @@ class ModuleInventoryReviewTests(unittest.TestCase):
         self.assertEqual(main_module(audit(c, o))["next_action"],
                          "ASK_OWNER_TO_SELECT_CAPABILITY_ROUTE")
 
+
+    def test_module_contract_mismatch_overrides_main_ready_and_pass_claims(self):
+        o = observed()
+        o["main_health"] = {"state": "READY", "operatorConnected": True}
+        o["modules"][0]["load_error_codes"] = ["MODULE_CONTRACT_MISMATCH"]
+        r = audit(obs=o)
+        row = main_module(r)
+        self.assertEqual(row["status"], "RUNTIME_LOAD_BLOCKED")
+        self.assertEqual(row["reported_pass_count"], 0)
+        self.assertEqual(row["missing_or_unverified"], ["FILE_LIST", "FILE_READ"])
+        self.assertEqual(row["next_action"], "REVIEW_OPERATOR_MODULE_LOAD_ISSUES")
+        self.assertEqual(r["summary"]["reported_complete"], 2)
+        self.assertIn({"project_id": "MAIN", "module_id": "windows.files",
+                       "reason": "MODULE_LOAD_ERRORS_REPORTED",
+                       "error_codes": ["MODULE_CONTRACT_MISMATCH"]}, r["issues"])
+        self.assertFalse(r["may_claim_live_verified"])
+
+    def test_load_errors_are_scoped_by_project_and_module(self):
+        o = observed()
+        o["modules"][0]["load_error_codes"] = ["MODULE_CONTRACT_MISMATCH"]
+        r = audit(obs=o)
+        self.assertEqual(main_module(r, "windows.cleanup")["status"],
+                         "REPORTED_COMPLETE")
+        self.assertEqual(audit(obs=o, project_id="VICTORIA")["modules"][0]["status"],
+                         "REPORTED_COMPLETE")
+
+    def test_errored_module_cannot_claim_ambiguous_capability_ownership(self):
+        c, o = catalog(), observed()
+        c["modules"][1]["declared_capabilities"].append("FILE_READ")
+        o["modules"][1]["capabilities"].append(claimed("FILE_READ", evidence="OTHER-QA"))
+        o["modules"][0]["load_error_codes"] = ["MODULE_CONTRACT_MISMATCH"]
+        r = audit(c, o)
+        self.assertEqual(r["summary"]["ambiguous_capabilities"], 0)
+        self.assertEqual(main_module(r)["status"], "RUNTIME_LOAD_BLOCKED")
+
+    def test_malformed_load_errors_fail_closed(self):
+        invalid_values = (None, "MODULE_CONTRACT_MISMATCH",
+                          ["../secret"], ["INVALID ERROR"], [True],
+                          ["DUPLICATE", "DUPLICATE"], ["ERROR"] * 17)
+        for invalid in invalid_values:
+            with self.subTest(invalid=invalid):
+                o = observed()
+                o["modules"][0]["load_error_codes"] = invalid
+                self.assertEqual(audit(obs=o)["reason"], "INVALID_MODULE_LOAD_ERRORS")
+
     def test_no_binary_data_and_no_implicit_writes(self):
         r = audit()
         self.assertTrue(all(set(m) == {
