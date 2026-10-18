@@ -31,6 +31,7 @@ def advice():
         "budget": {
             "steps_available_this_cycle": 1,
             "max_parallel_tasks": 1, "active_tasks": 0,
+            "max_changed_files_per_step": 4,
             "paid_providers_enabled": False,
             "provider_budget_units_remaining": 0,
         },
@@ -245,3 +246,24 @@ class MainOperatorHandoffAdapterTests(unittest.TestCase):
         del inp["source_plan"]
         r = evaluate_envelope(inp)
         self.assertEqual(r["status"], "MISSING_MAIN_CONTEXT")
+
+
+    def test_owner_file_limit_mismatch_does_not_accept_forged_candidate(self):
+        a = advice()
+        a["candidate"]["max_changed_files_per_step"] = 6
+        self.assertEqual(review(a=a)["reason"], "OWNER_FILE_BATCH_LIMIT")
+        a["budget"]["max_changed_files_per_step"] = 6
+        self.assertEqual(review(a=a)["status"], "HOST_HANDOFF_PACKET_READY")
+
+    def test_missing_failed_action_history_is_never_assumed_empty(self):
+        p = plan()
+        del p["prior_failed_action_hashes"]
+        self.assertEqual(review(p=p)["reason"], "INVALID_OR_UNPINNED_SOURCE_PLAN")
+
+    def test_negative_or_bool_budget_not_treated_as_valid_quota(self):
+        a = advice()
+        a["budget"]["active_tasks"] = -1
+        self.assertEqual(review(a=a)["reason"], "OWNER_PARALLEL_LIMIT_REACHED")
+        a = advice()
+        a["budget"]["provider_budget_units_remaining"] = True
+        self.assertEqual(review(a=a)["reason"], "INVALID_PROVIDER_POLICY")
