@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "entries": [
     {
       "id": "pre_action_query_route",
@@ -56,6 +56,14 @@
     {
       "id": "merge_candidate_router",
       "purpose": "Suggest reuse/merge/link decisions to the Brain while keeping final semantic decisions in INVENTHOR."
+    },
+    {
+      "id": "evidence_aware_module_inventory",
+      "purpose": "Read-only audit of per-project module capability completeness, missing evidence, stale observations and ambiguous ownership; host must independently verify."
+    },
+    {
+      "id": "owner_open_module_intake",
+      "purpose": "Plan owner-selected custom modules and extension of existing modules without vendor, provider or product category whitelist; Main host verifies owner and performs authorized installation."
     }
   ]
 }
