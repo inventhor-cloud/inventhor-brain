@@ -354,3 +354,137 @@ class GovernedDevelopmentChainTests(unittest.TestCase):
     def test_invalid_owner_budget_bool_as_integer_rejected(self):
         r = chain(setts=settings(max_steps_per_cycle=True))
         self.assertEqual(r["reason"], "INVALID_OWNER_DEVELOPMENT_LIMITS")
+
+
+
+def inventory_catalog():
+    return {
+        "schema_version": 1, "system_of_record": "INVENTHOR_MAIN",
+        "snapshot_revision": REV,
+        "modules": [
+            {"project_id": "MAIN", "module_id": "module_a",
+             "declared_capabilities": ["READ_STATE", "WRITE_STATE"]},
+            {"project_id": "VIKTORIJA", "module_id": "module_a",
+             "declared_capabilities": ["READ_STATE"]},
+        ],
+    }
+
+
+def inventory_observations():
+    return {
+        "schema_version": 1, "source": "WINDOWS_OPERATOR",
+        "snapshot_revision": REV, "captured_at": TIME,
+        "modules": [
+            {"project_id": "MAIN", "module_id": "module_a", "status": "ACTIVE",
+             "capabilities": [
+                 {"name": "READ_STATE", "result": "PASS",
+                  "evidence_ref": "QA-READ"},
+             ]},
+            {"project_id": "VIKTORIJA", "module_id": "module_a",
+             "status": "ACTIVE", "capabilities": [
+                {"name": "READ_STATE", "result": "PASS",
+                 "evidence_ref": "QA-OTHER"},
+             ]},
+        ],
+    }
+
+
+def chain_with_inventory(q=None, cat=None, obs=None, **kw):
+    return review_development_chain(
+        PROJECTS, queue() if q is None else q, settings(),
+        quality(), agent_report(), candidate_agent="INVENTHOR",
+        active_leases=[], host_snapshot_revision=REV, host_time_iso=TIME,
+        module_catalog=inventory_catalog() if cat is None else cat,
+        module_observations=inventory_observations() if obs is None else obs,
+        **kw,
+    )
+
+
+class InventoryDevelopmentBridgeTests(unittest.TestCase):
+    def test_gap_is_proposed_to_canonical_main_intake_not_silently_added(self):
+        r = chain_with_inventory()
+        self.assertEqual(r["status"], "NEXT_DEVELOPMENT_STEP_ADVISORY")
+        gap = r["inventory_gap_for_main_intake"]
+        self.assertEqual(gap["project_id"], "MAIN")
+        self.assertEqual(gap["module_id"], "module_a")
+        self.assertEqual(gap["capability"], "WRITE_STATE")
+        self.assertEqual(gap["next_action"], "PROPOSE_TO_EXISTING_MAIN_WORK_INTAKE")
+        self.assertIsNone(gap["proposed_task_id"])
+        self.assertFalse(gap["may_create_task"])
+        self.assertFalse(r["may_create_task"])
+
+    def test_incomplete_inventory_rejected_without_new_task(self):
+        r = review_development_chain(
+            PROJECTS, queue(), settings(), quality(), agent_report(),
+            candidate_agent="INVENTHOR", active_leases=[],
+            host_snapshot_revision=REV, host_time_iso=TIME,
+            module_catalog=inventory_catalog(),
+        )
+        self.assertEqual(r["reason"], "INCOMPLETE_INVENTORY_SNAPSHOT")
+        self.assertFalse(r["may_create_task"])
+
+    def test_stale_observation_fails_closed(self):
+        o = inventory_observations()
+        o["captured_at"] = "2026-10-18T11:50:00Z"
+        self.assertEqual(chain_with_inventory(obs=o)["reason"],
+                         "INVENTORY_STALE_INVENTORY_OBSERVATION")
+
+    def test_proposal_matches_existing_task_by_target_without_duplication(self):
+        q = queue()
+        q["work_items"].append({
+            "project_id": "MAIN", "id": "T-ALREADY",
+            "state": "READY", "title": "Fix capability",
+            "priority": "P1", "scope_keys": ["module:module_a"],
+            "target_module_id": "module_a",
+            "target_capability": "WRITE_STATE",
+        })
+        r = chain_with_inventory(q=q)
+        gap = r["inventory_gap_for_main_intake"]
+        self.assertEqual(gap["next_action"], "TRACK_EXISTING_WORK_ITEM")
+        self.assertEqual(gap["matched_task_ids"], ["T-ALREADY"])
+        self.assertIsNone(gap["proposed_task_id"])
+
+    def test_terminal_task_will_not_be_replayed_automatically(self):
+        q = queue()
+        q["work_items"].append({
+            "project_id": "MAIN", "id": "T-CLOSED",
+            "state": "BS", "title": "Fix capability",
+            "target_module_id": "module_a",
+            "target_capability": "WRITE_STATE",
+        })
+        gap = chain_with_inventory(q=q)["inventory_gap_for_main_intake"]
+        self.assertEqual(gap["next_action"], "HOST_REVIEW_TERMINAL_EVIDENCE")
+        self.assertEqual(gap["matched_task_ids"], ["T-CLOSED"])
+
+    def test_duplicate_target_tasks_need_main_reconciliation(self):
+        q = queue()
+        for n in ("A", "B"):
+            q["work_items"].append({
+                "project_id": "MAIN", "id": "T-" + n,
+                "state": "READY", "title": "Different title " + n,
+                "priority": "P1", "scope_keys": ["module:module_a"],
+                "target_module_id": "module_a",
+                "target_capability": "WRITE_STATE",
+            })
+        gap = chain_with_inventory(q=q)["inventory_gap_for_main_intake"]
+        self.assertEqual(gap["next_action"], "HOST_RECONCILE_DUPLICATE_EXISTING_WORK")
+        self.assertEqual(gap["matched_task_ids"], ["T-A", "T-B"])
+
+    def test_project_scope_never_returns_other_private_module(self):
+        r = chain_with_inventory(project_id="VIKTORIJA")
+        self.assertIsNone(r["inventory_gap_for_main_intake"])
+
+    def test_stable_gap_fingerprint_across_repeated_calls(self):
+        a = chain_with_inventory()["inventory_gap_for_main_intake"]
+        b = chain_with_inventory()["inventory_gap_for_main_intake"]
+        self.assertEqual(a["suggestion_fingerprint"],
+                         b["suggestion_fingerprint"])
+        self.assertEqual(len(a["suggestion_fingerprint"]), 64)
+
+    def test_no_gap_when_evidence_for_all_capabilities_is_reported(self):
+        o = inventory_observations()
+        o["modules"][0]["capabilities"].append({
+            "name": "WRITE_STATE", "result": "PASS",
+            "evidence_ref": "QA-WRITE",
+        })
+        self.assertIsNone(chain_with_inventory(obs=o)["inventory_gap_for_main_intake"])
