@@ -64,6 +64,11 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
                           candidate.get("queue_revision"))
     scopes = candidate.get("scope_keys")
     if (not _valid_id(pid) or not _valid_id(tid)
+        or candidate.get("next_action") not in (
+            "REVALIDATE_AND_ACQUIRE_HOST_LEASE",
+            "RESUME_FROM_ATTESTED_CHECKPOINT")
+        or (candidate.get("learning_evidence_ref") is not None
+            and not _valid_id(candidate["learning_evidence_ref"]))
         or revision != host_snapshot_revision
         or not isinstance(scopes, list) or not 0 < len(scopes) <= 64
         or any(not _valid_scope(s) for s in scopes)
@@ -80,6 +85,11 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
     base_commit = source_plan.get("base_commit")
     pr_commit = source_plan.get("candidate_commit")
     failures = source_plan.get("prior_failed_action_hashes", [])
+    provider_required = source_plan.get("provider_required", False)
+    quota_verified = source_plan.get("provider_quota_verified", False)
+    if (type(provider_required) is not bool or type(quota_verified) is not bool
+        or (provider_required and not quota_verified)):
+        return answer("BLOCKED", "UNVERIFIED_PROVIDER_REQUIREMENT")
     if (not isinstance(kind, str) or kind not in _STEPS
         or plan_project != pid or plan_task != tid
         or not _hex(action_hash, _SHA256) or not _hex(source_hash, _SHA256)
@@ -117,7 +127,8 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
     raw = "\0".join((
         "inventhor-work-packet-v1", pid, tid, revision,
         kind, "\x1e".join(sorted(s.casefold() for s in scopes)),
-        str(changed), str(cost), action_hash.lower(), source_hash.lower(),
+        str(changed), str(cost), str(provider_required),
+        action_hash.lower(), source_hash.lower(),
         base_commit.lower(), pr_commit.lower(),
     ))
     packet_hash = hashlib.sha256(raw.encode("utf-8")).hexdigest()
@@ -126,6 +137,8 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
         "queue_revision": revision, "scope_keys": list(scopes),
         "step_kind": kind, "estimated_changed_files": changed,
         "estimated_provider_cost_units": cost,
+        "provider_required": provider_required,
+        "provider_quota_verified": quota_verified,
         "action_sha256": action_hash.lower(),
         "source_tree_sha256": source_hash.lower(),
         "base_commit": base_commit.lower(),
