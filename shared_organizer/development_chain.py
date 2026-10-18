@@ -212,10 +212,10 @@ def review_development_chain(projects: object, queue: object, settings: object,
         if type(cost) is not int or cost < 0:
             return response("BLOCKED", "INVALID_PROVIDER_COST_ESTIMATE", budget=budget)
         if cost and not settings["paid_providers_enabled"]:
-            copy["state"] = "WAITING_PROVIDER"
+            copy["state"] = "WAITING_APPROVAL"
             report(tid, "PAID_PROVIDER_DISABLED_BY_OWNER")
         elif cost > settings["provider_budget_units_remaining"]:
-            copy["state"] = "WAITING_PROVIDER"
+            copy["state"] = "WAITING_APPROVAL"
             report(tid, "OWNER_PROVIDER_BUDGET_EXCEEDED")
         files = r.get("estimated_changed_files", 1)
         if type(files) is not int or files < 0:
