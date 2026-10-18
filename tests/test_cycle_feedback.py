@@ -1,7 +1,11 @@
 import copy
+import json
+import subprocess
+import sys
 import unittest
 
 from shared_organizer.cycle_feedback import review_cycle_feedback
+from shared_organizer.__main__ import evaluate_envelope
 
 REV = "host-rev-42"
 TIME = "2026-10-18T18:50:00+02:00"
@@ -201,3 +205,66 @@ class CycleFeedbackReviewTests(unittest.TestCase):
         f = feedback()
         f["outcome"] = "AGENT_SAYS_PASSED"
         self.assertEqual(review(f=f)["reason"], "INVALID_QUALITY_FACTORY_FEEDBACK")
+
+
+
+class CycleFeedbackAdapterTests(unittest.TestCase):
+    def envelope(self):
+        return {
+            "schema_version": 1, "intent": "DEVELOPMENT_FEEDBACK_REVIEW",
+            "snapshot_revision": REV, "host_time_iso": TIME,
+            "handoff_packet": packet(), "quality_feedback": feedback(),
+            "development_ledger": ledger(),
+        }
+
+    def test_canonical_main_intent_returns_one_nonexecuting_transition(self):
+        r = evaluate_envelope(self.envelope())
+        self.assertEqual(r["status"], "FEEDBACK_RECONCILIATION_ADVISORY")
+        self.assertFalse(r["may_write_ledger"])
+        self.assertFalse(r["may_mark_task_done"])
+        self.assertFalse(r["may_execute_next"])
+
+    def test_cli_reconciles_without_starting_a_task(self):
+        done = subprocess.run(
+            [sys.executable, "-m", "shared_organizer"],
+            input=json.dumps(self.envelope()), text=True,
+            capture_output=True, check=False,
+        )
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(len(done.stdout.splitlines()), 1)
+        r = json.loads(done.stdout)
+        self.assertEqual(r["status"], "FEEDBACK_RECONCILIATION_ADVISORY")
+        self.assertIsNotNone(r["proposed_transition"])
+        self.assertFalse(r["proposed_transition"]["may_start_next_task"])
+
+    def test_cli_idempotent_already_recorded_is_normal_nonmutating_outcome(self):
+        e = self.envelope()
+        e["development_ledger"] = ledger(3, 0, [HANDOFF])
+        done = subprocess.run(
+            [sys.executable, "-m", "shared_organizer"],
+            input=json.dumps(e), text=True,
+            capture_output=True, check=False,
+        )
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(json.loads(done.stdout)["status"], "ALREADY_RECORDED")
+
+    def test_no_cli_bypass_of_host_execution_gates(self):
+        e = self.envelope()
+        e["execute"] = True
+        self.assertEqual(evaluate_envelope(e)["status"], "UNTRUSTED_EXECUTION_FLAGS")
+
+    def test_missing_ledger_is_explicitly_rejected(self):
+        e = self.envelope()
+        e.pop("development_ledger")
+        self.assertEqual(evaluate_envelope(e)["status"], "MISSING_MAIN_CONTEXT")
+
+    def test_invalid_quality_evidence_does_not_become_success(self):
+        e = self.envelope()
+        e["quality_feedback"]["tests_failed"] = True
+        done = subprocess.run(
+            [sys.executable, "-m", "shared_organizer"],
+            input=json.dumps(e), text=True,
+            capture_output=True, check=False,
+        )
+        self.assertEqual(done.returncode, 2)
+        self.assertEqual(json.loads(done.stdout)["status"], "BLOCKED")
