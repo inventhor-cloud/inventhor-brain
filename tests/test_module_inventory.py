@@ -46,6 +46,11 @@ def audit(cat=None, obs=None, **kw):
     )
 
 
+def main_module(report, name="windows.files"):
+    return next(m for m in report["modules"]
+                if m["project_id"] == "MAIN" and m["module_id"] == name)
+
+
 class ModuleInventoryReviewTests(unittest.TestCase):
     def test_full_coverage_is_only_unattested_source_report(self):
         r = audit()
@@ -62,7 +67,7 @@ class ModuleInventoryReviewTests(unittest.TestCase):
         o = observed()
         o["modules"][0]["capabilities"].pop()
         r = audit(obs=o)
-        row = r["modules"][0]
+        row = main_module(r)
         self.assertEqual(row["reported_pass_count"], 1)
         self.assertEqual(row["status"], "PARTIAL_OR_UNVERIFIED")
         self.assertEqual(row["missing_or_unverified"], ["FILE_READ"])
@@ -70,7 +75,7 @@ class ModuleInventoryReviewTests(unittest.TestCase):
     def test_pass_without_evidence_never_counts(self):
         o = observed()
         o["modules"][0]["capabilities"][0]["evidence_ref"] = None
-        row = audit(obs=o)["modules"][0]
+        row = main_module(audit(obs=o))
         self.assertEqual(row["reported_pass_count"], 1)
         self.assertIn("FILE_LIST", row["missing_or_unverified"])
 
@@ -80,14 +85,14 @@ class ModuleInventoryReviewTests(unittest.TestCase):
             claimed("FILE_LIST", "FAIL", "QA-FAILED"),
             claimed("FILE_READ", "UNKNOWN", None),
         ]
-        row = audit(obs=o)["modules"][0]
+        row = main_module(audit(obs=o))
         self.assertEqual(row["reported_pass_count"], 0)
 
     def test_missing_module_is_not_misreported_as_installed(self):
         o = observed()
         o["modules"] = o["modules"][1:]
         r = audit(obs=o)
-        row = r["modules"][0]
+        row = main_module(r)
         self.assertEqual(row["status"], "NOT_REPORTED")
         self.assertIn("MODULE_OBSERVATION_MISSING",
                       [i["reason"] for i in r["issues"]])
@@ -95,7 +100,7 @@ class ModuleInventoryReviewTests(unittest.TestCase):
     def test_inactive_module_reports_no_coverage(self):
         o = observed()
         o["modules"][0]["status"] = "INACTIVE"
-        row = audit(obs=o)["modules"][0]
+        row = main_module(audit(obs=o))
         self.assertEqual(row["status"], "INACTIVE")
         self.assertEqual(row["reported_pass_count"], 0)
 
@@ -112,7 +117,7 @@ class ModuleInventoryReviewTests(unittest.TestCase):
         o = observed()
         o["modules"][0]["capabilities"].append(claimed("FILE_PURGE"))
         r = audit(obs=o)
-        row = r["modules"][0]
+        row = main_module(r)
         self.assertEqual(row["status"], "PARTIAL_OR_UNVERIFIED")
         self.assertEqual(row["reported_pass_count"], 2)
         self.assertEqual(row["undeclared_observed"], ["FILE_PURGE"])
@@ -124,8 +129,8 @@ class ModuleInventoryReviewTests(unittest.TestCase):
         o["modules"][1]["capabilities"].append(claimed("FILE_READ", evidence="QA-OTHER"))
         r = audit(c, o)
         self.assertEqual(r["summary"]["ambiguous_capabilities"], 1)
-        self.assertEqual(r["modules"][0]["status"], "AMBIGUOUS_OWNER")
-        self.assertEqual(r["modules"][1]["status"], "AMBIGUOUS_OWNER")
+        self.assertEqual(main_module(r)["status"], "AMBIGUOUS_OWNER")
+        self.assertEqual(main_module(r, "windows.cleanup")["status"], "AMBIGUOUS_OWNER")
         self.assertIn("AMBIGUOUS_CAPABILITY_OWNER",
                       [i["reason"] for i in r["issues"]])
 
