@@ -83,6 +83,7 @@ def evaluate_envelope(envelope: object) -> dict:
                 handoffs=envelope.get("handoffs"),
                 module_catalog=envelope.get("module_catalog"),
                 module_observations=envelope.get("module_observations"),
+                fix_memory_snapshot=envelope.get("fix_memory_snapshot"),
             )
         except (TypeError, ValueError, KeyError, OverflowError):
             return _blocked("INVALID_MAIN_CONTEXT")
