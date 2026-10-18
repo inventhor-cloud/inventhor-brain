@@ -141,3 +141,91 @@ def review_agent_lessons(report: object, *, host_snapshot_revision: str,
     ))
     return answer("LESSONS_REVIEW_READY", lessons=lessons[:max_lessons],
                   event_count=filtered)
+
+
+
+def advise_fix_memory_promotion(lesson_report: object, memory_snapshot: object, *,
+                                host_snapshot_revision: str,
+                                max_candidates: int = 4) -> dict:
+    """Suggest bounded idempotent updates to EXISTING canonical Fix Memory.
+
+    The host must attach a current, attested revision to the canonical
+    fix_memory index; old GitHub template JSON is not a live snapshot.
+    No mutation, history deletion, secret copying or second memory database.
+    """
+    def result(status: str, reason: str = "", proposals: list[dict] | None = None) -> dict:
+        return {
+            "status": status, "reason": reason,
+            "proposals": proposals or [],
+            "memory_target": "INVENTHOR_MAIN_FIX_MEMORY",
+            "source_only": True,
+            "may_write_memory": False, "may_delete_history": False,
+            "may_auto_apply_fix": False, "may_create_task": False,
+            "requires_main_snapshot_attestation": True,
+            "requires_quality_factory_review": True,
+        }
+
+    if (not isinstance(lesson_report, Mapping)
+        or lesson_report.get("status") != "LESSONS_REVIEW_READY"
+        or not isinstance(lesson_report.get("lessons"), list)
+        or len(lesson_report["lessons"]) > 32
+        or not isinstance(memory_snapshot, Mapping)
+        or not _id(host_snapshot_revision)
+        or type(max_candidates) is not int or not 1 <= max_candidates <= 32):
+        return result("BLOCKED", "INVALID_MEMORY_PROMOTION_INPUT")
+    if (type(memory_snapshot.get("schema_version")) is not int
+        or memory_snapshot.get("schema_version") != 1
+        or memory_snapshot.get("source") != "INVENTHOR_MAIN_FIX_MEMORY"
+        or memory_snapshot.get("snapshot_revision") != host_snapshot_revision
+        or not isinstance(memory_snapshot.get("fixes"), list)
+        or len(memory_snapshot["fixes"]) > 4096):
+        return result("BLOCKED", "UNPINNED_OR_INVALID_FIX_MEMORY")
+
+    stored: dict[tuple[str, str], str | None] = {}
+    for entry in memory_snapshot["fixes"]:
+        if not isinstance(entry, Mapping):
+            return result("BLOCKED", "INVALID_KNOWN_FIX_ENTRY")
+        project, fingerprint, evidence = (
+            entry.get("project_id"), entry.get("lesson_fingerprint"),
+            entry.get("verified_recovery_evidence_ref"))
+        if (not _id(project) or not _hash(fingerprint)
+            or (evidence is not None and not _id(evidence))):
+            return result("BLOCKED", "INVALID_KNOWN_FIX_ENTRY")
+        key = (project, fingerprint.lower())
+        if key in stored:
+            return result("BLOCKED", "DUPLICATE_KNOWN_FIX")
+        stored[key] = evidence
+
+    candidates = []
+    seen = set()
+    for lesson in lesson_report["lessons"]:
+        if not isinstance(lesson, Mapping):
+            return result("BLOCKED", "INVALID_LESSON_CANDIDATE")
+        project, fingerprint, evidence = (
+            lesson.get("project_id"), lesson.get("lesson_fingerprint"),
+            lesson.get("verified_recovery_evidence_ref"))
+        if (not _id(project) or not _hash(fingerprint)
+            or (evidence is not None and not _id(evidence))):
+            return result("BLOCKED", "INVALID_LESSON_CANDIDATE")
+        key = (project, fingerprint.lower())
+        if key in seen:
+            return result("BLOCKED", "DUPLICATE_LESSON_CANDIDATE")
+        seen.add(key)
+        if key not in stored:
+            action = "PROPOSE_NEW_CANONICAL_FIX_MEMORY_RECORD"
+        elif stored[key] == evidence:
+            action = "REUSE_EXISTING_CANONICAL_MEMORY"
+        elif stored[key] is None and evidence is not None:
+            action = "REVIEW_VERIFIED_RECOVERY_ENRICHMENT"
+        else:
+            action = "REVIEW_CONFLICTING_FIX_EVIDENCE"
+        candidates.append({
+            "project_id": project,
+            "lesson_fingerprint": fingerprint.lower(),
+            "next_action": action,
+            "existing_evidence_ref": stored.get(key),
+            "candidate_evidence_ref": evidence,
+        })
+    candidates.sort(key=lambda x: (x["project_id"], x["lesson_fingerprint"]))
+    return result("FIX_MEMORY_INTAKE_ADVISORY",
+                  proposals=candidates[:max_candidates])
