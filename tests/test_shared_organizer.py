@@ -102,6 +102,37 @@ class SharedOrganizerTests(unittest.TestCase):
                             [lease(expiry="2026-10-16T10:00:00Z")], "rev7", TIME)
         self.assertEqual(r["reason"], "STALE_OR_EXPIRED_LEASE_REQUIRES_HOST_RECONCILIATION")
 
+    def test_unrelated_stale_scope_does_not_freeze_entire_project(self):
+        unrelated = lease(scopes=["path:windows/audio"],
+                          expiry="2026-10-16T10:00:00Z")
+        r = assess_takeover(candidate(), "gpt", ["path:windows/core"],
+                            [unrelated], "rev7", TIME)
+        self.assertEqual(r["decision"], "HOST_LEASE_REQUIRED")
+        self.assertFalse(r["may_execute"])
+
+    def test_stale_same_task_even_disjoint_path_still_blocks(self):
+        stale_same = dict(lease(scopes=["path:windows/audio"],
+                               expiry="2026-10-16T10:00:00Z"), task_id="T1")
+        r = assess_takeover(candidate(), "gpt", ["path:windows/core"],
+                            [stale_same], "rev7", TIME)
+        self.assertEqual(r["reason"],
+                         "STALE_OR_EXPIRED_LEASE_REQUIRES_HOST_RECONCILIATION")
+
+    def test_stale_other_agent_overlap_still_blocks(self):
+        stale = lease(scopes=["path:windows/core"],
+                      expiry="2026-10-16T10:00:00Z")
+        r = assess_takeover(candidate(), "gpt", ["path:windows/core/tests"],
+                            [stale], "rev7", TIME)
+        self.assertEqual(r["decision"], "BLOCKED")
+
+    def test_malformed_unrelated_lease_fails_closed(self):
+        stale = lease(scopes=["path:windows/audio"],
+                      expiry="2026-10-16T10:00:00Z")
+        stale["scope_keys"] = []
+        r = assess_takeover(candidate(), "gpt", ["path:windows/core"],
+                            [stale], "rev7", TIME)
+        self.assertEqual(r["reason"], "MALFORMED_LEASE")
+
     def test_stale_snapshot_requires_reconciliation(self):
         r = assess_takeover(candidate(), "gpt", ["module:ui"],
                             [dict(lease(), snapshot_revision="old")], "rev7", TIME)
