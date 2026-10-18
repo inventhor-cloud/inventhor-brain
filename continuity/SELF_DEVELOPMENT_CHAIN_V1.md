@@ -94,6 +94,26 @@ Memory suggestions are bounded to four per planning call and never write, delete
 
 The same planner explicitly holds tasks marked \`provider_required=true\` if the provider price or quota has not been verified. Default missing provider-cost data is never used as proof that a provider call is free. The caller's provider permissions and budget still require live host enforcement.
 
+## Main quality feedback and daily budget reconciliation
+
+`shared_organizer/cycle_feedback.py::review_cycle_feedback` completes the **source-only proposal** for the end of one finite development step. The existing `python -m shared_organizer` adapter exposes `DEVELOPMENT_FEEDBACK_REVIEW` with a revision-pinned `handoff_packet`, `quality_feedback`, `development_ledger`, `snapshot_revision` and `host_time_iso`.
+
+The authenticated Main host must supply and verify:
+
+- The nonexecuting exact `handoff_fingerprint`, project, task, action SHA-256 and original source-tree SHA-256 from its previously selected one-step handoff.
+- A recent **Quality Factory** `VERIFIED_DONE` or `VERIFIED_FAILURE` record, the same project/task/action/tree identity, the QA evidence reference, a backup reference, a rollback-plan reference, and the actual test counts. A success cannot contain failed tests or zero passing tests.
+- The current canonical owner-local day, remaining daily steps, number of active tasks and at most 512 previously consumed handoff fingerprints from the **existing Main Development Ledger**. The ledger is host owned; this source helper does not create a second database.
+
+The advisor returns one of:
+
+1. `FEEDBACK_RECONCILIATION_ADVISORY`: propose decrementing **one** daily step and one active task, appending exactly the used handoff fingerprint, and either moving the canonical work item to the host's independent acceptance flow or recording the verified failed action for diagnosis. It does **not** itself mark the task done or launch another task.
+2. `ALREADY_RECORDED`: a prior completion for that handoff is present; propose **no mutation**, no extra budget deduction and no replay (including case-insensitive hash equality).
+3. `BLOCKED`: stale data, insufficient quota, invalid or cross-task QA evidence, missing backup/rollback plan or malformed budget history. Do not retry the same unsafe mutation.
+
+**Critical trust distinction:** the helper only checks the structure and consistency of **host-supplied claims**. A self-declared `source=INVENTHOR_QUALITY_FACTORY` value or source-only test is **not authentication**. Before applying any counter or queue change, Main must independently validate the issuer, signature/receipt, live epoch, lease and expected current revision, then perform a single atomic compare-and-swap. If any verification fails, the installed host does nothing.
+
+CI tests cover successful finish, failed finish, exhausted daily budget, duplicate callback, another project's result, stale cross-version result, time-zone day boundary, malformed untrusted data and nonexecuting CLI integration.
+
 ## Quality and full chain acceptance (remaining host tasks)
 
 Source-only Python tests validate planning, budgets, lessons and CLI. To claim **AUTONOMOUS_LOCAL_VERIFIED**, the installed Main/Operator must additionally pass:
