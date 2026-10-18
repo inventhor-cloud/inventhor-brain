@@ -124,7 +124,7 @@ def review_module_inventory(catalog: object, observations: object, *,
         pid, mid = entry.get("project_id"), entry.get("module_id")
         state = entry.get("status")
         capabilities = entry.get("capabilities")
-        if (not _identity(pid) or not _identity(mid) or state not in _STATES
+        if (not _identity(pid) or not _identity(mid) or not isinstance(state, str) or state not in _STATES
             or not isinstance(capabilities, list) or len(capabilities) > 64):
             return answer("BLOCKED", "INVALID_OPERATOR_OBSERVATION")
         key = (pid, mid.casefold())
@@ -137,7 +137,7 @@ def review_module_inventory(catalog: object, observations: object, *,
             name, result, evidence = (item.get("name"), item.get("result"),
                                       item.get("evidence_ref"))
             if (not isinstance(name, str) or not _CAP.fullmatch(name)
-                or result not in _RESULTS
+                or not isinstance(result, str) or result not in _RESULTS
                 or (evidence is not None and
                     (not isinstance(evidence, str) or not _REF.fullmatch(evidence)))
                 or name in by_cap):
