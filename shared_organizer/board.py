@@ -200,6 +200,8 @@ def assess_takeover(task: Mapping, candidate_agent: str, desired_scopes: list[st
     state = task.get("state")
     if state in _TERMINAL_NO_REPLAY:
         return result("BLOCKED", "TERMINAL_TASK_REPLAY")
+    if state in ("TODO", "BACKLOG"):
+        return result("BLOCKED", "HOST_MUST_ACTIVATE_TODO_BEFORE_WRITE_LEASE")
     if state not in ("READY", "QUEUED", "CHECKPOINTED", "WAITING_PROVIDER", "REVIEW_PENDING"):
         return result("BLOCKED", "TASK_NOT_ELIGIBLE_FOR_HANDOFF")
     timestamp = _time(host_time_iso)
@@ -242,6 +244,45 @@ def assess_takeover(task: Mapping, candidate_agent: str, desired_scopes: list[st
         return result("CONFLICT", "ANOTHER_AGENT_OWNS_OVERLAPPING_WORK",
                       sorted(set(conflicts)))
     return result("HOST_LEASE_REQUIRED", "ATOMIC_OWNER_LEASE_AND_POLICY_CHECK_REQUIRED")
+
+
+def advise_read_only_source_comparison(task: Mapping, relative_paths: list[str]) -> dict:
+    """Advisory alternative to a blocked TODO/write lease: inspect, never mutate.
+
+    Hashing already-accessible local files is not a Work Item execution and
+    must not repeatedly rewrite a task from TODO/READY. This does not grant
+    filesystem read permission. The real host enforces access, confidentiality,
+    platform boundaries and audit on any actual comparison.
+    """
+    def result(status: str, reason: str, normalized: tuple[str, ...] = ()) -> dict:
+        return {
+            "status": status, "reason": reason, "paths": list(normalized),
+            "can_propose_read_only_comparison": status == "SOURCE_COMPARISON_ADVICE",
+            "may_read_private_files": False,
+            "may_mutate_files": False, "may_merge": False,
+            "may_change_task_state": False, "may_take_ownership": False,
+            "requires_host_write_lease": False,
+            "evidence_level": "SOURCE_REFERENCE_ONLY",
+        }
+
+    if (not isinstance(task, Mapping) or not _ident(task.get("project_id"))
+        or not _ident(task.get("task_id", task.get("id")))):
+        return result("BLOCKED", "INVALID_CANONICAL_TASK")
+    state = task.get("state")
+    if state not in ("TODO", "BACKLOG", "READY", "QUEUED",
+                     "CHECKPOINTED", "WAITING_PROVIDER", "REVIEW_PENDING",
+                     "RUNNING", "BLOCKED"):
+        return result("BLOCKED", "REVIEW_TASK_STATE")
+    if (not isinstance(relative_paths, list) or not 0 < len(relative_paths) <= 256
+        or any(not _valid_scope("path:" + p) for p in relative_paths
+               if isinstance(p, str))
+        or any(not isinstance(p, str) for p in relative_paths)):
+        return result("BLOCKED", "INVALID_COMPARISON_PATHS")
+    if len({p.casefold() for p in relative_paths}) != len(relative_paths):
+        return result("BLOCKED", "DUPLICATE_COMPARISON_PATHS")
+    return result("SOURCE_COMPARISON_ADVICE",
+                  "COMPARE_HASHES_WITHOUT_TASK_MUTATION_OR_LEASE_CLAIM",
+                  tuple(relative_paths))
 
 
 VISIBLE_EVENTS = frozenset({
