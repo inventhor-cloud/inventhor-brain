@@ -560,7 +560,7 @@ def advise_next_work(projects: list[Mapping], queue: Mapping, candidate_agent: s
         return answer("HOST_LEASE_REQUIRED", {
             "project_id": pid, "task_id": task_id,
             "title": row.get("title", ""),
-            "priority": row["priority"], "queue_revision": host_snapshot_revision,
+            "priority": row.get("priority", "P4"), "queue_revision": host_snapshot_revision,
             "scope_keys": list(row["scope_keys"]),
             "next_action": ("RESUME_FROM_ATTESTED_CHECKPOINT"
                             if row["state"] in ("CHECKPOINTED", "WAITING_PROVIDER")
