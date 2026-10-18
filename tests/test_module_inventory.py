@@ -203,11 +203,31 @@ class ModuleInventoryReviewTests(unittest.TestCase):
                 o["modules"][0]["capabilities"][0]["result"] = invalid
                 self.assertEqual(audit(obs=o)["reason"], "INVALID_CAPABILITY_EVIDENCE")
 
+    def test_action_is_finite_and_specific_without_ai_provider(self):
+        self.assertEqual(main_module(audit())["next_action"],
+                         "HOST_VALIDATE_REFERENCED_QA_EVIDENCE")
+        o = observed()
+        o["modules"][0]["capabilities"] = [claimed("FILE_LIST")]
+        self.assertEqual(main_module(audit(obs=o))["next_action"],
+                         "RUN_MISSING_CAPABILITY_QA_AND_VERIFY")
+        o["modules"][0]["status"] = "INACTIVE"
+        self.assertEqual(main_module(audit(obs=o))["next_action"],
+                         "INSPECT_MODULE_RUNTIME_STATE")
+        o["modules"].pop(0)
+        self.assertEqual(main_module(audit(obs=o))["next_action"],
+                         "REQUEST_FRESH_OPERATOR_INVENTORY")
+        c = catalog()
+        c["modules"][1]["declared_capabilities"].append("FILE_READ")
+        o = observed()
+        o["modules"][1]["capabilities"].append(claimed("FILE_READ", evidence="OTHER-QA"))
+        self.assertEqual(main_module(audit(c, o))["next_action"],
+                         "ASK_OWNER_TO_SELECT_CAPABILITY_ROUTE")
+
     def test_no_binary_data_and_no_implicit_writes(self):
         r = audit()
         self.assertTrue(all(set(m) == {
             "project_id", "module_id", "status", "declared_count",
             "reported_pass_count", "missing_or_unverified", "undeclared_observed",
-            "ambiguous_capabilities", "coverage_basis",
+            "ambiguous_capabilities", "next_action", "coverage_basis",
         } for m in r["modules"]))
         self.assertNotIn("QA-123", str(r))
