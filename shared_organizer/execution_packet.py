@@ -84,7 +84,7 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
     source_hash = source_plan.get("source_tree_sha256")
     base_commit = source_plan.get("base_commit")
     pr_commit = source_plan.get("candidate_commit")
-    failures = source_plan.get("prior_failed_action_hashes", [])
+    failures = source_plan.get("prior_failed_action_hashes")
     provider_required = source_plan.get("provider_required", False)
     quota_verified = source_plan.get("provider_quota_verified", False)
     if (type(provider_required) is not bool or type(quota_verified) is not bool
@@ -104,7 +104,9 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
     if action_hash.lower() in {f.lower() for f in failures}:
         return answer("HOLD_REPEATED_FAILURE", "IDENTICAL_FAILED_ACTION_REQUIRES_NEW_PLAN")
     max_files = candidate.get("max_changed_files_per_step")
+    budget_file_limit = budget.get("max_changed_files_per_step")
     if (type(max_files) is not int or not 1 <= max_files <= 256
+        or type(budget_file_limit) is not int or budget_file_limit != max_files
         or changed > max_files):
         return answer("BLOCKED", "OWNER_FILE_BATCH_LIMIT")
     if (type(budget.get("steps_available_this_cycle")) is not int
@@ -112,10 +114,13 @@ def review_operator_handoff(chain_advice: object, source_plan: object, *,
         return answer("BLOCKED", "OWNER_CYCLE_BUDGET_EXHAUSTED")
     if (type(budget.get("active_tasks")) is not int
         or type(budget.get("max_parallel_tasks")) is not int
+        or budget["active_tasks"] < 0
+        or not 1 <= budget["max_parallel_tasks"] <= 32
         or budget["active_tasks"] >= budget["max_parallel_tasks"]):
         return answer("BLOCKED", "OWNER_PARALLEL_LIMIT_REACHED")
     if (type(budget.get("paid_providers_enabled")) is not bool
-        or type(budget.get("provider_budget_units_remaining")) is not int):
+        or type(budget.get("provider_budget_units_remaining")) is not int
+        or budget["provider_budget_units_remaining"] < 0):
         return answer("BLOCKED", "INVALID_PROVIDER_POLICY")
     if cost and not budget["paid_providers_enabled"]:
         return answer("BLOCKED", "PAID_PROVIDER_DISABLED")
