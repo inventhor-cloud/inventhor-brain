@@ -1,7 +1,8 @@
 """Read-only Main Organizer advisory adapter for an authenticated host.
 
 One <=1 MiB JSON envelope via stdin. Supports existing canonical WORK_CONTINUE
-and explicitly selected source-only MODULE_INVENTORY_REVIEW / OWNER_MODULE_REQUEST.
+and explicitly selected source-only Inventory, owner-module, agent-learning and
+self-development-chain reviews.
 No filesystem, network, queue write, provider, claim or background worker.
 
 This module is NOT an alternate intent router, installer or task scheduler.
@@ -12,6 +13,8 @@ import json
 import sys
 
 from .board import advise_next_work
+from .agent_learning import review_agent_lessons
+from .development_chain import review_development_chain
 from .inventory import review_module_inventory
 from .owner_modules import review_owner_module_request
 
@@ -47,6 +50,37 @@ def evaluate_envelope(envelope: object) -> dict:
                 envelope["module_request"], envelope["catalog"],
                 host_snapshot_revision=envelope["snapshot_revision"],
                 host_time_iso=envelope["host_time_iso"],
+            )
+        except (TypeError, ValueError, KeyError, OverflowError):
+            return _blocked("INVALID_MAIN_CONTEXT")
+
+    if intent in ("AGENT_LESSON_REVIEW", "DEVELOPMENT_CHAIN_REVIEW"):
+        required = ("agent_report", "snapshot_revision", "host_time_iso")
+        if any(k not in envelope for k in required):
+            return _blocked("MISSING_MAIN_CONTEXT")
+        try:
+            if intent == "AGENT_LESSON_REVIEW":
+                return review_agent_lessons(
+                    envelope["agent_report"],
+                    host_snapshot_revision=envelope["snapshot_revision"],
+                    host_time_iso=envelope["host_time_iso"],
+                    project_id=envelope.get("project_id"),
+                )
+            required_chain = (
+                "projects", "queue", "settings", "quality_report",
+                "candidate_agent", "active_leases",
+            )
+            if any(k not in envelope for k in required_chain):
+                return _blocked("MISSING_MAIN_CONTEXT")
+            return review_development_chain(
+                envelope["projects"], envelope["queue"], envelope["settings"],
+                envelope["quality_report"], envelope["agent_report"],
+                candidate_agent=envelope["candidate_agent"],
+                active_leases=envelope["active_leases"],
+                host_snapshot_revision=envelope["snapshot_revision"],
+                host_time_iso=envelope["host_time_iso"],
+                project_id=envelope.get("project_id"),
+                handoffs=envelope.get("handoffs"),
             )
         except (TypeError, ValueError, KeyError, OverflowError):
             return _blocked("INVALID_MAIN_CONTEXT")
@@ -106,6 +140,8 @@ def main() -> int:
         "HOST_LEASE_REQUIRED", "SOURCE_COVERAGE_REVIEW",
         "OWNER_CHOICE_READY_FOR_HOST_VALIDATION",
         "REVIEW_EXISTING_MODULE_EXTENSION",
+        "LESSONS_REVIEW_READY", "NEXT_DEVELOPMENT_STEP_ADVISORY",
+        "NO_SAFE_STEP", "PAUSED",
     ) else 2
 
 
