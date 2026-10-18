@@ -3,7 +3,8 @@ import json
 import subprocess
 import sys
 from shared_organizer.__main__ import evaluate_envelope
-from shared_organizer.board import view, assess_takeover, event_inbox, review_resume_packet, advise_next_work
+from shared_organizer.board import (view, assess_takeover, event_inbox, review_resume_packet,
+                                    advise_next_work, advise_read_only_source_comparison)
 
 PROJECTS = [
     {"project_id": "P-A", "title": "Operator", "objective": "Unattended work",
@@ -112,6 +113,41 @@ class SharedOrganizerTests(unittest.TestCase):
                 self.assertEqual(
                     assess_takeover(candidate(state), "gpt", ["module:ui"], [], "rev7", TIME)["reason"],
                     "TERMINAL_TASK_REPLAY")
+
+    def test_todo_write_handoff_identifies_exact_host_activation(self):
+        r = assess_takeover(candidate("TODO"), "codex",
+                            ["path:windows/core"], [], "rev7", TIME)
+        self.assertEqual(r["decision"], "BLOCKED")
+        self.assertEqual(r["reason"], "HOST_MUST_ACTIVATE_TODO_BEFORE_WRITE_LEASE")
+        self.assertFalse(r["may_execute"])
+        self.assertFalse(r["may_take_ownership"])
+
+    def test_read_only_comparison_no_task_flip_or_host_lease(self):
+        r = advise_read_only_source_comparison(candidate("TODO"),
+                 ["windows/src/Inventhor.Operator.Core/TaskEngine.cs",
+                  "windows/src/Inventhor.Operator.Core/ModuleManager.cs"])
+        self.assertEqual(r["status"], "SOURCE_COMPARISON_ADVICE")
+        self.assertEqual(len(r["paths"]), 2)
+        self.assertTrue(r["can_propose_read_only_comparison"])
+        self.assertFalse(r["requires_host_write_lease"])
+        self.assertFalse(r["may_read_private_files"])
+        self.assertFalse(r["may_mutate_files"])
+        self.assertFalse(r["may_change_task_state"])
+        self.assertFalse(r["may_take_ownership"])
+
+    def test_read_only_comparison_does_not_replay_terminal_execution(self):
+        r = advise_read_only_source_comparison(candidate("BS"), ["foo/bar.cs"])
+        self.assertEqual(r["status"], "BLOCKED")
+        self.assertFalse(r["may_merge"])
+
+    def test_read_only_comparison_refuses_traversal_or_duplicate_paths(self):
+        for paths in (["../secret"], ["windows/../secret"],
+                      ["src/A.cs", "SRC/a.cs"], ["C:/secrets/file"],
+                      [], [None]):
+            with self.subTest(paths=paths):
+                r = advise_read_only_source_comparison(candidate("TODO"), paths)
+                self.assertEqual(r["status"], "BLOCKED")
+                self.assertFalse(r["can_propose_read_only_comparison"])
 
     def test_running_task_no_duplicate(self):
         r = assess_takeover(candidate("RUNNING"), "gpt", ["module:ui"], [], "rev7", TIME)
