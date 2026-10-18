@@ -64,6 +64,21 @@ Use only structured Main-replicated **event records**, never copied private chat
 - No model fine-tuning or new paid service is needed for deterministic error learning. Higher-level semantic generalization can use an optional owner-configured provider *later*, only with data boundaries and budget.
 
 
+## Pinned Main → Operator handoff packet
+
+The existing read-only Main adapter now supports \`OPERATOR_HANDOFF_REVIEW\`. Main submits the last \`NEXT_DEVELOPMENT_STEP_ADVISORY\`, a **separately prepared** task-specific source plan and the same \`snapshot_revision\`. \`shared_organizer.execution_packet.review_operator_handoff\` checks:
+
+- exact immutable \`PROJECT_ID + TASK_ID\`, unchanged queue revision and valid canonical file/module scope;
+- full 40-character base + candidate commit pins and a 64-character source-tree SHA-256 claim;
+- operation/action SHA-256, \`step_kind\`, file-count limit and the **owner budget**'s corresponding file limit;
+- *explicit* prior failed-action fingerprint list (missing history is not treated as empty), repeat failure, available cycle budget, concurrent-job limit, zero-paid-provider default, and provider quota;
+- deterministic project/task/source/action/step/scope fingerprint to help Main deduplicate an exact retry;
+- required actual Main owner/scope/lease CAS, independent backup/rollback and Quality Factory acceptance.
+
+The resulting \`HOST_HANDOFF_PACKET_READY\` packet is **not executable**: \`execution_allowed=false\`, no host authentication/lease receipt, no arbitrary shell commands and no ability to install, spend or overwrite. The authenticated Main host must recheck all original catalog/task/lease revisions and exact on-disk hashes at actual write time, create a separate authorization receipt and issue work to the current installed Operator. A GitHub draft passing source tests does **not** activate this workflow in the running PC.
+
+This operational step list is not a product allowlist: it does not limit which owner-chosen apps or module types may be built. It constrains the provenance and size of code changes to avoid recreating Codex-style branch and file collisions.
+
 ## Gap detection and durable Fix Memory handoff
 
 With optional revision-pinned \`module_catalog\` and \`module_observations\` supplied by the authentic host, the same chain can produce one \`inventory_gap_for_main_intake\` suggestion. It has stable SHA-256 \`suggestion_fingerprint\`, existing-task matches, the project/module/capability and an explicit \`next_action\`. Suggestions always have \`proposed_task_id=null\` and \`may_create_task=false\`; Main Owner Work Intake is responsible for validating source evidence and de-duplicating before registering any new Work Item. Verified terminal work is never automatically replayed.
