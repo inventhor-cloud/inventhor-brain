@@ -242,6 +242,32 @@ class GovernedDevelopmentChainTests(unittest.TestCase):
         self.assertFalse(r["may_spend_money"])
         self.assertFalse(r["may_execute"])
 
+    def test_unknown_provider_price_does_not_count_as_free(self):
+        q = queue()
+        q["work_items"][1]["provider_required"] = True
+        r = chain(q=q)
+        self.assertEqual(r["status"], "NO_SAFE_STEP")
+        self.assertIn("PROVIDER_COST_ESTIMATE_MISSING",
+                      [x["reason"] for x in r["diagnostics"]])
+
+    def test_provider_quota_must_be_attested_even_at_zero_price(self):
+        q = queue()
+        q["work_items"][1]["provider_required"] = True
+        q["work_items"][1]["estimated_provider_cost_units"] = 0
+        r = chain(q=q)
+        self.assertEqual(r["status"], "NO_SAFE_STEP")
+        self.assertIn("PROVIDER_QUOTA_UNVERIFIED",
+                      [x["reason"] for x in r["diagnostics"]])
+        q["work_items"][1]["provider_quota_verified"] = True
+        r = chain(q=q)
+        self.assertEqual(r["status"], "NEXT_DEVELOPMENT_STEP_ADVISORY")
+        self.assertFalse(r["may_spend_money"])
+
+    def test_nonboolean_provider_requirements_rejected(self):
+        q = queue()
+        q["work_items"][1]["provider_required"] = "false"
+        self.assertEqual(chain(q=q)["reason"], "INVALID_PROVIDER_REQUIREMENT")
+
     def test_owner_adjustable_file_change_limit(self):
         q = queue()
         q["work_items"][1]["estimated_changed_files"] = 5
