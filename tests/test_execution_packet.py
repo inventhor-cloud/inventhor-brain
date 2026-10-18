@@ -150,6 +150,8 @@ class ExecutionHandoffTests(unittest.TestCase):
         self.assertEqual(review(p=p)["reason"], "OWNER_FILE_BATCH_LIMIT")
         a = advice()
         a["candidate"]["max_changed_files_per_step"] = 5
+        self.assertEqual(review(a=a, p=p)["reason"], "OWNER_FILE_BATCH_LIMIT")
+        a["budget"]["max_changed_files_per_step"] = 5
         self.assertEqual(review(a=a, p=p)["status"], "HOST_HANDOFF_PACKET_READY")
 
     def test_owner_paused_or_busy_budget_stops_handoff(self):
