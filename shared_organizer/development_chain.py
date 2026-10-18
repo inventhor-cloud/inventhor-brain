@@ -224,11 +224,21 @@ def review_development_chain(projects: object, queue: object, settings: object,
             if (pid, failure.lower()) in holds:
                 copy["state"] = "WAITING_REVIEW"
                 report(tid, "HOLD_REPEATED_AGENT_FAILURE")
-        # Provider cost refers to a host-recorded plan estimate, not price
-        # speculation. No cost or unknown estimate => use cheap local steps.
+        # Host-marked provider work must carry a verified quota and an explicit
+        # price estimate. Unknown pricing is NOT automatically treated as free.
+        provider = r.get("provider_required", False)
+        quota_verified = r.get("provider_quota_verified", False)
+        if type(provider) is not bool or type(quota_verified) is not bool:
+            return response("BLOCKED", "INVALID_PROVIDER_REQUIREMENT", budget=budget)
         cost = r.get("estimated_provider_cost_units", 0)
         if type(cost) is not int or cost < 0:
             return response("BLOCKED", "INVALID_PROVIDER_COST_ESTIMATE", budget=budget)
+        if provider and "estimated_provider_cost_units" not in r:
+            copy["state"] = "WAITING_APPROVAL"
+            report(tid, "PROVIDER_COST_ESTIMATE_MISSING")
+        if provider and not quota_verified:
+            copy["state"] = "WAITING_APPROVAL"
+            report(tid, "PROVIDER_QUOTA_UNVERIFIED")
         if cost and not settings["paid_providers_enabled"]:
             copy["state"] = "WAITING_APPROVAL"
             report(tid, "PAID_PROVIDER_DISABLED_BY_OWNER")
