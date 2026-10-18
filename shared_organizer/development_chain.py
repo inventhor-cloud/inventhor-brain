@@ -11,9 +11,11 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import datetime, timezone
+import hashlib
 import re
 
 from .agent_learning import review_agent_lessons
+from .inventory import review_module_inventory
 from .board import advise_next_work, _queue_rows
 
 _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}\Z")
@@ -41,7 +43,9 @@ def review_development_chain(projects: object, queue: object, settings: object,
                              candidate_agent: str, active_leases: object,
                              host_snapshot_revision: str, host_time_iso: str,
                              project_id: str | None = None,
-                             handoffs: list[Mapping] | None = None) -> dict:
+                             handoffs: list[Mapping] | None = None,
+                             module_catalog: object = None,
+                             module_observations: object = None) -> dict:
     """Suggest at most one next canonical work item based on verified prerequisites.
 
     Settings are an owner-adjustable Main-snapshot policy *reference*, never
@@ -51,12 +55,14 @@ def review_development_chain(projects: object, queue: object, settings: object,
     def response(status: str, reason: str = "", candidate: dict | None = None,
                  diagnostics: list[dict] | None = None,
                  learning: list[dict] | None = None,
-                 budget: dict | None = None) -> dict:
+                 budget: dict | None = None,
+                 inventory_gap: dict | None = None) -> dict:
         return {
             "status": status, "reason": reason,
             "candidate": candidate, "diagnostics": diagnostics or [],
             "learning_suggestions": learning or [],
             "budget": budget or {},
+            "inventory_gap_for_main_intake": inventory_gap,
             "state": "SOURCE_REFERENCE_ONLY",
             "may_execute": False, "may_claim_task": False,
             "may_create_task": False, "may_install": False,
@@ -146,6 +152,18 @@ def review_development_chain(projects: object, queue: object, settings: object,
         return response("BLOCKED", "UNTRUSTED_CANONICAL_WORK_QUEUE",
                         diagnostics=[{"reason": str(ex)}], budget=budget)
     by_key = {(r["project_id"], r.get("task_id", r.get("id"))): r for r in rows}
+    gap = None
+    if module_catalog is not None or module_observations is not None:
+        if module_catalog is None or module_observations is None:
+            return response("BLOCKED", "INCOMPLETE_INVENTORY_SNAPSHOT", budget=budget)
+        inventory = review_module_inventory(
+            module_catalog, module_observations,
+            host_snapshot_revision=host_snapshot_revision,
+            host_time_iso=host_time_iso, project_id=project_id,
+        )
+        if inventory["status"] != "SOURCE_COVERAGE_REVIEW":
+            return response("BLOCKED", "INVENTORY_" + inventory["reason"], budget=budget)
+        gap = _propose_inventory_gap(inventory["modules"], rows, project_id)
     diagnostics: list[dict] = []
     def report(tid: str, reason: str) -> None:
         if len(diagnostics) < 64:
@@ -235,7 +253,8 @@ def review_development_chain(projects: object, queue: object, settings: object,
     diagnostics.extend(advice.get("diagnostics", [])[:max(0, 64-len(diagnostics))])
     if advice["status"] != "HOST_LEASE_REQUIRED":
         return response("NO_SAFE_STEP", advice["status"], diagnostics=diagnostics,
-                        learning=lessons["lessons"], budget=budget)
+                        learning=lessons["lessons"], budget=budget,
+                        inventory_gap=gap)
     choice = dict(advice["candidate"])
     task = by_key[(choice["project_id"], choice["task_id"])]
     failure = task.get("last_failure_fingerprint")
@@ -247,4 +266,63 @@ def review_development_chain(projects: object, queue: object, settings: object,
     return response("NEXT_DEVELOPMENT_STEP_ADVISORY",
                     "MAIN_HOST_MUST_REVALIDATE_AND_ACQUIRE_LEASE",
                     candidate=choice, diagnostics=diagnostics,
-                    learning=lessons["lessons"], budget=budget)
+                    learning=lessons["lessons"], budget=budget,
+                    inventory_gap=gap)
+
+
+
+def _propose_inventory_gap(modules: list[dict], rows: list[Mapping],
+                           project_id: str | None) -> dict | None:
+    """Give canonical Main Work Intake one smallest *suggestion*, not a Task ID.
+
+    A capability claim or missing observation is not authority to change code.
+    Fingerprints are deterministic, project-scoped, and match existing queue
+    records before Main decides whether a new Work Item is appropriate.
+    """
+    candidates = []
+    for module in modules:
+        pid, mid = module["project_id"], module["module_id"]
+        if project_id is not None and project_id != pid:
+            continue
+        for cap in module["missing_or_unverified"]:
+            candidates.append((pid, mid, cap, "VERIFY_DECLARED_CAPABILITY"))
+        for cap in module["ambiguous_capabilities"]:
+            candidates.append((pid, mid, cap, "REVIEW_OWNER_CAPABILITY_ROUTE"))
+    for pid, mid, cap, kind in sorted(set(candidates)):
+        raw = "\0".join(("capability-gap-v1", pid, mid.casefold(), cap, kind))
+        fingerprint = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+        matches = []
+        for row in rows:
+            if row["project_id"] != pid:
+                continue
+            same_fingerprint = (
+                isinstance(row.get("work_fingerprint"), str)
+                and row["work_fingerprint"].lower() == fingerprint)
+            same_target = (
+                row.get("target_module_id", "").casefold()
+                == mid.casefold() and row.get("target_capability") == cap
+                if isinstance(row.get("target_module_id"), str) else False)
+            if same_fingerprint or same_target:
+                matches.append(row)
+        if len(matches) > 1:
+            next_action = "HOST_RECONCILE_DUPLICATE_EXISTING_WORK"
+        elif matches:
+            next_action = ("HOST_REVIEW_TERMINAL_EVIDENCE"
+                           if matches[0].get("state") in _TERMINAL
+                           else "TRACK_EXISTING_WORK_ITEM")
+        else:
+            next_action = "PROPOSE_TO_EXISTING_MAIN_WORK_INTAKE"
+        return {
+            "project_id": pid, "module_id": mid, "capability": cap,
+            "kind": kind, "suggestion_fingerprint": fingerprint,
+            "scope_hint": "module:" + mid,
+            "matched_task_ids": sorted(
+                str(row.get("task_id", row.get("id"))) for row in matches),
+            "proposed_task_id": None,
+            "next_action": next_action,
+            "needs_main_owner_work_intake": True,
+            "requires_fresh_quality_evidence": True,
+            "may_create_task": False,
+            "may_install": False,
+        }
+    return None
