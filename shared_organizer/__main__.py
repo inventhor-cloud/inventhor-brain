@@ -16,6 +16,7 @@ from .board import advise_next_work
 from .agent_learning import review_agent_lessons
 from .development_chain import review_development_chain
 from .execution_packet import review_operator_handoff
+from .cycle_feedback import review_cycle_feedback
 from .inventory import review_module_inventory
 from .owner_modules import review_owner_module_request
 
@@ -89,6 +90,21 @@ def evaluate_envelope(envelope: object) -> dict:
         except (TypeError, ValueError, KeyError, OverflowError):
             return _blocked("INVALID_MAIN_CONTEXT")
 
+    if intent == "DEVELOPMENT_FEEDBACK_REVIEW":
+        required = ("handoff_packet", "quality_feedback", "development_ledger",
+                    "snapshot_revision", "host_time_iso")
+        if any(key not in envelope for key in required):
+            return _blocked("MISSING_MAIN_CONTEXT")
+        try:
+            return review_cycle_feedback(
+                envelope["handoff_packet"], envelope["quality_feedback"],
+                envelope["development_ledger"],
+                host_snapshot_revision=envelope["snapshot_revision"],
+                host_time_iso=envelope["host_time_iso"],
+            )
+        except (TypeError, ValueError, KeyError, OverflowError, AttributeError):
+            return _blocked("INVALID_MAIN_CONTEXT")
+
     if intent == "OPERATOR_HANDOFF_REVIEW":
         required = ("chain_advice", "source_plan", "snapshot_revision")
         if any(key not in envelope for key in required):
@@ -158,6 +174,7 @@ def main() -> int:
         "REVIEW_EXISTING_MODULE_EXTENSION",
         "LESSONS_REVIEW_READY", "NEXT_DEVELOPMENT_STEP_ADVISORY",
         "NO_SAFE_STEP", "PAUSED", "HOST_HANDOFF_PACKET_READY",
+        "FEEDBACK_RECONCILIATION_ADVISORY", "ALREADY_RECORDED",
     ) else 2
 
 
