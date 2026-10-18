@@ -1,5 +1,10 @@
 import copy
+import json
+import subprocess
+import sys
 import unittest
+
+from shared_organizer.__main__ import evaluate_envelope
 
 from shared_organizer.execution_packet import review_operator_handoff
 
@@ -198,3 +203,45 @@ class ExecutionHandoffTests(unittest.TestCase):
             self.assertNotIn(key, packet)
         self.assertEqual(packet["quality_gates"][-1],
                          "MAIN_QUALITY_FACTORY_ACCEPTANCE")
+
+
+
+class MainOperatorHandoffAdapterTests(unittest.TestCase):
+    def envelope(self):
+        return {
+            "schema_version": 1,
+            "intent": "OPERATOR_HANDOFF_REVIEW",
+            "snapshot_revision": REV,
+            "chain_advice": advice(),
+            "source_plan": plan(),
+        }
+
+    def test_existing_main_adapter_issues_one_unprivileged_packet(self):
+        r = evaluate_envelope(self.envelope())
+        self.assertEqual(r["status"], "HOST_HANDOFF_PACKET_READY")
+        self.assertFalse(r["may_execute"])
+        self.assertIsNone(r["packet"]["host_lease_receipt"])
+
+    def test_cli_reports_single_machine_readable_packet_without_side_effects(self):
+        run = subprocess.run(
+            [sys.executable, "-m", "shared_organizer"],
+            input=json.dumps(self.envelope()),
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(len(run.stdout.splitlines()), 1)
+        out = json.loads(run.stdout)
+        self.assertEqual(out["status"], "HOST_HANDOFF_PACKET_READY")
+        self.assertFalse(out["packet"]["execution_allowed"])
+
+    def test_cli_rejects_direct_instruction_to_execute(self):
+        inp = self.envelope()
+        inp["execute"] = True
+        r = evaluate_envelope(inp)
+        self.assertEqual(r["status"], "UNTRUSTED_EXECUTION_FLAGS")
+
+    def test_cli_rejects_missing_pins_instead_of_using_defaults(self):
+        inp = self.envelope()
+        del inp["source_plan"]
+        r = evaluate_envelope(inp)
+        self.assertEqual(r["status"], "MISSING_MAIN_CONTEXT")
