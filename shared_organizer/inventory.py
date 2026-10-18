@@ -183,12 +183,20 @@ def review_module_inventory(catalog: object, observations: object, *,
                   else "AMBIGUOUS_OWNER" if ambiguous
                   else "REPORTED_COMPLETE" if not missing and not unexpected
                   else "PARTIAL_OR_UNVERIFIED")
+        next_action = {
+            "NOT_REPORTED": "REQUEST_FRESH_OPERATOR_INVENTORY",
+            "INACTIVE": "INSPECT_MODULE_RUNTIME_STATE",
+            "AMBIGUOUS_OWNER": "ASK_OWNER_TO_SELECT_CAPABILITY_ROUTE",
+            "PARTIAL_OR_UNVERIFIED": "RUN_MISSING_CAPABILITY_QA_AND_VERIFY",
+            "REPORTED_COMPLETE": "HOST_VALIDATE_REFERENCED_QA_EVIDENCE",
+        }[status]
         modules.append({
             "project_id": pid, "module_id": mid, "status": status,
             "declared_count": len(declared), "reported_pass_count": len(passes),
             "missing_or_unverified": missing,
             "undeclared_observed": unexpected,
             "ambiguous_capabilities": ambiguous,
+            "next_action": next_action,
             "coverage_basis": "CLAIM_WITH_EVIDENCE_REFERENCE_NOT_ATTESTED",
         })
         if observation is None:
