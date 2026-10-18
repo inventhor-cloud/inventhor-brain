@@ -63,6 +63,22 @@ Use only structured Main-replicated **event records**, never copied private chat
 - Repeated calls produce deterministic \`lesson_fingerprint\` values. Main must persist the appropriate lesson/evidence only after authenticating source and verifying referenced artifacts.
 - No model fine-tuning or new paid service is needed for deterministic error learning. Higher-level semantic generalization can use an optional owner-configured provider *later*, only with data boundaries and budget.
 
+
+## Gap detection and durable Fix Memory handoff
+
+With optional revision-pinned \`module_catalog\` and \`module_observations\` supplied by the authentic host, the same chain can produce one \`inventory_gap_for_main_intake\` suggestion. It has stable SHA-256 \`suggestion_fingerprint\`, existing-task matches, the project/module/capability and an explicit \`next_action\`. Suggestions always have \`proposed_task_id=null\` and \`may_create_task=false\`; Main Owner Work Intake is responsible for validating source evidence and de-duplicating before registering any new Work Item. Verified terminal work is never automatically replayed.
+
+\`advise_fix_memory_promotion\` accepts a current, host-attested \`INVENTHOR_MAIN_FIX_MEMORY\` snapshot and new cross-agent lessons. It suggests one of:
+
+- \`PROPOSE_NEW_CANONICAL_FIX_MEMORY_RECORD\`: genuinely new lesson fingerprint
+- \`REUSE_EXISTING_CANONICAL_MEMORY\`: identical lesson and evidence already known
+- \`REVIEW_VERIFIED_RECOVERY_ENRICHMENT\`: earlier lesson exists, newly verified repair could enrich it
+- \`REVIEW_CONFLICTING_FIX_EVIDENCE\`: preserved prior proof conflicts with the newer proof
+
+Memory suggestions are bounded to four per planning call and never write, delete or overwrite the canonical Fix Memory ledger. Existing \`fix_memory/fix_memory_index.json\` is a **legacy GitHub template** with no live revision; it cannot itself be treated as an attested Main memory snapshot. Main host must supply the new revisioned envelope, verify Quality Factory receipts and persist proposals through its own authorized memory workflow.
+
+The same planner explicitly holds tasks marked \`provider_required=true\` if the provider price or quota has not been verified. Default missing provider-cost data is never used as proof that a provider call is free. The caller's provider permissions and budget still require live host enforcement.
+
 ## Quality and full chain acceptance (remaining host tasks)
 
 Source-only Python tests validate planning, budgets, lessons and CLI. To claim **AUTONOMOUS_LOCAL_VERIFIED**, the installed Main/Operator must additionally pass:
