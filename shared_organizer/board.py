@@ -218,25 +218,27 @@ def assess_takeover(task: Mapping, candidate_agent: str, desired_scopes: list[st
             continue
         if lease.get("project_id") != task["project_id"]:
             continue
-        if lease.get("snapshot_revision") != host_snapshot_revision:
-            stale = True
-            continue
-        expires = _time(lease.get("expires_at"))
-        if expires is None or expires <= timestamp:
-            stale = True   # Never silently steal stale/expired lease.
-            continue
         agent = lease.get("agent_id")
         scope_keys = lease.get("scope_keys")
         if not _ident(agent) or not isinstance(scope_keys, list) or not scope_keys:
             return result("BLOCKED", "MALFORMED_LEASE")
         if any(not _valid_scope(s) for s in scope_keys):
             return result("BLOCKED", "INVALID_LEASE_SCOPE")
-        if agent != candidate_agent and any(
+        same_task = lease.get("task_id") == task.get("task_id", task.get("id"))
+        overlapping = any(
             _scope_conflict(requested, occupied)
             for requested in desired_scopes for occupied in scope_keys
-        ):
-            conflicts.append(agent)
-        if lease.get("task_id") == task.get("task_id", task.get("id")) and agent != candidate_agent:
+        )
+        expires = _time(lease.get("expires_at"))
+        if (lease.get("snapshot_revision") != host_snapshot_revision
+            or expires is None or expires <= timestamp):
+            # Do not freeze unrelated scopes merely because another task in
+            # the same project has a stale lease. Overlap or same-task reuse
+            # still fails closed, including when the agent ID matches.
+            if same_task or overlapping:
+                stale = True
+            continue
+        if agent != candidate_agent and (overlapping or same_task):
             conflicts.append(agent)
     if stale:
         return result("BLOCKED", "STALE_OR_EXPIRED_LEASE_REQUIRES_HOST_RECONCILIATION")
