@@ -44,6 +44,8 @@ def advise_parallel_lanes(
         or not _ident(candidate_agent) or not _ident(host_snapshot_revision)
         or (project_id is not None and not _ident(project_id))):
         return answer("INVALID_INPUT")
+    if queue.get("snapshot_revision") != host_snapshot_revision:
+        return answer("UNVERSIONED_OR_MISMATCHED_SNAPSHOT")
     if (type(settings.get("schema_version")) is not int
         or settings.get("schema_version") != 1
         or settings.get("source") != "INVENTHOR_MAIN_SETTINGS"
