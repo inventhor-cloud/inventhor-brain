@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.5.0",
   "entries": [
     {
       "id": "pre_action_query_route",
@@ -56,6 +56,34 @@
     {
       "id": "merge_candidate_router",
       "purpose": "Suggest reuse/merge/link decisions to the Brain while keeping final semantic decisions in INVENTHOR."
+    },
+    {
+      "id": "evidence_aware_module_inventory",
+      "purpose": "Read-only audit of per-project module capability completeness, missing evidence, stale observations and ambiguous ownership; host must independently verify."
+    },
+    {
+      "id": "owner_open_module_intake",
+      "purpose": "Plan owner-selected custom modules and extension of existing modules without vendor, provider or product category whitelist; Main host verifies owner and performs authorized installation."
+    },
+    {
+      "id": "bounded_development_chain",
+      "purpose": "Owner-adjustable free-first finite Main work progression: verified dependency receipts, quota/file limits, duplicate fingerprint prevention, one host-lease candidate only."
+    },
+    {
+      "id": "cross_agent_recovery_learning",
+      "purpose": "Project-scoped learning from Codex and other agents' failures and independently verified repairs; create bounded reuse advisories, never auto-apply unknown patches."
+    },
+    {
+      "id": "inventory_gap_owner_intake_bridge",
+      "purpose": "Deterministically identify missing module capability and match stable fingerprint against existing Main Work Items before proposing a new intake; never silently create a task."
+    },
+    {
+      "id": "pinned_main_operator_work_handoff",
+      "purpose": "Produce source-only, project-and-task pinned single-step Main→Operator handoff fingerprint; enforce owner file/provider limits, failed action dedupe and required Main atomic lease/Quality Factory gates."
+    },
+    {
+      "id": "idempotent_development_cycle_feedback",
+      "purpose": "Reconcile attested Main/Operator Quality Factory completion into a source-only proposed daily step/active-task budget update, never replay a handoff or grant execution."
     }
   ]
 }

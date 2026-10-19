@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "source": "INVENTHOR_MAIN_SETTINGS",
+  "snapshot_revision": "EXAMPLE_ONLY_NOT_A_HOST_REVISION",
+  "enabled": true,
+  "max_steps_per_cycle": 1,
+  "steps_remaining_today": 4,
+  "max_parallel_tasks": 1,
+  "active_tasks": 0,
+  "max_changed_files_per_step": 4,
+  "paid_providers_enabled": false,
+  "provider_budget_units_remaining": 0,
+  "purpose": "Reference defaults for future Main Settings UI. NOT LIVE SETTINGS. The authenticated Main host must store owner choices, reset daily counters, maintain atomic leases and pass a current attested snapshot."
+}

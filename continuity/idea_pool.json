@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-09-22T20:32:00+02:00",
+  "updated_at": "2026-10-17T20:56:00+02:00",
   "ideas": [
     {
       "id": "IDEA-PC-DEEP-CLEAN",
@@ -43,6 +43,206 @@
       "state": "IN_PROGRESS",
       "after": "P0-core",
       "notes": "Performance, cleanup, processes, services, storage, network, startup, software updates, desktop control and power/system."
+    },
+    {
+      "id": "IDEA-INVENTHOR-FAMILY-EDUCATION",
+      "project_id": "INVENTHOR_MAIN",
+      "title": "INVENTHOR Family personalized tutoring / Aile Eğitim Asistanı",
+      "state": "IDEA_POOL",
+      "priority": "P1_PROPOSED",
+      "after": "P0_AUTHENTICATED_MAIN",
+      "architecture_ref": "continuity/FAMILY_EDUCATION_ARCHITECTURE_V1.md",
+      "notes": "Owner proposal 2026-10-16: adult foreign-language practice, child-specific English/German, mathematics/science/school subjects, adaptive micro-lessons, tests, spaced review, guardian-governed child profiles and private per-learner progress. Main owns routing and authorization; extend existing Language/Memory domains with optional subject skill packs. No duplicate brain, no advertising or public learner data. Draft idea, not canonical live Work Item or deployed feature. Owner additional requirements: strong bidirectional German/Turkish/English translation, instant opt-in chat translation, and opt-in Viktorija-inspired word marking, tap details, fill-in-word and fill-in-letters inside family chat; Main remains authenticated host and no duplicate Viktorija app. Owner clarification 2026-10-17: primary product goal is TEACHING; translation and Viktorija-inspired chat tools are optional learning aids, not the outcome. Owner addition 2026-10-17: optional music teaching and vocal coach, guided pitch/rhythm/voice practice, virtual instruments, supportive DE/EN pronunciation activities; permissions, child vocal comfort and no default recording required.",
+      "language_priorities": [
+        "de",
+        "en"
+      ],
+      "chat_translation_pairs": [
+        "de-tr",
+        "tr-de",
+        "de-en",
+        "en-de",
+        "tr-en",
+        "en-tr"
+      ],
+      "chat_learning_optional": {
+        "default_enabled": false,
+        "features": [
+          "word_marker_red_unknown",
+          "word_marker_green_user_focus",
+          "tap_word_detail",
+          "word_completion_cloze",
+          "letter_completion",
+          "spaced_review_candidate"
+        ],
+        "independent_student_profiles": true,
+        "child_guardian_controls": true,
+        "existing_language_brain_ref": "inventhor-cloud/inventhor-brain-language:docs/OPTIONAL_CHAT_WORD_LEARNING_V1.md",
+        "runtime_status": "SOURCE_ONLY_NOT_INSTALLED"
+      },
+      "primary_goal": "TEACHING_AND_VERIFIED_LEARNING",
+      "supporting_tools": [
+        "instant_translation",
+        "contextual_word_explanation",
+        "chat_word_markers",
+        "word_completion",
+        "letter_completion",
+        "spoken_practice"
+      ],
+      "teaching_cycle": [
+        "diagnose_level",
+        "explain_small_concept",
+        "guided_practice",
+        "correct_with_reason",
+        "independent_check",
+        "spaced_review",
+        "record_verified_progress"
+      ],
+      "acceptance_criterion": "Learner independently demonstrates understanding on new examples and later review; translation or revealing an answer never counts as mastery.",
+      "music_teaching_optional": {
+        "status": "IDEA_POOL_SOURCE_ONLY",
+        "primary_goal": "MUSIC_SKILL_TEACHING_AND_VERIFIED_PROGRESS",
+        "subject_modes": [
+          "music_theory_rhythm_pitch",
+          "vocal_coach",
+          "virtual_instruments",
+          "music_supported_language_practice"
+        ],
+        "vocal_coach_v1": [
+          "gentle_warmup",
+          "listen_repeat_notes",
+          "approximate_pitch_high_low_feedback",
+          "timing_and_rhythm",
+          "short_positive_guided_retry"
+        ],
+        "later": [
+          "midi_instrument_adapter",
+          "real_time_pitch_analysis",
+          "composition",
+          "repertoire"
+        ],
+        "requirements": [
+          "age_appropriate",
+          "no_strained_singing",
+          "microphone_opt_in",
+          "guardian_permission_for_children",
+          "local_processing_first",
+          "no_default_voice_recording",
+          "no_medical_diagnosis",
+          "licensed_or_original_music_content",
+          "independent_delayed_progress_check"
+        ],
+        "owner": "INVENTHOR_MAIN",
+        "runtime_status": "NOT_INSTALLED"
+      },
+      "research_media_optional": {
+        "reused_from": "INVENTHOR_MAIN repair/research_media.py",
+        "purpose": "teacher-approved video/images/reference explanations when they materially assist learning",
+        "status": "SOURCE_ONLY_NOT_RENDERED"
+      }
+    },
+    {
+      "id": "IDEA-INVENTHOR-UNIVERSAL-REPAIR",
+      "project_id": "INVENTHOR_MAIN",
+      "title": "INVENTHOR Universal Repair & Vehicle Diagnostics / Evrensel Tamir ve Araç Bağlantısı",
+      "state": "IDEA_POOL",
+      "priority": "P1_PROPOSED",
+      "after": "P0_AUTHENTICATED_MAIN",
+      "architecture_ref": "continuity/UNIVERSAL_REPAIR_VEHICLE_ARCHITECTURE_V1.md",
+      "owner_intent": "Any device from electronics and appliances to automotive, heavy vehicle, bicycle and industrial machinery; build best extensible adapter platform, not brand-restricted.",
+      "capability_domains": [
+        "electronics",
+        "computer_phone",
+        "home_appliance",
+        "home_electrical",
+        "hvac",
+        "plumbing",
+        "audio",
+        "vehicle",
+        "motorcycle",
+        "bicycle",
+        "power_tool",
+        "industrial"
+      ],
+      "visual_policy": {
+        "priority": [
+          "user_photo_with_consent",
+          "verified_model_and_revision_service_reference",
+          "existing_approved_visual",
+          "labeled_generic_generated_explanation_only_if_needed"
+        ],
+        "never_invent": [
+          "pinouts",
+          "wiring_geometry",
+          "measurement_test_points",
+          "component_location",
+          "torque_values",
+          "safety_critical_procedure"
+        ],
+        "default_generate": false
+      },
+      "vehicle_connection": {
+        "adapters": [
+          "OBD_GENERIC",
+          "OBDONUDS",
+          "UDS_CAN",
+          "DOIP",
+          "J2534",
+          "J1939",
+          "OEM_TOOL",
+          "OTHER_VERIFIED"
+        ],
+        "read": [
+          "DISCOVER",
+          "READ_IDENTIFICATION",
+          "READ_DTC",
+          "READ_FREEZE_FRAME",
+          "READ_LIVE_DATA",
+          "READ_OEM_MODULE_STATUS"
+        ],
+        "advanced": [
+          "CLEAR_DTC",
+          "SERVICE_RESET",
+          "ACTUATOR_TEST",
+          "CALIBRATION",
+          "ADAPTATION",
+          "ECU_CODING",
+          "ECU_PROGRAMMING",
+          "SECURITY_SERVICE"
+        ],
+        "authority": "INVENTHOR_MAIN per-session/policy/owner attestation and supported OEM/hardware capability",
+        "status": "SOURCE_PLAN_ONLY_NO_VEHICLE_LINK"
+      },
+      "source_modules": [
+        "repair/triage.py",
+        "repair/vehicle_policy.py",
+        "education/repair_visual_policy.py"
+      ],
+      "notes": "User requested fullest future feature range and vehicle connection without arbitrary vendor/category limits. Preserve one Main and Organizer. Actual device compatibility, OEM access, qualified hazardous work, backups, Main session leases and hardware tests remain required; no bus write or hardware session is implemented. User-visible SOURCE_ONLY. Owner addition: INVENTHOR researches YouTube/Google/Yandex/other allowed providers itself and displays sourced videos/images/technical manuals in its own screen when platform allows, preserving OEM provenance and avoiding invented circuit details. Main gateway/provider integration and WebView not yet built.",
+      "research_media_center": {
+        "architecture_ref": "continuity/RESEARCH_MEDIA_CENTER_V1.md",
+        "source_module": "repair/research_media.py",
+        "test_module": "tests/test_research_media.py",
+        "provider_targets": [
+          "YOUTUBE",
+          "GOOGLE",
+          "YANDEX",
+          "OEM",
+          "TECHNICAL_FORUM",
+          "GENERAL_WEB",
+          "OTHER_VERIFIED"
+        ],
+        "media_kinds": [
+          "VIDEO",
+          "IMAGE",
+          "DOCUMENT",
+          "WEBPAGE"
+        ],
+        "presentation": "INVENTHOR existing repair/chat UI: step-by-step guidance beside sourced video, image, schematic, web tabs; official embedded video only when provider permissions and UI runtime confirm",
+        "prioritization": "exact-device-and-revision manufacturer source outranks user video; no fabricated measurement points or pinouts",
+        "cost_policy": "free-tier-first; Main approved provider quotas; no automatic media downloading",
+        "status": "SOURCE_ONLY_NOT_SEARCHING_OR_RENDERING"
+      }
     }
   ]
 }

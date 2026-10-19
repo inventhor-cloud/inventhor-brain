@@ -1,0 +1,39 @@
+name: Source-only Organizer regression checks
+on:
+  pull_request:
+    paths:
+      - "shared_organizer/**"
+      - "education/**"
+      - "tests/**"
+      - "continuity/**"
+      - "fix_memory/**"
+      - "logic_registry.json"
+      - "module_catalog.json"
+      - ".github/workflows/shared-organizer-source-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  organizer-source-tests:
+    name: Pure-Python source preflight (not runtime acceptance)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Run deterministic Organizer tests (stdlib, no network calls)
+        shell: bash
+        run: python3 -m unittest discover -s tests -v
+      - name: Parse Organizer modules without importing optional hosts
+        shell: bash
+        run: python3 -m compileall -q shared_organizer education
+      - name: Parse developer budgets and registry manifests
+        shell: bash
+        run: |
+          python3 -m json.tool logic_registry.json >/dev/null
+          python3 -m json.tool module_catalog.json >/dev/null
+          python3 -m json.tool continuity/SELF_DEVELOPMENT_SETTINGS.example.json >/dev/null
+          python3 -m json.tool fix_memory/fix_memory_index.json >/dev/null
