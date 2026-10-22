@@ -39,3 +39,22 @@ Codex QA Fabrikası üzerinde çalışırken bu Beyin değişiklikleri ayrı kol
 **Güven sınırı:** Bu salt-okunur araç, canlı `revision`, `observed_at`, proje/bağımlılık doğrulaması, atomik kilit, native preflight veya güvenilir QA imzasını **sağlamaz**. Bu alanları sahte değerlerle doldurmak kesinlikle yasaktır. Mutasyon için ayrıca mevcut kanonik .NET Organizer içinde owner-kontrollü ve doğrulanmış atomik adaptör uygulanmalıdır.
 
 Kaynak testleri: `python3 -m unittest discover -s tests -v` (hem süreklilik kapısı hem CLI salt-okunur köprü negatif testleri). Yerel PC'ye uygulanmış olduğunun kanıtı değildir. İşbirliği sınırı aynı: Codex Fabika ve Studio üzerinde çalışırken bu Beyin dalı Main/Operator kurulu dosyalarına yazmaz.
+
+
+## GPT / Codex / INVENTHOR için küçük, güvenli devir görünümü
+
+Var olan native `Tool.exe handoff` çağrısını yeni bir servis oluşturmadan okumak için:
+`continuity/organizer_cli_reader.py` (SHA-256 ile sabitlenmiş salt-okunur dosya çağrısı),
+`continuity/provider_resume_view.py` (yalnız sınırlı, uygun alanları içeren; kimlik bilgisine benzeyen metni maskeleyen ortak JSON görünümü) ve
+`tools/show_native_task_resume.py` (tek görev kimliği için komut satırı aracı) eklendi.
+
+Yetkili bilgisayarda örnek (yollar ve SHA **ilgili yerel operatör tarafından** gerçek dosyadan sağlanmalıdır):
+
+```sh
+python tools/show_native_task_resume.py --tool <TRUSTED_INSTALLED_TOOL_PATH> --organizer-root <CANONICAL_ORGANIZER_ROOT> --tool-sha256 <PINNED_APPROVED_64_HEX_SHA256> --task <EXACT_TASK_ID>
+```
+
+Çıktı yalnızca `NATIVE_TASK_READ_ONLY_REFERENCE` sınıfındadır. `write_authorized=false`,
+`install_verified=false` ve `live_qa_verified=false` sabittir. Alanlar: görev/durum, aktif çalışan, checkpoint aşaması, tamamlanan/kalan iş, sınırlı kanıt referansları ve sonraki işlem. Eksik alanlar tahmin edilmez; kısa liste olarak kalır.
+
+Önemli: Python görünümü native .NET Organizer'dan **canlı revizyon ve atomik sahiplik kilidi** almadan iş yapmaya başlamaz. Salt-okunur geçmiş gösterimi, işi otomatik başlatan claim/preflight/ACK/dispatch mekanizması değildir. Bundan sonraki geliştirme tek kanonik .NET host içindeki gerçek `revision + observed_at + dependencies + preflight` bağlayıcısı ve kesinti/çatışma sınamalarıdır. Codex'in QA Fabrikası sürümü ile bu işi karıştırma.
