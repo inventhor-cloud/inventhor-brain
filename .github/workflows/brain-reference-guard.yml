@@ -1,0 +1,19 @@
+name: Brain reference freshness
+on:
+  pull_request:
+    paths:
+      - "CONTINUE_HERE.md"
+      - "continuity/**"
+      - "tools/verify_reference_freshness.py"
+      - ".github/workflows/brain-reference-guard.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public mirror cannot advertise stale live work
+        run: python3 tools/verify_reference_freshness.py
