@@ -57,7 +57,7 @@ class ResumeViewTests(unittest.TestCase):
         before = dict(native.task)
         packet = project_native_handoff(native)
         self.assertEqual(dict(native.task), before)
-        self.assertNotIn("lease", packet.as_json())
+        self.assertNotIn("lease", json.loads(packet.as_json()))
 
     def test_bad_source_and_task_id_denied(self):
         original = read_task()
