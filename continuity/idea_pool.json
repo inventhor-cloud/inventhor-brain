@@ -44,5 +44,10 @@
       "after": "P0-core",
       "notes": "Performance, cleanup, processes, services, storage, network, startup, software updates, desktop control and power/system."
     }
-  ]
+  ],
+  "runtime_authoritative": false,
+  "reference_snapshot_only": true,
+  "state_freshness": "UNVERIFIED",
+  "freshness_policy_path": "continuity/LIVE_SOURCE_FRESHNESS_GATE.md",
+  "ideas_do_not_preempt_active_work": true
 }
