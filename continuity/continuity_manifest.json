@@ -37,5 +37,12 @@
     }
   ],
   "work_queue_path": "continuity/work_queue.json",
-  "owner_work_intake_policy_path": "continuity/OWNER_WORK_INTAKE_POLICY.md"
+  "owner_work_intake_policy_path": "continuity/OWNER_WORK_INTAKE_POLICY.md",
+  "runtime_authoritative": false,
+  "reference_snapshot_only": true,
+  "live_task_handoff_required": true,
+  "freshness_policy_path": "continuity/LIVE_SOURCE_FRESHNESS_GATE.md",
+  "policy_revision_date": "2026-10-22",
+  "state_freshness": "UNVERIFIED",
+  "cloud_role": "SANITISED_REFERENCE_ONLY"
 }
