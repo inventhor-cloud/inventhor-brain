@@ -30,3 +30,12 @@ Mevcut `Inventhor.WorkOrganizer.Tool.exe handoff` tamamlanan/kalan alanlarını 
 Kaynak testleri: `python3 -m unittest discover -s tests -v`. Bu testsuite, **yerel Organizer değil sahte bir yetkili port** kullanır; gerçek UI veya yüklü uygulama başarısını kanıtlamaz. GitHub değişikliği görev dağıtımı başlatmaz. Gerçek başarı: kurulu Operator'da bir işin doğrulanmış kontrol noktası ile bir ajandan diğerine devri, aynı işin yeniden oynatılmaması ve güncel ACK/kanıtla sonuçlanmasıdır.
 
 Codex QA Fabrikası üzerinde çalışırken bu Beyin değişiklikleri ayrı kolda kalır; mevcut PC'ye yazma yetkisi veya sınırsız provider kullanımı gerektirmez.
+
+
+## Mevcut Organizer'ın salt-okunur köprüsü
+
+`continuity/organizer_cli_reader.py` dosyası kaynak geliştirme için güvenli bir ilk bağlayıcıdır. Sahibi tarafından önceden belirlenmiş tam `Tool.exe` yolu, mevcut Organizer kökü ve **sabitlenmiş SHA-256** olmadan okumayı reddeder. Yeni bir havuz veya işlem başlatmaz; yalnızca doğrudan `handoff --root=... --task=...` komutunu, kabuk aracılığıyla komut birleştirmeden çalıştırır. Yanlış görev kimliği, beklenmeyen kaynak türü, bozulmuş çıktı veya değişmiş yürütülebilir dosya reddedilir.
+
+**Güven sınırı:** Bu salt-okunur araç, canlı `revision`, `observed_at`, proje/bağımlılık doğrulaması, atomik kilit, native preflight veya güvenilir QA imzasını **sağlamaz**. Bu alanları sahte değerlerle doldurmak kesinlikle yasaktır. Mutasyon için ayrıca mevcut kanonik .NET Organizer içinde owner-kontrollü ve doğrulanmış atomik adaptör uygulanmalıdır.
+
+Kaynak testleri: `python3 -m unittest discover -s tests -v` (hem süreklilik kapısı hem CLI salt-okunur köprü negatif testleri). Yerel PC'ye uygulanmış olduğunun kanıtı değildir. İşbirliği sınırı aynı: Codex Fabika ve Studio üzerinde çalışırken bu Beyin dalı Main/Operator kurulu dosyalarına yazmaz.
