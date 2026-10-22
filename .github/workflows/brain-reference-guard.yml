@@ -5,6 +5,7 @@ on:
       - "CONTINUE_HERE.md"
       - "continuity/**"
       - "tools/verify_reference_freshness.py"
+      - "tests/**"
       - ".github/workflows/brain-reference-guard.yml"
   workflow_dispatch:
 permissions:
@@ -17,3 +18,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify public mirror cannot advertise stale live work
         run: python3 tools/verify_reference_freshness.py
+      - name: Run provider-neutral live handoff safety tests
+        run: python3 -m unittest discover -s tests -v
