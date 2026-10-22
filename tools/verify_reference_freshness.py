@@ -64,6 +64,12 @@ def validate(root: Path) -> list[str]:
     if queue.get("owner_runtime_task_id_required") is not True:
         errors.append("queue: must require a canonical runtime task ID")
 
+    ideas_path = "continuity/idea_pool.json"
+    ideas = read_json(ideas_path)
+    require_reference_only(ideas_path, ideas)
+    if ideas.get("ideas_do_not_preempt_active_work") is not True:
+        errors.append("ideas: backlog intake must not preempt active work")
+
     declared = [
         manifest.get("idea_pool_path"),
         manifest.get("resume_protocol_path"),
