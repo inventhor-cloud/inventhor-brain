@@ -46,3 +46,11 @@ SOURCE_IMPLEMENTED is not RUNTIME_VERIFIED.
 CI_PASS is not LOCAL_DEPLOYED.
 LOCAL_DEPLOYED is not END_TO_END_CONNECTED.
 DONE requires project-specific evidence.
+
+## Live-state safety and current scope (2026-10-22)
+
+This public repository is a **reference snapshot**, not current task ownership or runtime readiness evidence. Before *any* execution, every agent (currently GPT, Codex or INVENTHOR) must obtain the exact canonical task ID and live task-scoped handoff directly from the owner-authorized Main/Organizer interface. A missing live handoff, missing write lease, unresolved dependency or stale epoch denies mutation, not just completion reporting. See [LIVE_SOURCE_FRESHNESS_GATE.md](LIVE_SOURCE_FRESHNESS_GATE.md).
+
+At handoff, persist separately: verified completed steps, still-open steps, evidence refs and verified hashes, task target and active owner, blocker, exact next safe step; planned handoff releases the lease and next agent rereads current state. If the execution result is uncertain, reconcile rather than blind retry.
+
+New owner ideas are collected/deduplicated in the canonical idea pool by default, **without preempting the current QA Factory goal**. New provider integrations and adaptive task distribution are future backlog; only GPT/Codex/INVENTHOR coordination is in the immediate scope. Live implementation and tests are required before any claim that this protocol automatically runs.
