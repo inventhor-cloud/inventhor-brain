@@ -163,7 +163,8 @@ def propose_next(
                 break
             seen_deps.add(dep_id)
             # Native host must verify the dependency evidence, not a provider.
-            if index.get(dep_id, {}).get("state") != "DONE":
+            if (dep.get("state") != "DONE"
+                or index.get(dep_id, {}).get("state") != "DONE"):
                 missing = True
         if missing:
             deferred.append((task_id, "DEPENDENCY_NOT_CONFIRMED_DONE"))
