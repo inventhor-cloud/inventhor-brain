@@ -64,3 +64,7 @@ Beyin, mevcut owner-approved ACTIVE plan kapsamındaki en küçük izinli hazır
 `continuity/decision_trace.py` her öneri için belirli bir JSON görünümü ve SHA-256 parmak izi üretir. Bu parmak izi **denetim/dedup içindir, imza veya Native ACK değildir**. Yürütme yine mevcut Main/Organizer üzerinde taze sahiplik, kilit ve preflight doğrulaması ister. Tamamlanan/kalan/kanıt ayrı checkpoint alanlarına girilip serbest bırakıldıktan sonra sıradaki ajan verileri tekrar okur.
 
 İlk kaynak doğrulaması GitHub Python testlerindedir; çalışan PC'ye bağlama, imzalı kurulum ve gerçek QA acceptance hâlâ ayrı açık işlerdir. Yetkisiz terminal görev replay, taslak QA'yı READY yapma veya kaynak testinden CANLI kurulum çıkarma yasaktır.
+
+## Ajan kimliğini insan kimliğinden ayırma (2026-10-23)
+
+Hangi oturumda, hangi `TASK_ID` için, kimin yazdığı native host tarafından doğrulanmadan bir model yanıtı **Owner/insan mesajı** veya gerçek yürütme kanıtı sayılmaz. `continuity/agent_action_origin.py` kaynak düzeyindeki iç görev önerilerini `AUTOMATED_AGENT` etiketiyle hazırlar; ChatGPT kullanıcı sohbeti, e-posta ve diğer dış mesaj hedeflerini reddeder. `continuity/AGENT_ACTION_ORIGIN_POLICY.md` bu sınırı ayrıntılı tanımlar. Bu kod tek başına canlı yetki, mesaj gönderimi, native olay kaydı veya bir sohbet mesajının asıl yazarını kanıtlamaz.
