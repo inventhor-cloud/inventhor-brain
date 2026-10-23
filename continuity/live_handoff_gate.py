@@ -139,7 +139,12 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
         raise HandoffDenied("INVALID_DETAIL")
     mode: Literal["READ_ONLY", "WRITE_CLAIMED"] = "READ_ONLY"
     if write:
-        if state not in ("TODO", "DOING"):
+        if state == "DOING":
+            # An orphaned RUNNING/DOING task is not implicitly available even
+            # when a prior worker is missing from a cached projection.
+            # Only the native Organizer reconciliation path may reopen it.
+            raise HandoffDenied("ACTIVE_TASK_REQUIRES_NATIVE_RECONCILIATION")
+        if state != "TODO":
             raise HandoffDenied("NOT_WRITABLE_STATE")
         deps = raw.get("dependencies")
         if not isinstance(deps, list) or len(deps) > MAX_ITEMS:
