@@ -134,7 +134,7 @@ def prepare_read_only_attachment(
         state=trusted.state,
         completed=view.completed,
         remaining=view.remaining,
-        checkpoint_stage=view.checkpoint_stage or trusted.stage,
+        checkpoint_stage=view.checkpoint_stage,
         next_action=view.next_action,
         display=view,
     )
