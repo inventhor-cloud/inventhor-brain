@@ -95,6 +95,20 @@ class GateTests(unittest.TestCase):
         self.deny("LEASE_REQUIRES_RECONCILIATION", p, write=True)
         self.assertEqual(p.claims, 0)
 
+    def test_orphan_doing_is_never_reclaimed_from_source_projection(self):
+        p = NativeFake()
+        p.data["state"] = "DOING"
+        p.data["active_worker"] = None
+        self.deny("ACTIVE_TASK_REQUIRES_NATIVE_RECONCILIATION", p, write=True)
+        self.assertEqual(p.claims, 0)
+
+    def test_doing_already_owned_requires_reconciliation_even_if_same_worker(self):
+        p = NativeFake()
+        p.data["state"] = "DOING"
+        p.data["active_worker"] = "GPT"
+        self.deny("ACTIVE_TASK_REQUIRES_NATIVE_RECONCILIATION", p, write=True)
+        self.assertEqual(p.claims, 0)
+
     def test_terminal_no_replay(self):
         for state in ("DONE", "BLOCKED", "VERIFY", "ARCHIVED", "IDEA"):
             p = NativeFake(); p.data["state"] = state
