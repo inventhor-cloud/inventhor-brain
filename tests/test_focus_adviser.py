@@ -13,7 +13,8 @@ def focus():
     return FocusEnvelope(
         plan_id="QA_070_OWNER_PLAN", project_id="INVENTHOR_QA",
         focus_task_id="IDEA_QA_CANONICAL", target_id="INVENTHOR_OPERATOR",
-        plan_revision=4, observed_at=NOW,
+        plan_revision=4, plan_state="ACTIVE", remaining_dispatches=2,
+        observed_at=NOW,
         authorized_work_ids=("STEP_A", "STEP_B"),
         allowed_capabilities=("SYSTEM_STATUS", "HASH"),
     )
@@ -82,6 +83,19 @@ class FocusAdviserTests(unittest.TestCase):
 
     def test_denies_public_mirror_without_trusted_host(self):
         self.denied("NATIVE_SNAPSHOT_REQUIRED", verified=False)
+
+    def test_completed_or_paused_plan_not_selected(self):
+        for state in ("COMPLETED", "PAUSED", "CANCELLED", "UNKNOWN"):
+            d = dict(focus().__dict__)
+            d["plan_state"] = state
+            self.denied("PLAN_NOT_ACTIVE", plan=FocusEnvelope(**d))
+
+    def test_plan_dispatch_budget_must_be_available(self):
+        for budget in (0, -1, 65, True, "2", None):
+            d = dict(focus().__dict__)
+            d["remaining_dispatches"] = budget
+            self.denied("PLAN_BUDGET_EXHAUSTED_OR_INVALID",
+                        plan=FocusEnvelope(**d))
 
     def test_stale_and_future_plan(self):
         self.denied("STALE_FOCUS_SNAPSHOT",
