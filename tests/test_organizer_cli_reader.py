@@ -77,6 +77,16 @@ class CliHandoffTests(unittest.TestCase):
         self.deny("PINNED_NATIVE_TOOL_CHANGED", reader.read_task, "QA_TASK")
         self.assertEqual(self.calls, [])
 
+    def test_tool_changed_during_invocation_is_rejected(self):
+        def changed_binary_during_read(args, **opts):
+            self.calls.append((args, opts))
+            self.tool.write_bytes(b"replaced while running")
+            return native_result()
+        self.invoker = changed_binary_during_read
+        self.deny("PINNED_NATIVE_TOOL_CHANGED",
+                  self.reader().read_task, "QA_TASK")
+        self.assertEqual(len(self.calls), 1)
+
     def test_rejects_noncanonical_and_wrong_task(self):
         self.response = native_result(source="GITHUB_OLD_SNAPSHOT")
         self.deny("NON_CANONICAL_HANDOFF", self.reader().read_task, "QA_TASK")
