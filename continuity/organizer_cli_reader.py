@@ -76,6 +76,10 @@ class OrganizerCliReader:
                                  text=True, timeout=10, check=False)
         except (OSError, subprocess.TimeoutExpired) as e:
             raise NativeHandoffUnavailable("NATIVE_HANDOFF_UNAVAILABLE") from e
+        # Detect at least substitutions during invocation. This is a second
+        # integrity observation, NOT an Authenticode/ACL/TOCTOU guarantee:
+        # installed native host must separately enforce those properties.
+        self._verify_pinned_tool()
         if result.returncode != 0:
             raise NativeHandoffUnavailable("NATIVE_HANDOFF_REFUSED")
         if not isinstance(result.stdout, str) or len(result.stdout) > MAX_OUTPUT:
