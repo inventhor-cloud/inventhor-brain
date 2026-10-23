@@ -31,6 +31,8 @@ class FocusEnvelope:
     focus_task_id: str
     target_id: str
     plan_revision: int
+    plan_state: str
+    remaining_dispatches: int
     observed_at: datetime
     authorized_work_ids: tuple[str, ...]
     allowed_capabilities: tuple[str, ...]
@@ -92,6 +94,11 @@ def propose_next(
         _identity(getattr(envelope, key), key.upper())
     if type(envelope.plan_revision) is not int or envelope.plan_revision < 1:
         raise FocusDenied("INVALID_PLAN_REVISION")
+    if envelope.plan_state != "ACTIVE":
+        raise FocusDenied("PLAN_NOT_ACTIVE")
+    if (type(envelope.remaining_dispatches) is not int
+        or not 1 <= envelope.remaining_dispatches <= MAX_TASKS):
+        raise FocusDenied("PLAN_BUDGET_EXHAUSTED_OR_INVALID")
     current = _aware(now)
     observed = _aware(envelope.observed_at)
     if observed > current + timedelta(seconds=5) or current - observed > MAX_AGE:
