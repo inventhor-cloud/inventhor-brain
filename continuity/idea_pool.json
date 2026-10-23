@@ -43,6 +43,13 @@
       "state": "IN_PROGRESS",
       "after": "P0-core",
       "notes": "Performance, cleanup, processes, services, storage, network, startup, software updates, desktop control and power/system."
+    },
+    {
+      "id": "IDEA-HOSTED-APP-FACTORY-SERVICE",
+      "title": "Hosted INVENTHOR App Factory client portal",
+      "state": "IDEA_POOL",
+      "after": "QA_FACTORY_LIVE_ACCEPTANCE_AND_BRAIN_OPERATOR_NATIVE_CONTINUITY",
+      "notes": "Future product: customers submit scoped application requests via an isolated customer portal; central owner-controlled INVENTHOR Brain/Operator/Design Studio/QA Factory builds and quality-gates deliverables; owner release approval; tenant data separation, explicit quotes/payment/entitlements. Do not copy owner private Brain state to customers. Self-hosted/portable licensing is a separate later option. This is a non-executable public concept, not pricing, code, or deployment authorization."
     }
   ],
   "runtime_authoritative": false,
