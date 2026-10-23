@@ -6,7 +6,7 @@ Status: SOURCE_TESTED_ONLY. Not installed or dispatched. Owner focus remains QA 
 
 The new Python module continuity/focus_adviser.py is a deterministic, in-memory adviser. It neither invents Work Items nor writes to a queue, claims a lease, calls a model, signs evidence, or executes an Operator command. This avoids a duplicate Brain/Organizer.
 
-It accepts ONE native approved plan with plan ID, revision, exact approved Work Item IDs, target, parent goal, project, capability whitelist, and an up-to-date consistent native task snapshot. The host must authenticate these inputs; a boolean supplied by any AI is NOT authentication.
+It accepts ONE native approved plan with plan ID, revision, ACTIVE plan state, remaining dispatch budget, exact approved Work Item IDs, target, parent goal, project, capability whitelist, and an up-to-date consistent native task snapshot. The host must authenticate these inputs; a boolean supplied by any AI is NOT authentication.
 
 The adviser proposes only existing finite TODO tasks with the correct project, target and parent; no active owner; exact allowed capability; verified DONE dependencies visible within the same native snapshot; bounded estimated steps (1..8), priority (0..3, 0 highest). It chooses lowest priority number, then shortest number of steps, then stable task ID. Missing or contradictory dependency evidence blocks the task. A new idea cannot preempt QA until the owner promotes its actual registered Work Item via the canonical Organizer.
 
@@ -14,7 +14,7 @@ All outputs are advisory ONLY: claim_authorized=false, can_execute_from_proposal
 
 ## Required existing .NET runtime attachment
 
-1. Verify original owner-approved plan, exact task scope, project and capability against the canonical Organizer ledger and immutable event history.
+1. Verify original owner-approved ACTIVE plan, positive remaining dispatch budget, exact task scope, project and capability against the canonical Organizer ledger and immutable event history.
 2. Load current live tasks, dependencies, lock owners and an actual monotonic revision from one consistent native epoch. Never fabricate revision, UTC observation time, installed QA status, signer or PID.
 3. Call the read-only adviser and receive one proposed exact task ID plus stable reasons.
 4. Under the existing Organizer lock reread task state and expected work hash. Perform native task lease/ownership and fresh preflight-show/ack/verify before WRITE. Never rely on the Python proposal as permission.
