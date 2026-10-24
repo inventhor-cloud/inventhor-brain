@@ -144,6 +144,24 @@ class BrainTurnIntegrationTests(unittest.TestCase):
         h.focus = replace(h.focus, project_id="OTHER_PROJECT")
         self.denied("FOCUS_TASK_SCOPE_MISMATCH", host=h)
 
+    def test_terminal_focus_cannot_reopen_child_work(self):
+        for state in ("DONE", "ARCHIVED"):
+            c, h = TestCli(), TestHost()
+            c.task["state"] = state
+            h.task["state"] = state
+            with self.subTest(state=state):
+                self.denied("FOCUS_TASK_TERMINAL_NO_REPLAY", cli=c, host=h)
+            self.assertEqual(h.focus_calls, 0)
+            self.assertEqual(h.actor_calls, 0)
+
+    def test_orphan_doing_parent_requires_native_reconciliation(self):
+        c, h = TestCli(), TestHost()
+        c.task["state"] = "DOING"
+        h.task["state"] = "DOING"
+        self.denied("FOCUS_ORPHAN_REQUIRES_NATIVE_RECONCILIATION", cli=c, host=h)
+        self.assertEqual(h.focus_calls, 0)
+        self.assertEqual(h.actor_calls, 0)
+
     def test_untrusted_owner_plan_rejected(self):
         h = TestHost()
         h.plan_verified = False
