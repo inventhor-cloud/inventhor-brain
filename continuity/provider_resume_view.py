@@ -27,8 +27,8 @@ _SECRET = re.compile(
 # Native Organizer retains the originals; only this display projection masks.
 _PRIVATE_LOCATION = re.compile(
     r"(?:[A-Za-z]:[\\/]|\\\\[^\\\s/]+[\\/]|file://"
-    r"|/(?:home|Users|root|mnt|media|Volumes)(?:/|\\b)"
-    r"|https?://\\S+\\?\\S+)",
+    r"|/(?:home|Users|root|mnt|media|Volumes)(?:/|\b)"
+    r"|https?://\S+\?\S+)",
     re.IGNORECASE,
 )
 _MAX_LIST = 24
