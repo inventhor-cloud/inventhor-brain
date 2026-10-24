@@ -58,3 +58,12 @@ python tools/show_native_task_resume.py --tool <TRUSTED_INSTALLED_TOOL_PATH> --o
 `install_verified=false` ve `live_qa_verified=false` sabittir. Alanlar: görev/durum, aktif çalışan, checkpoint aşaması, tamamlanan/kalan iş, sınırlı kanıt referansları ve sonraki işlem. Eksik alanlar tahmin edilmez; kısa liste olarak kalır.
 
 Önemli: Python görünümü native .NET Organizer'dan **canlı revizyon ve atomik sahiplik kilidi** almadan iş yapmaya başlamaz. Salt-okunur geçmiş gösterimi, işi otomatik başlatan claim/preflight/ACK/dispatch mekanizması değildir. Bundan sonraki geliştirme tek kanonik .NET host içindeki gerçek `revision + observed_at + dependencies + preflight` bağlayıcısı ve kesinti/çatışma sınamalarıdır. Codex'in QA Fabrikası sürümü ile bu işi karıştırma.
+
+
+## Kurtarma ve Android aşaması (2026-10-24)
+
+Kaynak geliştirme dalında `continuity/interruption_recovery.py`, Owner tarafından yetkilendirilmiş gerçek native Organizer denetim portunun sunduğu güncel görev/deneme kaydına bakarak yalnız **kurtarma tavsiyesi** üretir. `PREPARED`, `STARTED`, `UNKNOWN` veya `CONFIRMED_SUCCEEDED` eylemden sonra durum tekrar çalıştırılmaz: önce native uzlaştırma gerekir. `CONFIRMED_FAILED` bile gerçek makbuz ve kalan deneme bütçesi olduğunda yalnız native retry kuralına gönderilir. DONE/ARCHIVED tekrar çalıştırılmaz, DOING ve yabancı çalışan kilidi otomatik ele geçirilmez. Bu Python kodu herhangi bir native retry, task claim, işlem başlatma veya kayıt yazma gerçekleştirmez.
+
+Ücretsiz ek provider adayları `provider_independence/free_provider_candidates_20261024.json` içinde yalnız araştırma olarak tutuluyor; `provider_candidate_gate.py` sağlayıcıları **etkinleştirmez**. Ücretsiz sohbet hakkı otomatik API hakkı değildir. Özel müşteri/owner verisi ücretsiz dış API'ye izin verilmeksizin gönderilemez. Yerel Ollama tarzı aday bile uygun yerel kaynak ve açık gizlilik yapılandırması gerektirir.
+
+**Android INVENTHOR eşlikçi uygulaması**, mevcut kanonik fikir havuzunda `IDEA-ANDROID-INVENTHOR-CONTROL-BRIDGE` olarak QA canlı kurulum kabulünden sonraya alındı. Telefon yalnız güvenli sohbet/kontrol/onay yüzeyi olur; tek Beyin, Organizer ve Operator yetkili PC'de kalır. Ajanlar yalnız kayda geçirilmiş native Provider Gateway kapasiteleri, izinleri, kota ve kaynak bütçesi üzerinden seçilebilir. Android uygulamasında anahtar/Owner hesap bilgileri kopyalanmaz; cihaz eşleştirme, iptal, tekrar oynatma koruması ve PC çevrimdışı hali gerçek native entegrasyonun zorunlu testleridir. Google GitHub fikir havuzu canlı iş kuyruğu **değildir**.
