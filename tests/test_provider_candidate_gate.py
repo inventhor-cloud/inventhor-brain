@@ -102,7 +102,7 @@ class ProviderCandidateGateTests(unittest.TestCase):
             selected(arr, "kimi-api").disposition,
             "NOT_SUSTAINABLY_FREE_API",
         )
-        arr = eval_c(role="fast_inference")
+        arr = eval_c(role="fast_model_comparison")
         self.assertEqual(
             selected(arr, "cerebras-inference").disposition,
             "NOT_SUSTAINABLY_FREE_API",
