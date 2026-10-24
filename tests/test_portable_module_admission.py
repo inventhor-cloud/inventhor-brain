@@ -115,6 +115,41 @@ class PortableModuleAdmissionTests(unittest.TestCase):
                 self.skipTest("local filesystem cannot create symlink")
             self.reject("STAGED_FILE_MISSING_OR_LINK", candidate(), root=staging)
 
+    def test_windows_casefold_duplicate_payload_path_denied(self):
+        manifest = candidate()
+        manifest["files"] = [
+            {"path": "Module.dll", "sha256": sha256(b"a").hexdigest()},
+            {"path": "module.dll", "sha256": sha256(b"b").hexdigest()},
+        ]
+        self.reject("DUPLICATE_FILE", manifest)
+
+    def test_nested_payload_hash_matches_when_read_in_chunks(self):
+        payload = b"test-module-code" * 180000
+        manifest = candidate(payload)
+        manifest["files"][0]["path"] = "nested/module.dll"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "nested").mkdir()
+            (root / "nested" / "module.dll").write_bytes(payload)
+            self.assertEqual(check(manifest, root).version, "1.2.3")
+            (root / "nested" / "module.dll").write_bytes(payload + b"x")
+            self.reject("STAGED_FILE_HASH_MISMATCH", manifest, root=root)
+
+    def test_symlink_ancestor_inside_staging_denied(self):
+        payload = b"test-module-code"
+        manifest = candidate(payload)
+        manifest["files"][0]["path"] = "alias/module.dll"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = root / "original"
+            original.mkdir()
+            (original / "module.dll").write_bytes(payload)
+            try:
+                (root / "alias").symlink_to(original, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("local filesystem cannot create directory symlink")
+            self.reject("STAGED_FILE_MISSING_OR_LINK", manifest, root=root)
+
     def test_bad_signature_encoding_denied(self):
         m = candidate()
         m["signature"] = "not-base64!?$"
