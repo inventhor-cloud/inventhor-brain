@@ -13,7 +13,7 @@ from typing import Literal, Sequence
 
 CAPABILITIES = frozenset({"reasoning", "code_assist", "summarize", "research", "classification"})
 MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,127}$")
-PROVIDER_RE = re.compile(r"^[a-z][a-z0-9_]{1,63}$")
+PROVIDER_RE = re.compile(r"^[a-z][a-z0-9_-]{1,63}$")
 MAX_CANDIDATES = 16
 
 class FreeRouteDenied(ValueError):
