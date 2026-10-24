@@ -190,6 +190,27 @@ class NativeReadOnlyAttachmentTests(unittest.TestCase):
         self.assertFalse(x.qa_installed_verified)
         self.assertFalse(x.display.install_verified)
 
+    def test_other_worker_lease_is_never_hidden_by_cli(self):
+        c, n = Cli(), Native()
+        n.data["active_worker"] = "CODEX"
+        self.assert_denied("ACTIVE_WORKER_CHANGED_DURING_CROSSCHECK", c, n)
+        c, n = Cli(), Native()
+        c.task["active_worker"] = "GPT"
+        self.assert_denied("ACTIVE_WORKER_CHANGED_DURING_CROSSCHECK", c, n)
+
+    def test_evidence_conflict_is_not_silently_accepted(self):
+        c, n = Cli(), Native()
+        c.task["evidence"] = "STALE_EVIDENCE"
+        self.assert_denied("EVIDENCE_CHANGED_DURING_CROSSCHECK", c, n)
+        c, n = Cli(), Native()
+        n.data["evidence_refs"] = ["DIFFERENT_HOST_PROOF"]
+        self.assert_denied("EVIDENCE_CHANGED_DURING_CROSSCHECK", c, n)
+
+    def test_invalid_native_worker_identity_refused(self):
+        c, n = Cli(), Native()
+        n.data["active_worker"] = 123
+        self.assert_denied("NATIVE_INVALID_ACTIVE_WORKER", c, n)
+
 
 if __name__ == "__main__":
     unittest.main()
