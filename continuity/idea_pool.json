@@ -63,6 +63,20 @@
       "state": "IDEA_POOL",
       "after": "QA_FACTORY_REAL_INSTALLED_ACCEPTANCE_THEN_BRAIN_NATIVE_MAIN_OPERATOR_INTEGRATION",
       "notes": "Future owner-authorized Android app, following QA Factory. Owner chats with INVENTHOR in one mobile app; INVENTHOR brokers only enrolled, owner-approved AI services (GPT, Codex, Claude, Gemini, local or future permitted APIs) and controls the existing PC Main/Organizer/Operator through authenticated scoped sessions. Provider use is on-demand, free/local-first and privacy/quotas/CPU/RAM-aware; nonessential modules sleep. No universal provider-account takeover, impersonating messages, credential copying, access-control bypass, bulk unapproved provider calls, or new duplicate queue. Use official provider APIs/connectors with explicit enrollment and commercial terms. Phone app is control surface; canonical tasks, policy, leases, evidence, and QA/release remain on Main/Operator. Encrypt sync, device pairing/revocation, offline read-only status, approval gates for sensitive operations. This is a FUTURE IDEA, NOT installed, queued or a new task; do not preempt Codex QA 0.7 or ongoing Brain scope."
+    },
+    {
+      "id": "IDEA-ANDROID-INVENTHOR-CONTROL-BRIDGE",
+      "title": "INVENTHOR Android companion: secure PC Brain and provider bridge",
+      "state": "IDEA_POOL",
+      "after": "QA_FACTORY_070_INSTALLED_LIVE_ACCEPTANCE",
+      "notes": "Future app AFTER QA Factory real installed acceptance: user's Android companion chats naturally with their authorized local Windows INVENTHOR Main/Brain and Operator over a secure pairing/session gateway. Main owns canonical Organizer state, requests and capability policy; phone is a lightweight control/speech/preview/approval surface, not a duplicate Brain. Existing Provider Gateway chooses only installed and owner-approved GPT/Codex/other/local providers by verified capability, quota, price, privacy and system load; do not automatically connect every provider. Consent for sensitive actions, signed short-lived device identity, per-capability permissions, replay protection, encrypted transport, clear authenticated human-vs-agent attribution, audit and pause/revoke controls required. PC may be offline: provide transparent offline status, not fake remote execution. Load limits: one bounded job per lease, active/inactive modules, resource budgets and provider circuit breaker; provider credentials remain on trusted PC/secret store not Android client. No new executable plan or active priority before QA, no code collision with Codex.",
+      "acceptance_targets": [
+        "Paired Android device sends one authorized request to the existing Main/Organizer and receives linked status/response",
+        "Full end-to-end native Operator checkpoint/receipt and independent QA evidence for one bounded task",
+        "Wrong device, leaked/replayed token, expired session, revoked capability and parallel duplicate tasks denied",
+        "Low resource use, offline notification, voice/chat UI and secure consent for sensitive actions",
+        "Installed modules/providers discovered through approved capability catalog, not uncontrolled all-provider fan-out"
+      ]
     }
   ],
   "runtime_authoritative": false,
