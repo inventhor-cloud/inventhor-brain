@@ -123,7 +123,9 @@ def verify_portable_module(
             _relative_file(f["path"]),
             _string(f["sha256"], pattern=_HASH, label="FILE_SHA256")
         ))
-    if len(set(p for p, _ in files)) != len(files):
+    # Native Windows staging is commonly case-insensitive: "Module.dll"
+    # and "module.dll" can address the same payload. Never admit aliases.
+    if len({p.casefold() for p, _ in files}) != len(files):
         raise ModuleAdmissionDenied("DUPLICATE_FILE")
     if files != sorted(files):
         raise ModuleAdmissionDenied("FILES_NOT_SORTED")
@@ -156,14 +158,28 @@ def verify_portable_module(
             raise ModuleAdmissionDenied("INVALID_STAGING_ROOT")
         resolved_root = root.resolve()
         for path, expected_hash in files:
-            file = root.joinpath(*path.split("/"))
-            if not file.is_file() or file.is_symlink():
+            # A final-file symlink check alone misses linked parent folders.
+            # Still advisory: only native host/ACL/open-handle verification can
+            # eliminate race conditions during real staging/installation.
+            file = root
+            for part in path.split("/"):
+                file = file / part
+                if file.is_symlink():
+                    raise ModuleAdmissionDenied("STAGED_FILE_MISSING_OR_LINK")
+            if not file.is_file():
                 raise ModuleAdmissionDenied("STAGED_FILE_MISSING_OR_LINK")
             if not file.resolve().is_relative_to(resolved_root):
                 raise ModuleAdmissionDenied("STAGED_FILE_ESCAPE")
-            with file.open("rb") as handle:
-                digest = sha256(handle.read()).hexdigest()
-            if digest != expected_hash:
+            # Stream hashes instead of reading arbitrary DLL files entirely
+            # into memory. No mutation, extraction, activation or native claim.
+            hasher = sha256()
+            try:
+                with file.open("rb") as handle:
+                    for block in iter(lambda: handle.read(1024 * 1024), b""):
+                        hasher.update(block)
+            except OSError as exc:
+                raise ModuleAdmissionDenied("STAGED_FILE_UNREADABLE") from exc
+            if hasher.hexdigest() != expected_hash:
                 raise ModuleAdmissionDenied("STAGED_FILE_HASH_MISMATCH")
     return ModuleAdmission(
         module_id=module_id, version=version, host_api=abi,
