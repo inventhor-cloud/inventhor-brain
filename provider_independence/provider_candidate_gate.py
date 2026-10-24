@@ -21,6 +21,7 @@ _ALLOWED_ROLES = frozenset({
     "nonprivate_prototyping", "text_tasks", "small_jobs",
     "model_prototyping", "private_local_assistance", "offline_fallback",
     "complex_code_review", "architecture", "sourced_research",
+    "fast_model_comparison",
 })
 _ALL_FREE_TYPES = FREE_API_CATEGORIES | frozenset({
     "small_new_user_trial_credit_not_recurring_free_tier",
