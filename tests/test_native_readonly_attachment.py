@@ -206,6 +206,20 @@ class NativeReadOnlyAttachmentTests(unittest.TestCase):
         n.data["evidence_refs"] = ["DIFFERENT_HOST_PROOF"]
         self.assert_denied("EVIDENCE_CHANGED_DURING_CROSSCHECK", c, n)
 
+    def test_private_reference_masks_display_but_checks_raw_host_evidence(self):
+        c, n = Cli(), Native()
+        signed_url = "https://example.test/witness?sig=secret_reference"
+        c.task["evidence"] = signed_url
+        n.data["evidence_refs"] = [signed_url]
+        packet = call(c, n)
+        self.assertEqual(
+            packet.display.evidence_refs, ("[REDACTED_PRIVATE_LOCATION_OR_LINK]",)
+        )
+        self.assertNotIn("secret_reference", packet.as_json())
+        self.assertEqual(n.data["evidence_refs"], [signed_url])
+        n.data["evidence_refs"] = ["https://example.test/witness?sig=other"]
+        self.assert_denied("EVIDENCE_CHANGED_DURING_CROSSCHECK", c, n)
+
     def test_invalid_native_worker_identity_refused(self):
         c, n = Cli(), Native()
         n.data["active_worker"] = 123
