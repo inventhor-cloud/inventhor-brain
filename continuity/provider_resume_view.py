@@ -22,6 +22,15 @@ _SECRET = re.compile(
     r"\s*[:=]\s*\S+)",
     re.IGNORECASE,
 )
+# A provider-facing summary must not expose owner-device locations or URL
+# query parameters (which can carry signed download/session credentials).
+# Native Organizer retains the originals; only this display projection masks.
+_PRIVATE_LOCATION = re.compile(
+    r"(?:[A-Za-z]:[\\/]|\\\\[^\\\s/]+[\\/]|file://"
+    r"|/(?:home|Users|root|mnt|media|Volumes)(?:/|\\b)"
+    r"|https?://\\S+\\?\\S+)",
+    re.IGNORECASE,
+)
 _MAX_LIST = 24
 _MAX_FIELD = 480
 _MAX_TOTAL = 16000
@@ -42,6 +51,8 @@ def _safe_text(value: Any, *, limit: int = _MAX_FIELD) -> str:
     # It remains untrusted data; redact obvious secrets before display.
     if _SECRET.search(value):
         return "[REDACTED_CREDENTIAL_LIKE_TEXT]"
+    if _PRIVATE_LOCATION.search(value):
+        return "[REDACTED_PRIVATE_LOCATION_OR_LINK]"
     return value.strip()
 
 
