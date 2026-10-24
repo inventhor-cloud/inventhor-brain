@@ -148,7 +148,8 @@
       "free_type": "one_time_initial_trial_credit",
       "privacy": "provider_terms_review_required",
       "recommended_for": [
-        "fast_model_comparison"
+        "fast_model_comparison",
+        "fast_inference"
       ],
       "status": "CANDIDATE_DISABLED",
       "free_limits": "5_usd_starting_trial_not_sustained_free_service",
