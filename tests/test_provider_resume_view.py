@@ -52,6 +52,33 @@ class ResumeViewTests(unittest.TestCase):
             self.assertNotIn(raw, view)
         self.assertIn("[REDACTED_CREDENTIAL_LIKE_TEXT]", view)
 
+    def test_private_owner_paths_and_signed_links_are_masked(self):
+        packet = project_native_handoff(read_task(
+            completed=[r"Read C:\Users\Owner\secret\review.txt"],
+            remaining=[
+                "Review /home/owner/.ssh/id_rsa",
+                "Fetch https://example.test/report?sig=secret_query_value",
+            ],
+            evidence_refs=[
+                r"\\fileserver\owner-share\private.json",
+                "sha256:check-fixture",
+            ],
+            next_action="Inspect file:///C:/private/witness.txt",
+        ))
+        data = json.loads(packet.as_json())
+        self.assertEqual(data["completed"], ["[REDACTED_PRIVATE_LOCATION_OR_LINK]"])
+        self.assertEqual(data["remaining"], [
+            "[REDACTED_PRIVATE_LOCATION_OR_LINK]",
+            "[REDACTED_PRIVATE_LOCATION_OR_LINK]",
+        ])
+        self.assertEqual(data["evidence_refs"], [
+            "[REDACTED_PRIVATE_LOCATION_OR_LINK]", "sha256:check-fixture",
+        ])
+        self.assertEqual(data["next_action"], "[REDACTED_PRIVATE_LOCATION_OR_LINK]")
+        for secret in ("secret_query_value", "owner-share", "review.txt", "id_rsa"):
+            self.assertNotIn(secret, packet.as_json())
+        self.assertFalse(data["write_authorized"])
+
     def test_not_a_second_queue_and_does_not_overwrite(self):
         native = read_task()
         before = dict(native.task)
