@@ -94,6 +94,14 @@ def prepare_brain_turn(
         cli, host, task_id, worker=worker, expected_target=expected_target,
         now=now,
     )
+    # A stale ACTIVE plan cannot revive a terminal parent task, and a
+    # DOING task with no native owner requires reconciliation before advice.
+    # This is defense in depth; the trusted Main host must still validate
+    # its plan and lease against the same native ledger epoch.
+    if attachment.state in ("DONE", "ARCHIVED"):
+        raise AgentTurnDenied("FOCUS_TASK_TERMINAL_NO_REPLAY")
+    if attachment.state == "DOING" and not attachment.display.active_worker:
+        raise AgentTurnDenied("FOCUS_ORPHAN_REQUIRES_NATIVE_RECONCILIATION")
     try:
         focus, tasks = host.read_focus_snapshot(task_id)
     except Exception as exc:
