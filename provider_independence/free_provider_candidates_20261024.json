@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-10-24",
+  "authority": "RESEARCH_ONLY_NOT_INSTALLED_OR_CONNECTED",
+  "runtime_authoritative": false,
+  "default_enabled": false,
+  "catalog_is_not_credentials": true,
+  "commercial_use_requires_terms_review": true,
+  "notes": "Approved research candidates only. Native owner-governed Provider Gateway must enroll an API key in secret store, enforce quotas and privacy class, and pass live tests before any provider is available. Free web chat subscriptions do not confer reusable automated API access. No chat UI automation or quota circumvention.",
+  "providers": [
+    {
+      "id": "google-gemini-api",
+      "name": "Google Gemini API",
+      "interface": "api",
+      "free_type": "limited_model_api_free_tier",
+      "privacy": "free_content_may_be_used_to_improve_products",
+      "recommended_for": [
+        "nonprivate_prototyping",
+        "coding_evaluation"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "model_dependent",
+      "sources": [
+        "https://ai.google.dev/gemini-api/docs/pricing",
+        "https://ai.google.dev/gemini-api/docs/billing"
+      ]
+    },
+    {
+      "id": "groqcloud",
+      "name": "GroqCloud",
+      "interface": "api",
+      "free_type": "rate_limited_free_api",
+      "privacy": "provider_terms_review_required",
+      "recommended_for": [
+        "fast_inference",
+        "coding_evaluation"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "organization_model_dependent",
+      "sources": [
+        "https://console.groq.com/docs/rate-limits",
+        "https://console.groq.com/docs/billing-faqs"
+      ]
+    },
+    {
+      "id": "mistral-studio",
+      "name": "Mistral AI Studio",
+      "interface": "api",
+      "free_type": "limited_monthly_free_api",
+      "privacy": "provider_terms_review_required",
+      "recommended_for": [
+        "coding_evaluation",
+        "text_tasks"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "account_limits_page",
+      "sources": [
+        "https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key",
+        "https://docs.mistral.ai/admin/billing-usage/usage-limits"
+      ]
+    },
+    {
+      "id": "openrouter-free",
+      "name": "OpenRouter free models",
+      "interface": "api_aggregator",
+      "free_type": "free_models_rate_limited",
+      "privacy": "downstream_provider_and_model_policies_review_required",
+      "recommended_for": [
+        "model_comparison",
+        "nonprivate_prototyping"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "50_requests_per_day_free_account_subject_to_change",
+      "sources": [
+        "https://openrouter.ai/pricing",
+        "https://openrouter.ai/collections/free-models"
+      ]
+    },
+    {
+      "id": "cloudflare-workers-ai",
+      "name": "Cloudflare Workers AI",
+      "interface": "api",
+      "free_type": "daily_neuron_allowance",
+      "privacy": "provider_terms_review_required",
+      "recommended_for": [
+        "small_jobs",
+        "model_prototyping"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "10000_neurons_per_day_some_models_paid_only",
+      "sources": [
+        "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+        "https://developers.cloudflare.com/changelog/post/2026-07-28-models-require-workers-paid/"
+      ]
+    },
+    {
+      "id": "ollama-local",
+      "name": "Ollama local",
+      "interface": "local_runtime",
+      "free_type": "local_compute_no_api_usage_charge",
+      "privacy": "local_only_when_cloud_features_disabled_and_data_stays_on_machine",
+      "recommended_for": [
+        "private_local_assistance",
+        "offline_fallback"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "depends_on_owner_pc_ram_gpu_model_license",
+      "sources": [
+        "https://ollama.com/pricing"
+      ]
+    },
+    {
+      "id": "anthropic-claude-api",
+      "name": "Anthropic Claude API",
+      "interface": "api",
+      "free_type": "small_new_user_trial_credit_not_recurring_free_tier",
+      "privacy": "api_terms_and_retention_review_required",
+      "recommended_for": [
+        "complex_code_review",
+        "architecture"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "trial_credit_then_usage_billing",
+      "sources": [
+        "https://platform.claude.com/docs/en/about-claude/pricing",
+        "https://claude.com/pricing"
+      ]
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity",
+      "interface": "web_research_and_separate_api",
+      "free_type": "consumer_basic_search_free_api_not_assumed_free",
+      "privacy": "api_terms_review_required",
+      "recommended_for": [
+        "sourced_research"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "consumer_standard_basic_search_limited_pro_not_api",
+      "sources": [
+        "https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you"
+      ]
+    },
+    {
+      "id": "cerebras-inference",
+      "name": "Cerebras Inference",
+      "interface": "api",
+      "free_type": "one_time_initial_trial_credit",
+      "privacy": "provider_terms_review_required",
+      "recommended_for": [
+        "fast_model_comparison"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "5_usd_starting_trial_not_sustained_free_service",
+      "sources": [
+        "https://www.cerebras.ai/pricing"
+      ]
+    },
+    {
+      "id": "kimi-api",
+      "name": "Kimi API",
+      "interface": "api",
+      "free_type": "pay_as_you_go_api",
+      "privacy": "provider_terms_review_required",
+      "recommended_for": [
+        "coding_evaluation"
+      ],
+      "status": "CANDIDATE_DISABLED",
+      "free_limits": "no_recurring_free_api_verified",
+      "sources": [
+        "https://www.kimi.ai/help/kimi-api/api-overview"
+      ]
+    }
+  ]
+}
