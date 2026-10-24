@@ -80,6 +80,25 @@ def _check_consistent(
         # diverging secrets or different checkpoints.
         if tuple(value) != from_host:
             raise IntegrationDenied("PROGRESS_CHANGED_DURING_CROSSCHECK")
+    # The displayed CLI worker cannot disagree with the authenticated native
+    # host's owner. A missing CLI owner must never erase a known live lease.
+    cli_worker = read.task.get("active_worker")
+    if cli_worker is None:
+        cli_worker = ""
+    if (not isinstance(cli_worker, str)
+        or cli_worker != trusted.active_worker):
+        raise IntegrationDenied("ACTIVE_WORKER_CHANGED_DURING_CROSSCHECK")
+
+    # CLI evidence may be an older single string or a list. Compare only
+    # when exposed, and compare exact raw values before any redaction.
+    for evidence_key in ("evidence_refs", "evidence"):
+        if evidence_key in read.task and read.task[evidence_key] is not None:
+            observed_refs = read.task[evidence_key]
+            if isinstance(observed_refs, str):
+                observed_refs = [observed_refs] if observed_refs else []
+            if not isinstance(observed_refs, list) or tuple(observed_refs) != trusted.evidence_refs:
+                raise IntegrationDenied("EVIDENCE_CHANGED_DURING_CROSSCHECK")
+
     # CLI output varies by installed build: compare optional fields if present.
     for key, expected in (
         ("target_id", trusted.target_id),
