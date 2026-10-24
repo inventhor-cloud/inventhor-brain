@@ -54,6 +54,7 @@ class ResumePacket:
     next_action: str
     observed_at: datetime
     mode: Literal["READ_ONLY", "WRITE_CLAIMED"]
+    active_worker: str = ""
 
 @dataclass(frozen=True)
 class CheckpointDraft:
@@ -132,6 +133,13 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
     completed = _items(raw, "completed")
     remaining = _items(raw, "remaining")
     evidence = _items(raw, "evidence_refs")
+    owner = raw.get("active_worker")
+    if owner is None:
+        owner = ""
+    if (not isinstance(owner, str) or len(owner) > 128
+        or (owner and not all(c.isascii() and (c.isalnum() or c in "_.-")
+                              for c in owner))):
+        raise HandoffDenied("INVALID_ACTIVE_WORKER")
     stage, blocker, next_action = (raw.get("stage", ""), raw.get("blocker", ""),
                                     raw.get("next_action", ""))
     if any(not isinstance(s, str) or len(s) > 1024
@@ -177,7 +185,7 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
         mode = "WRITE_CLAIMED"
     return ResumePacket(task_id, project, target, revision, state, stage,
                         completed, remaining, evidence, blocker,
-                        next_action.strip(), observed, mode)
+                        next_action.strip(), observed, mode, owner)
 
 def draft_next_checkpoint(claimed: ResumePacket, *,
                           verified_completed: list[str],
