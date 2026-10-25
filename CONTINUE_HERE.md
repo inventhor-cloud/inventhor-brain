@@ -65,3 +65,14 @@ OWNER_COMMANDED_CODEX=YES_REPORTED_BY_OWNER; DO_NOT_DUPLICATE_WORK
 ONLY_NATIVE_WORKER_WITH_VERIFIED_CURRENT_TASK_AND_LEASE_MAY_EDIT_ORGANIZER=TRUE
 NONCORE_MODULES=DEFER_SEPARATE_PROJECTS_AND_SAFE_DETACH_AFTER_BACKUP_QA
 SOURCE_HAS_NO_RUNTIME_ACTIVATION_AUTHORITY=TRUE
+
+## SEPARATE PROGRAMS + CENTRAL INVENTHOR CONTROL — OWNER UPDATE 2026-10-25
+
+SOURCE_OWNER_GOAL=continuity/OWNER_CORE_APPLICATION_FACTORY_GOAL_20261025.md
+SOURCE_CANDIDATES=continuity/DEFERRED_PROGRAM_CANDIDATES_20261025.json
+SOURCE_PROGRAM_CONTROL_GUARD=continuity/program_control_gate.py
+SOURCE_TEST=tests/test_program_control_gate.py
+POLICY=User-facing legacy feature modules become separate individually listed standalone programs in the future, not permanently embedded in INVENTHOR. The four core Brain/Main, Operator, Organizer and QA Factory stay singletons. Security, transport and necessary internal adapters remain internal when a verified core dependency.
+PROGRAM_AI_CONTROL=Each real program can expose its full permission-scoped, versioned capabilities to the SAME Brain and Operator. The user controls via compact text/live-voice assistant, and may also use the program manually. No silent admin authority, duplicate AI, duplicate operator, fake edits or fake test results. Source program control gate is READ-ONLY and never grants native execution.
+NATIVE_ORGANIZER_MIGRATION=REQUIRED_BY_CODEX_UNDER_VERIFIED_EXISTING_TASK_OWNER_LEASE_NOT_YET_VERIFIED_HERE
+MIRROR_IS_NOT_INSTALLED=true
