@@ -55,3 +55,13 @@ OUTPUT=CoreBrainReview: current task and finite safe advisory + four-core activa
 SAFETY=Never dispatch/claim/install/delete. Even zero reported blockers => NATIVE_REVIEW_REQUIRED, not activated. Does not authenticate arbitrary caller's activation facts. Must not be used as a security ticket.
 NATIVE_HOST_GAP=Real Main must collect, authenticate and reconcile same-epoch installed evidence for all four components; verify native owner/lease, signatures, artifact hashes, Operator result ACK, QA witness and rollback. Native Composer/real-program command execution is separately gated.
 SCOPE=Four-core integration only; no new module, queue, factory, voice provider or app.
+
+## 2026-10-25: owner-approved application creation end-to-end goal
+
+OWNER_ACTIVE_PRODUCT_GOAL=single clean INVENTHOR using Brain/Main, Operator, Organizer, QA Factory to create actual programs from voice/text instructions; design, one-to-one render and run, update, human change-of-mind/mouse override, Factory test, evidence-linked repair, re-test, rollback and gated delivery.
+AUTHORITATIVE_OWNER_MIRROR=continuity/OWNER_CORE_APPLICATION_FACTORY_GOAL_20261025.md
+NATIVE_ORGANIZER_GOAL_MIGRATION=REQUIRED_NOT_VERIFIED
+OWNER_COMMANDED_CODEX=YES_REPORTED_BY_OWNER; DO_NOT_DUPLICATE_WORK
+ONLY_NATIVE_WORKER_WITH_VERIFIED_CURRENT_TASK_AND_LEASE_MAY_EDIT_ORGANIZER=TRUE
+NONCORE_MODULES=DEFER_SEPARATE_PROJECTS_AND_SAFE_DETACH_AFTER_BACKUP_QA
+SOURCE_HAS_NO_RUNTIME_ACTIVATION_AUTHORITY=TRUE
