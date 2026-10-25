@@ -44,3 +44,14 @@ CURRENT_SOURCE_TEST=GitHub Actions 40223408469 success at commit 84cd3b0c6e2d7a4
 ACTIVATION_LIMIT=This source-only gate cannot activate installed code, grant a native lease, sign a release, or attest live QA. Never claim activation from this mirror.
 KNOWN_NATIVE_BLOCKERS=Last reported QA Factory 0.5.0 installed / 0.7 draft, 17 Operator PR#3 versus local conflicts with Cleanup locally deleted, Main/Operator native ACK not proven, signing/rollback witness pending. Native Organizer must be freshly read to verify whether these are still current.
 NEXT_NATIVE_STEP=Trusted Main/Organizer owner/lease check, classify deployed core versus deferred modules, reconcile Operator conflict, verify exact signed artifacts/rollback/handshake and QA acceptance, then owner-gated progressive activation. No blind merge/deletion/restore or duplicate modules. DC low quota/offline is not a Brain runtime state.
+
+## FOUR-CORE COMPOSED BRAIN REVIEW — 2026-10-25
+
+SOURCE=continuity/core_brain_review.py
+TEST=tests/test_core_brain_review.py
+FUNCTION=prepare_core_brain_review
+INPUT=Exact native Organizer handoff + independently trusted Main context host + one claimed CoreActivationSnapshot + exact task/revision/time.
+OUTPUT=CoreBrainReview: current task and finite safe advisory + four-core activation blockers in one bounded read-only object.
+SAFETY=Never dispatch/claim/install/delete. Even zero reported blockers => NATIVE_REVIEW_REQUIRED, not activated. Does not authenticate arbitrary caller's activation facts. Must not be used as a security ticket.
+NATIVE_HOST_GAP=Real Main must collect, authenticate and reconcile same-epoch installed evidence for all four components; verify native owner/lease, signatures, artifact hashes, Operator result ACK, QA witness and rollback. Native Composer/real-program command execution is separately gated.
+SCOPE=Four-core integration only; no new module, queue, factory, voice provider or app.
