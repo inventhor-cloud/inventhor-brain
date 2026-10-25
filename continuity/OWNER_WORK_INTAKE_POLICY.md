@@ -31,3 +31,9 @@ The queue survives chat/provider/session changes.
 ## Operator / Brain scope boundary
 
 GPT/Codex/INVENTHOR collaboration and the QA Factory are the immediate owner priority. Brain cleanup may proceed concurrently in non-overlapping files/targets. Additional provider integrations belong in the backlog until the owner changes priorities. This file is public reference policy, not an executable work authorization or a replacement for live canonical Organizer records. See [LIVE_SOURCE_FRESHNESS_GATE.md](LIVE_SOURCE_FRESHNESS_GATE.md).
+
+## Owner priority override — 2026-10-25 / one application-production loop
+
+The Owner explicitly overrode earlier product/module expansion priorities. For **new intake and Organizer goal reconciliation**, only four cores stay active: INVENTHOR Brain/Main, Operator, existing canonical Organizer, existing App Factory/QA. The product goal is the complete spoken/written **idea -> design -> genuine live preview/runtime -> actual change/update -> Factory QA -> repair -> QA retest -> approved release** loop, with user-controlled revisions and optional manual mouse intervention. [Owner goal and native migration handoff](OWNER_CORE_APPLICATION_FACTORY_GOAL_20261025.md).
+
+Other products/modules (including Viktorija, Cleaner, Antivirus and future standalone extensions) are **DEFERRED** in the **same Organizer**, with intact recoverable source/evidence, pending native registry/lease validation and approved reversible isolation. No duplicate modules, Studios, queues or QA services. This priority change must be reflected in the current *existing* native Organizer Project/Work Item goal and acceptance criteria by its active authorized worker; no blind overwrite, task replay, new task ID or mass mutation from a source mirror. The GitHub version of this policy is informative only, not the canonical native migration receipt.
