@@ -123,10 +123,10 @@ def prepare_program_action(
         or len(context.owner_allowed_capabilities) > MAX_CAPABILITIES):
         raise ProgramControlDenied("INVALID_CAPABILITY_SET")
     for caps in (context.published_capabilities, context.owner_allowed_capabilities):
-        if len(caps) != len(set(caps)):
-            raise ProgramControlDenied("DUPLICATE_CAPABILITIES")
         for cap in caps:
             _id(cap, "PUBLISHED_CAPABILITY")
+        if len(caps) != len(set(caps)):
+            raise ProgramControlDenied("DUPLICATE_CAPABILITIES")
     if risk not in _ALLOWED_RISK:
         raise ProgramControlDenied("INVALID_RISK_CLASS")
 
