@@ -32,3 +32,15 @@ DO_NOT_REPEAT:
 - treating provider conversation as canonical project truth
 
 Any new AI/provider must resume from the System of Record and select exactly one finite eligible Work Item.
+
+## OWNER CORE-ACTIVATION DIRECTION — 2026-10-25
+
+ACTIVE_SCOPE=INVENTHOR_BRAIN,OPERATOR,ORGANIZER,QA_FACTORY
+OTHER_MODULES=DEFERRED_FUTURE_SEPARATE_PROJECTS_NOT_AUTO_ACTIVATED
+OWNER_EXPERIENCE=Actual program opens; single small movable INVENTHOR voice/text assistant in the program; authorized Operator edits the real program, user may take over; Organizer tracks work and QA Factory tests.
+SOURCE_ACTIVATION_CHECK=continuity/core_activation_gate.py
+SOURCE_ACTIVATION_TEST=tests/test_core_activation_gate.py
+CURRENT_SOURCE_TEST=GitHub Actions 40223408469 success at commit 84cd3b0c6e2d7a4e259ed0071237e2d74458b5c7 (SOURCE ONLY)
+ACTIVATION_LIMIT=This source-only gate cannot activate installed code, grant a native lease, sign a release, or attest live QA. Never claim activation from this mirror.
+KNOWN_NATIVE_BLOCKERS=Last reported QA Factory 0.5.0 installed / 0.7 draft, 17 Operator PR#3 versus local conflicts with Cleanup locally deleted, Main/Operator native ACK not proven, signing/rollback witness pending. Native Organizer must be freshly read to verify whether these are still current.
+NEXT_NATIVE_STEP=Trusted Main/Organizer owner/lease check, classify deployed core versus deferred modules, reconcile Operator conflict, verify exact signed artifacts/rollback/handshake and QA acceptance, then owner-gated progressive activation. No blind merge/deletion/restore or duplicate modules. DC low quota/offline is not a Brain runtime state.
