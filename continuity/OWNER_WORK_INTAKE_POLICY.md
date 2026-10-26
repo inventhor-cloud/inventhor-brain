@@ -1,4 +1,4 @@
-> **CURRENT OWNER PRIORITY 2026-10-26:** ONLY finish actual production platform **INVENTHOR (existing Organizer within), OPERATOR, STUDIO DESIGN, QUALITY FACTORY**. All other modules and future program initiatives are deferred and MUST NOT be started. This explicitly supersedes the 2026-10-25 separate-program conversion instructions for active work. The native Organizer existing task/project goal must be aligned by current authorized worker, not from a GitHub mirror. See [latest owner production engine contract](OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md).
+> **CURRENT OWNER PRIORITY 2026-10-26:** ONLY finish actual production platform **INVENTHOR, OPERATOR, ORGANIZER, STUDIO_DESIGN, QA_FACTORY** (QA=Fabrika; Organizer is the one existing canonical ledger). All other modules and future program initiatives are deferred and MUST NOT be started. This explicitly supersedes the 2026-10-25 separate-program conversion instructions for active work. The native Organizer existing task/project goal must be aligned by current authorized worker, not from a GitHub mirror. See [latest owner production engine contract](OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md).
 
 # Owner Work Intake Policy
 
@@ -34,7 +34,7 @@ The queue survives chat/provider/session changes.
 
 GPT/Codex/INVENTHOR collaboration and the QA Factory are the immediate owner priority. Brain cleanup may proceed concurrently in non-overlapping files/targets. Additional provider integrations belong in the backlog until the owner changes priorities. This file is public reference policy, not an executable work authorization or a replacement for live canonical Organizer records. See [LIVE_SOURCE_FRESHNESS_GATE.md](LIVE_SOURCE_FRESHNESS_GATE.md).
 
-## Owner priority override — 2026-10-25 / one application-production loop
+## HISTORICAL owner priority — 2026-10-25 / superseded by 2026-10-26 five systems
 
 The Owner explicitly overrode earlier product/module expansion priorities. For **new intake and Organizer goal reconciliation**, only four cores stay active: INVENTHOR Brain/Main, Operator, existing canonical Organizer, existing App Factory/QA. The product goal is the complete spoken/written **idea -> design -> genuine live preview/runtime -> actual change/update -> Factory QA -> repair -> QA retest -> approved release** loop, with user-controlled revisions and optional manual mouse intervention. [Owner goal and native migration handoff](OWNER_CORE_APPLICATION_FACTORY_GOAL_20261025.md).
 
