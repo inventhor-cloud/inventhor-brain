@@ -112,7 +112,7 @@ def inspect_source() -> list[str]:
         ("CONTINUE_HERE.md", ("ÜST MİMARİ TALİMAT — 2026-10-26",
                               CONTRACT)),
         ("system_constitution/core_rules.md",
-         ("GÜNCEL SAHİP MİMARİ KURALI", CONTRACT)),
+         ("GÜNCEL SAHİP MİMARİ KURALI", "ACTIVE_PRODUCT_ARCHITECTURE_20261026.json")),
         ("continuity/OWNER_WORK_INTAKE_POLICY.md",
          ("CURRENT OWNER PRIORITY 2026-10-26",)),
     ):
