@@ -203,6 +203,17 @@ def advise_studio_factory_handoff(
         need(snapshot.factory_verdict == "FAIL", "REAL_FAILURE_NOT_RECORDED")
         need(bool(snapshot.defect_evidence_ref), "DEFECT_EVIDENCE_MISSING")
         need(snapshot.iteration < 5, "REPAIR_ITERATION_BUDGET_EXHAUSTED")
+    if phase == "REPAIRED_RUNNING":
+        need(snapshot.iteration > 1, "REPAIR_REQUIRES_FAILED_PRIOR_ITERATION")
+    if phase == "QA_PASSED" and snapshot.iteration == 1:
+        # First-pass success is valid; it must not inherit failed-run metadata
+        # belonging to an unrelated prior build or project.
+        need(not snapshot.previous_failed_build_sha256,
+             "FIRST_PASS_CARRIES_OLD_FAILED_BUILD")
+        need(not snapshot.previous_failed_factory_run_id,
+             "FIRST_PASS_CARRIES_OLD_FAILED_QA_RUN")
+        need(not snapshot.previous_failure_evidence_ref,
+             "FIRST_PASS_CARRIES_OLD_FAILURE_EVIDENCE")
     if phase in ("REPAIRED_RUNNING", "QA_PASSED") and snapshot.iteration > 1:
         need(bool(snapshot.previous_failed_build_sha256),
              "FAILED_BUILD_REFERENCE_MISSING")
