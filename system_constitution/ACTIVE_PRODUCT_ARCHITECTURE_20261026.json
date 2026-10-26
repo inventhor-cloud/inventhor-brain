@@ -1,6 +1,6 @@
 {
   "contract_id": "INVENTHOR_SINGLE_PRODUCT_ENGINE_20261026",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "owner_policy_effective_date": "2026-10-26",
   "priority": "P0_ONLY",
   "source_role": "PUBLIC_SOURCE_POLICY_REFERENCE_NOT_NATIVE_AUTHORIZATION",
@@ -100,6 +100,7 @@
     "failure_reporting": "Real failures recorded honestly with exact blockers and smallest finite next step"
   },
   "new_agent_startup": [
+    "OWNER LATEST CLARIFICATION 2026-10-26: Legacy noncore modules are fully removed NOW from live INVENTHOR; someday they MAY be separate ordinary apps. INVENTHOR+single OPERATOR can control actual devices/apps through authorized OS/UI/API adapters without embedding each program as a module; future standalone app development remains PAUSED.",
     "FIRST read continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md and this contract; owner expects FULL live runtime detachment, not hiding optional modules",
     "Read trusted current ORIGINAL Organizer exact PROJECT_ID TASK_ID revision lease owner evidence and the last Codex owner command; do not duplicate existing work",
     "Inventory installed module registries/services/startup/dependency graph read-only, classify required internal capabilities versus full noncore removal and unknowns",
@@ -149,5 +150,18 @@
     },
     "unverified_runtime_is_not_success": true,
     "irreversible_deletion_of_user_data_requires_separate_explicit_approval": true
+  },
+  "future_program_architecture": {
+    "owner_clarification_date": "2026-10-26",
+    "priority_now": "DEFERRED_NO_STANDALONE_PROGRAM_IMPLEMENTATION",
+    "future_strategy": "Former noncore product modules may LATER be developed as independent normal applications, separately from INVENTHOR. This is NOT an instruction to preserve old plugin dependencies or to produce such apps now.",
+    "central_control": "INVENTHOR reasons and orchestrates one existing OPERATOR as its only native executor. Operator can inspect and manipulate owner-authorized parts of the computer and separate installed applications through actual OS APIs, accessibility/UI automation, app-supported integrations and versioned capabilities without bundling each app as a Brain/Operator module.",
+    "installed_app_not_required_to_embed_inventhor": true,
+    "operator_ownership_boundary": "Operator is a single executor; use signed/native known interfaces and scoped host credentials, verify targets and actions, audit changes and support rollback. Device/program control is conditional on installation, connectivity, operating system capabilities and owner-granted permissions; never silently bypass OS security or imply access has already been enabled.",
+    "remove_all_legacy_noncore_runtime_dependencies_now": true,
+    "preserve_original_historical_source_outside_runtime": true,
+    "no_duplicate_brain_operator_organizer_design_studio_factory": true,
+    "native_installed_computer_access_verified": false,
+    "source_contract_only": true
   }
 }
