@@ -1,3 +1,5 @@
+> **CURRENT OWNER PRIORITY 2026-10-26:** ONLY finish actual production platform **INVENTHOR (existing Organizer within), OPERATOR, STUDIO DESIGN, QUALITY FACTORY**. All other modules and future program initiatives are deferred and MUST NOT be started. This explicitly supersedes the 2026-10-25 separate-program conversion instructions for active work. The native Organizer existing task/project goal must be aligned by current authorized worker, not from a GitHub mirror. See [latest owner production engine contract](OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md).
+
 # Owner Work Intake Policy
 
 Status: ACTIVE
