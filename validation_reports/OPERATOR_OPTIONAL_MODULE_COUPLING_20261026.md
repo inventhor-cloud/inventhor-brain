@@ -28,3 +28,21 @@
 **Kaynak denetim aracı:** `tools/audit_operator_core_modularity.py <operator_checkout>`. Yalnızca okur, bir JSON raporu üretir; mimari bağımlılık işaretleri varsa sıfır olmayan çıkış kodu döndürür. Testleri `tests/test_audit_operator_core_modularity.py` içindedir. Bu araç **tam semantik bağımlılık analizi değil**, yerel kurulu sistem denetimi hiç değildir.
 
 **Geçerli durum:** `SOURCE_ARCHITECTURE_DEFECT_CONFIRMED` (incelenen PR #3 SHA için); `NATIVE_OPERATOR_DEPENDENCY_STATUS=UNVERIFIED`; `REAL_MODULE_DETACHMENT=UNVERIFIED`; `EMPTY_PLUGIN_NATIVE_CORE_BOOT=NOT_VERIFIED`.
+
+## 26 Ekim 2026 — Gerçek kaynak refaktör ilerlemesi
+
+**Operator taslak PR #5:** https://github.com/inventhor-cloud/inventhor-operator-core/pull/5
+
+Ayrı dal `brain/core-transport-without-legacy-plugins-20261026`, önceki Operator PR #3 kaynak HEAD'i temel alınarak açıldı; Codex'in mevcut yerel dosyaları, başka çalışanın native Organizer lease'i veya kurulu PC **değiştirilmedi**. PR #5 **taslak ve birleştirilmedi**.
+
+Bu kod değişiklikleri artık mevcut:
+- `Operator.Service` proje referansı, eski `Inventhor.Transport.Inventhor` ve `Inventhor.Transport.DirectBrain` iletişim kodlarını **doğrudan derlenmiş çekirdek servis bağımlılığı** olarak içeriyor. `CoreTransportFactory` ikisini `module.json` olmadan oluşturuyor ve başlatıyor.
+- `PluginCatalog.Load(..., includeTransports: false)`, iki iletişim kanalının eski `transport.*` eklentisi olarak tekrar yüklenmesini önlüyor.
+- `CoreStatusExecutor` hiçbir eski modül kurulu olmadan `STATUS/READ_CORE_STATUS` komutuna, izin kontrolü altında salt-okunur ve hiçbir gerçek QA/bağlantı kanıtı iddiası taşımayan yanıt verebiliyor.
+- Windows PR CI artık derlenmiş servis paketinin iki iletişim DLL'sini içerdiğini ve içinde eski `modules` klasörü oluşturmadığını doğruluyor.
+
+**Doğrulanmış kaynak kanıtı:** [Operator Windows kaynak CI #40404820824](https://github.com/inventhor-cloud/inventhor-operator-core/actions/runs/40404820824), **150/150 test PASS**, Windows Operator servisi kaynak publish PASS, WPF masaüstü derleme PASS, Windows read-only predeploy/source drift/compare regresyonları PASS.
+
+**Açık ve hâlâ gerçek eksikler:** Eski isteğe bağlı *executor* eklentileri geçici olarak kalıyor; `OperatorWorker` onları `PluginCatalog` ile keşfediyor. Eski 16-modül deployment betiği, `config/modules` taşıma gereksinimi, Module Center/registry/startup izleri, gerçek Studio edit/build/run ve Fabrika QA döngüsü tamamlanmış değil. Kaynak çekirdek STATUS sonucu yetkili bir gerçek program değişikliğiyle karıştırılamaz. Yerel Organizer son görev/lease, imzalı bağlanma ACK, gerçek modülsüz Windows kurulum testi ve QA rollback **DOĞRULANMADI**.
+
+**Bir sonraki mevcut native görev alt adımı:** Codex'in güncel Organizer lease'i ve kaynak diff'i doğrulaması ardından PR #5'teki modül-bağımsız çekirdek haberleşme kodunu kontrollü biçimde incelemesi; gerçek uygulama oluşturma/run/QA işlevlerini tek Operator çekirdeğine taşıması; eski script/menü/dizin/servis bağlantılarını geri alınabilir etaplarda sıfırlaması; modül klasörü boşken gerçek beşli sistem testi ve aynı Fabrika FAIL→FIX→RETEST onayı alması. Kör PR merge veya Cleanup yeniden kurma yok.
