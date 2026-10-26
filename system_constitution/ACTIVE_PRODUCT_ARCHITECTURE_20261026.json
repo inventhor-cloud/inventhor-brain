@@ -86,7 +86,7 @@
     "Second Brain, Operator, Organizer, Design Studio, Factory, QA or parallel task ledger",
     "Rebuilding finished/terminal tasks or reviving quarantined work"
   ],
-  "legacy_policy": "Preserve all old module/app sources as future backlog/archive. Non-core live integrations may be safely deactivated only after actual dependency check, backup, lease, rollback and QA; no silent deletion of dependencies or user data.",
+  "legacy_policy": "LATEST OWNER DIRECTION 2026-10-26: FULLY DETACH every optional historical noncore module from the five-system ACTIVE runtime, UI, registry, services, startup, dependency graph, build/CI/install/updaters (not merely hide or disable). Migrate mandatory core functions into existing core-owned internal capabilities before removing old plugin module identities; require zero active noncore refs. Preserve genuine audit history, rollback backups and owner-owned data in nonruntime archive. Actual native Organizer authorization, current lease, reversible batches and installed independent Factory verification required. DO NOT CLAIM REMOVED until native proof.",
   "execution_policy": {
     "first_action": "Read real owner-controlled existing Organizer work identity, task revision, active lease, checkpoint, dependencies; deduplicate owner's Codex instructions",
     "reuse_ids": true,
