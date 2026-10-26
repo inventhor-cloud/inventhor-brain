@@ -63,11 +63,18 @@ class CoreActivationGateTests(unittest.TestCase):
                       review(links=tuple(links[:5] + links[6:])).blockers)
 
     def test_studio_design_is_mandatory_and_never_faked(self):
-        incomplete = complete().components[:2] + complete().components[3:]
+        incomplete = complete().components[:3] + complete().components[4:]
         self.assertIn("STUDIO_DESIGN:MISSING",
                       review(components=incomplete).blockers)
         self.assertIn("STUDIO_REAL_RENDER:MISSING",
                       review(links=complete().links[:-1]).blockers)
+
+    def test_organizer_is_required_separately_no_second_ledger(self):
+        incomplete = complete().components[:2] + complete().components[3:]
+        self.assertIn("ORGANIZER:MISSING",
+                      review(components=incomplete).blockers)
+        self.assertEqual(CORE.count("ORGANIZER"), 1)
+        self.assertEqual(CORE.count("QA_FACTORY"), 1)
 
     def test_noncore_is_not_reactivated_or_deleted(self):
         advice = review(active_noncore_ids=("VIKTORIJA", "CLEANUP"))
