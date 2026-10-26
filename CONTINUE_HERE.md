@@ -1,3 +1,11 @@
+# SON SAHİP SÖKÜM TALİMATI — 2026-10-26
+
+**ÜST MİMARİ TALİMAT — 2026-10-26:** Yalnızca `INVENTHOR`, `OPERATOR`, `ORGANIZER`, `STUDIO_DESIGN`, `QA_FACTORY` kalacak. QA=Fabrika (tek servis). **TÜM non-core eski bağımsız modüller**, aktif servis/başlangıç/menü/registry/installer/CI/build/IPC ve ters-bağımlılıklarıyla **TAMAMEN canlı sistemden sökülecek**. Gizlemek veya durdurmak tamamlandı sayılmaz. Eski noncore kimliklerinden beş sisteme **0 aktif bağımlılık** kalmalı. Zorunlu çekirdek işlevleri beş sistemin **içinde** korunur/taşınır; gizli eski plugin bağımlılığı bırakılmaz. Yerel devre dışı bırakma/sökümün kendisi **henüz doğrulanmadı**.
+
+**YENİ AI VE CODEX ÖNCE OKU:** [Tam söküm ve Organizer devam kuralı](continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md), sonra [makine-okunur tek mimari sözleşme](system_constitution/ACTIVE_PRODUCT_ARCHITECTURE_20261026.json). Önce mevcut Windows Organizer exact TASK_ID + worker lease oku; yeni görev, ikinci Organizer/Studio/Fabrika/Operator kurma. Eski 25 Ekim "ayrı uygulama yapma", 26 Ekim "yalnızca arşivle/pasifleştir" yönleri **bu tam söküm emrine göre geçersiz aktif hedeftir**. Kaynak kayıtları ve kullanıcı verisi saklanabilir, fakat canlı üründe eski modül yokmuş gibi davranmak **testle kanıtlanmalıdır**.
+
+---
+
 # ÜST MİMARİ TALİMAT — 2026-10-26
 
 **HEDEF = SADECE BEŞ İŞLEVSEL PARÇA:** INVENTHOR, OPERATOR, ORGANIZER, STUDIO DESIGN, KALİTE FABRİKASI (QA). **QA/Fabrika aynıdır.** Tek uygulama üretim zincirini bitir. Yeni modül, ürün, ayrı program, provider veya yan projede geliştirme yapma. Eski modülleri yalnızca sakla/gelecek havuzunda tut; ancak güvenli ve geri alınabilir temizliğini çekirdek bağlantıları koruyarak yap. Organizer ayrı yetkili tek kanonik kayıt, INVENTHOR arayüzü içinde görülebilir ama kopyalanamaz.
