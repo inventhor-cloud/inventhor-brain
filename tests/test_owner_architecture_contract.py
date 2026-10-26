@@ -55,7 +55,7 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(order["protect_user_data_and_rollback_material"])
         self.assertTrue(order["native_organizer_exact_task_update_required"])
         self.assertEqual(order["status"], "SOURCE_POLICY_REGISTERED_NATIVE_UNVERIFIED")
-        self.assertEqual(policy["version"], "1.2.0")
+        self.assertEqual(policy["version"], "1.3.0")
         self.assertTrue((ROOT / order["authoritative_human_handoff"]).is_file())
 
     def test_noncore_detach_must_have_zero_active_runtime_dependencies(self):
@@ -81,6 +81,27 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(any("EXACT" in line or "exact" in line for line in start))
         self.assertTrue(any("ZERO" in line.upper() for line in start))
         self.assertEqual(len(self.policy["core_systems"]), 5)
+
+    def test_zero_legacy_dependency_is_mandatory_for_core_boot(self):
+        rule = self.policy["core_dependency_invariant"]
+        self.assertEqual(rule["rule_id"], "NO_CORE_DEPENDENCY_ON_OPTIONAL_MODULES")
+        self.assertTrue(rule["required"])
+        for key in (
+            "native_operator_must_start_with_zero_legacy_plugins",
+            "native_organizer_handoff_must_work_without_legacy_plugins",
+            "brain_operator_transport_must_work_without_legacy_plugins",
+            "studio_build_run_and_existing_qa_must_work_without_legacy_plugins",
+            "optional_plugin_loader_cannot_be_required_by_core",
+            "core_build_and_install_must_not_publish_all_legacy_modules",
+            "release_gate_must_not_enforce_minimum_legacy_module_count",
+            "core_boot_with_empty_legacy_module_directory_is_mandatory",
+            "zero_dependency_edges_to_all_legacy_noncore_modules_required",
+        ):
+            self.assertTrue(rule[key], key)
+        self.assertFalse(rule["native_refactor_completed"])
+        self.assertFalse(rule["installed_clean_boot_verified"])
+        self.assertEqual(rule["native_observation_status"],
+                         "GITHUB_OPERATOR_SOURCE_ONLY_NOT_INSTALLED")
 
     def test_future_programs_are_separate_and_deferred(self):
         future = self.policy["future_program_architecture"]
