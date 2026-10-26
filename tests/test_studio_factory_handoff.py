@@ -93,6 +93,8 @@ class StudioFactoryHandoffTests(unittest.TestCase):
     def test_repair_changes_build_and_document_revision(self):
         s=built("REPAIRED_RUNNING",iteration=2,build_sha256=HASH2,
                 previous_failed_build_sha256=HASH1,
+                previous_failed_factory_run_id="QA_FAILURE_1",
+                previous_failure_evidence_ref="BUG_1",
                 prior_design_revision=3,design_revision=4)
         advice=judge(s)
         self.assertEqual(advice.disposition,"NATIVE_PREFLIGHT_REQUIRED")
@@ -110,6 +112,8 @@ class StudioFactoryHandoffTests(unittest.TestCase):
     def test_old_factory_result_must_not_be_reused_as_retest(self):
         s=built("REPAIRED_RUNNING",iteration=2,build_sha256=HASH2,
                 previous_failed_build_sha256=HASH1,
+                previous_failed_factory_run_id="QA_FAILURE_1",
+                previous_failure_evidence_ref="BUG_1",
                 prior_design_revision=3,design_revision=4,
                 factory_tested_sha256=HASH1,
                 factory_run_id="PREVIOUS_QA_RUN",
@@ -122,6 +126,8 @@ class StudioFactoryHandoffTests(unittest.TestCase):
     def test_matching_qa_pass_still_does_not_release(self):
         s=built("QA_PASSED",iteration=2,build_sha256=HASH2,
                 previous_failed_build_sha256=HASH1,
+                previous_failed_factory_run_id="QA_FAILURE_1",
+                previous_failure_evidence_ref="BUG_1",
                 prior_design_revision=3,design_revision=4,
                 factory_tested_sha256=HASH2,
                 factory_run_id="RETEST_QA_2",
@@ -135,6 +141,58 @@ class StudioFactoryHandoffTests(unittest.TestCase):
         self.assertFalse(a.may_install)
         self.assertFalse(a.factory_pass_attested)
         self.assertFalse(a.native_evidence_authenticated)
+
+    def test_repaired_build_must_carry_prior_failed_run_and_defect(self):
+        s=built("REPAIRED_RUNNING",iteration=2,build_sha256=HASH2,
+                previous_failed_build_sha256=HASH1,
+                prior_design_revision=3,design_revision=4)
+        advice=judge(s)
+        self.assertEqual(advice.disposition,"BLOCKED")
+        self.assertIn("PRIOR_FAILED_FACTORY_RUN_MISSING",advice.blockers)
+        self.assertIn("PRIOR_FAILURE_EVIDENCE_MISSING",advice.blockers)
+        self.assertFalse(advice.may_execute)
+
+    def test_retest_cannot_reuse_failed_factory_run_id(self):
+        s=built("QA_PASSED",iteration=2,build_sha256=HASH2,
+                previous_failed_build_sha256=HASH1,
+                previous_failed_factory_run_id="QA_RUN_1",
+                previous_failure_evidence_ref="BUG_1",
+                prior_design_revision=3,design_revision=4,
+                factory_tested_sha256=HASH2,
+                factory_run_id="QA_RUN_1",
+                factory_verdict="PASS",qa_witness_verified=True,
+                rollback_verified=True)
+        self.assertIn("SAME_FACTORY_RUN_REUSED_FOR_RETEST",judge(s).blockers)
+
+    def test_edited_design_cannot_claim_old_build_launch_or_qa(self):
+        s=replace(base(),build_sha256=HASH1,
+                  factory_tested_sha256=HASH1,factory_run_id="QA_OLD",
+                  real_program_launch_verified=True,
+                  qa_witness_verified=True)
+        blocked=judge(s)
+        for code in ("DESIGN_MUST_NOT_CARRY_OLD_BUILD",
+                     "DESIGN_MUST_NOT_CARRY_OLD_QA",
+                     "DESIGN_MUST_NOT_CARRY_OLD_QA_RUN",
+                     "DESIGN_MUST_NOT_CLAIM_QA_WITNESS",
+                     "DESIGN_MUST_NOT_CLAIM_REAL_LAUNCH"):
+            self.assertIn(code,blocked.blockers)
+
+    def test_pass_cannot_claim_current_failure_evidence(self):
+        s=built("QA_PASSED",factory_tested_sha256=HASH1,
+                factory_run_id="QA_RUN_1",factory_verdict="PASS",
+                defect_evidence_ref="OLD_BUG",
+                qa_witness_verified=True,rollback_verified=True)
+        self.assertIn("CURRENT_PASS_CARRIES_FAILURE_EVIDENCE",judge(s).blockers)
+
+    def test_single_first_qa_pass_needs_no_previous_failure(self):
+        s=built("QA_PASSED",iteration=1,
+                factory_tested_sha256=HASH1,factory_run_id="QA_FIRST",
+                factory_verdict="PASS",qa_witness_verified=True,
+                rollback_verified=True)
+        a=judge(s)
+        self.assertEqual(a.disposition,"NATIVE_PREFLIGHT_REQUIRED")
+        self.assertFalse(a.factory_pass_attested)
+        self.assertFalse(a.may_release)
 
     def test_wrong_project_and_stale_task_block(self):
         for s,code in (
