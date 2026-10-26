@@ -1,4 +1,4 @@
-"""Read-only Brain review combining ONE native task with four-core readiness.
+"""Read-only Brain review combining ONE native task with five-system readiness.
 
 This is a source-level composition boundary, not an activation switch.
 It cannot attest that an independently supplied activation snapshot is from
