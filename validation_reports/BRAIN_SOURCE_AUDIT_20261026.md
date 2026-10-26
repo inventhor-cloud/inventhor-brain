@@ -51,3 +51,18 @@ Kaynaktaki 104 Git ağacı girdisi (dizinler dâhil) tarandı; merkezi Python g�
 `continuity/studio_factory_handoff.py` kaynak denetimi daha sıkı hâle getirildi. Studio düzenleme aşaması eski build/QA çalıştırma kanıtını taşıyamaz. Gerçek hatadan sonra yeni sürümün QA'ya geri gönderilmesi için **önceki başarısız build hash'i, önceki Fabrika çalıştırma ID'si, hata kanıtı, daha yüksek Studio revizyonu ve değişmiş build hash'i** tutarlı olmalıdır. Yeniden QA'nın ID'si önceki başarısız QA ID'si olamaz. Önceki başarısız test yoksa `REPAIRED_RUNNING` adı kullanılmaz. İlk denemede başarılı QA, ilgisiz tarihsel hata kanıtı taşıyamaz. Hiçbiri native Factory PASS, imzalı çıktı veya PC'de kurulu çalışma kanıtı üretmez.
 
 Bu ek kaynak korumaları `tests/test_studio_factory_handoff.py` içinde negatif ve pozitif durumlarla denetlenir. **Doğrulama sonucu GitHub Actions'ın en son commit bazlı sonucu okunmadan başarı sayılmayacaktır**. Yerel Organizer/Operator/Studio/Factory entegrasyonu hâlâ ayrı ve engellidir.
+
+## 26 Ekim 2026 — QA tekrar deneme ve başarısızlık kökeni düzeltmesi
+
+**Kapsam:** `continuity/studio_factory_handoff.py`; yalnızca SOURCE-ONLY öneri doğrulaması, kurulu Fabrika sonucu değil.
+
+**Denetimde yakalanan gerçek açıklar:**
+- `QA_FAILED` ve `iteration > 1` iken önceki başarısız Fabrika kaydı, hash, hata delili ve yükselmiş Studio revizyonu bazı durumlarda zorunlu değildi. Artık tüm sonraki başarısızlıklar, önceki hatayla aynı köken zinciri şartına tabi.
+- `BUILD_RUNNING` aşamasıyla `iteration > 1` gönderilmesi, `REPAIRED_RUNNING` onarım kontrollerini atlama riski taşıyordu. Tekrarlı işlem bu isimle kabul edilmiyor.
+- İlk QA başarısızlığına farklı projeden eski test kimliği/hash/kanıt eklenmesi artık reddediliyor.
+- `phase` bir liste/sözlük gibi hashlenemeyen bir değer olduğunda beklenmedik Python `TypeError` yerine denetimli `INVALID_PHASE` reddi üretiliyor.
+- Daha önce kullanılan `FIRST_PASS_*` bloklayıcı kodları korunarak çağıran tarafların uyumluluğu bozulmadı.
+
+**Test kanıtı:** GitHub Actions [run #40334651363](https://github.com/inventhor-cloud/inventhor-brain/actions/runs/40334651363), commit `fcc9de4bedb569b2477cbf7d8bd025051f0b54b5`, **245/245 test PASS**, kaynak hijyen/freshness ve sözdizimi kontrolleri başarılı.
+
+**Açık sınır:** Bu denetimler rastgele kaynak veri paketinin yerel Factory/Organizer'dan geldiğini kanıtlamaz. Yerel işletim sisteminde gerçek kurulu QA, task lease, Operator ACK ve yeniden test yürütmesi halen native entegrasyonla ayrı doğrulanmalıdır. Bu kaynak değişikliklerinden imza, kurulum, yayın, görev değişimi veya otomatik QA PASS türetilmez.
