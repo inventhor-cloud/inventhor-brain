@@ -20,6 +20,7 @@ REQUIRED = (
     CONTRACT,
     "system_constitution/core_rules.md",
     "continuity/OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md",
+    "continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md",
     "continuity/OWNER_WORK_INTAKE_POLICY.md",
     "continuity/studio_factory_handoff.py",
     "continuity/core_activation_gate.py",
@@ -84,6 +85,31 @@ def inspect_source() -> list[str]:
         errors.append("PUBLIC_MIRROR_CLAIMS_NATIVE_ORGANIZER_UPDATED")
     if policy.get("installed_system_status") != "NOT_VERIFIED":
         errors.append("PUBLIC_MIRROR_CLAIMS_INSTALLED")
+    newest = policy.get("current_owner_operational_override")
+    if not isinstance(newest, dict) or newest.get("instruction_id") != "OWNER_FULL_NONCORE_DETACH_20261026":
+        errors.append("LATEST_OWNER_FULL_DETACH_RULE_MISSING")
+    else:
+        if newest.get("complete_removal_not_equal_hide_or_disable") is not True:
+            errors.append("NONCORE_HIDE_IS_NOT_COMPLETE_REMOVAL")
+        if newest.get("status") != "SOURCE_POLICY_REGISTERED_NATIVE_UNVERIFIED":
+            errors.append("FALSE_NATIVE_DETACH_SUCCESS")
+        if newest.get("protect_user_data_and_rollback_material") is not True:
+            errors.append("LOSS_OF_RECOVERABILITY_GUARD")
+        if newest.get("native_organizer_exact_task_update_required") is not True:
+            errors.append("MISSING_CANONICAL_ORGANIZER_HANDOFF")
+    remove = policy.get("noncore_detachment_acceptance")
+    acceptance = remove.get("complete_requires", {}) if isinstance(remove, dict) else {}
+    for name in (
+        "active_noncore_module_count",
+        "active_noncore_dependency_edges",
+        "orphan_noncore_runtime_registration_count",
+        "orphan_noncore_service_startup_task_menu_count",
+        "orphan_noncore_updater_installer_ci_reference_count",
+    ):
+        if type(acceptance.get(name)) is not int or acceptance[name] != 0:
+            errors.append("NONCORE_ZERO_POSTCONDITION_MISSING:" + name)
+    if not isinstance(remove, dict) or remove.get("unverified_runtime_is_not_success") is not True:
+        errors.append("FALSE_NONCORE_REMOVAL_ATTESTATION")
     rules = policy.get("execution_policy")
     if not isinstance(rules, dict):
         errors.append("EXECUTION_POLICY_MISSING")
