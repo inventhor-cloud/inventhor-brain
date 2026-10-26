@@ -45,3 +45,9 @@ Kaynaktaki 104 Git ağacı girdisi (dizinler dâhil) tarandı; merkezi Python g�
 **SONUÇ:** Kaynak temizlik katmanı ve otomatik linter iyileştirildi. Beşli kural için kaynak testleri başarıyla çalışıyor. **Sistem bütünüyle temiz/kurulu/aktif olarak doğrulanmadı.** Kalıcı silme, canlı çalışma taşıma ve QA kabulü yapılmadı.
 
 **İş sınırı:** Codex native görevini ve aktif lease'ini devralma; başka görev oluşturma; 25 Ekim bağımsız program planını yeniden etkinleştirme; eylem ve test sonucu üretme veya uydurma; terminal işi yeniden oynatma.
+
+## Aynı gün — Studio → QA hata zinciri ek düzeltme
+
+`continuity/studio_factory_handoff.py` kaynak denetimi daha sıkı hâle getirildi. Studio düzenleme aşaması eski build/QA çalıştırma kanıtını taşıyamaz. Gerçek hatadan sonra yeni sürümün QA'ya geri gönderilmesi için **önceki başarısız build hash'i, önceki Fabrika çalıştırma ID'si, hata kanıtı, daha yüksek Studio revizyonu ve değişmiş build hash'i** tutarlı olmalıdır. Yeniden QA'nın ID'si önceki başarısız QA ID'si olamaz. Önceki başarısız test yoksa `REPAIRED_RUNNING` adı kullanılmaz. İlk denemede başarılı QA, ilgisiz tarihsel hata kanıtı taşıyamaz. Hiçbiri native Factory PASS, imzalı çıktı veya PC'de kurulu çalışma kanıtı üretmez.
+
+Bu ek kaynak korumaları `tests/test_studio_factory_handoff.py` içinde negatif ve pozitif durumlarla denetlenir. **Doğrulama sonucu GitHub Actions'ın en son commit bazlı sonucu okunmadan başarı sayılmayacaktır**. Yerel Organizer/Operator/Studio/Factory entegrasyonu hâlâ ayrı ve engellidir.
