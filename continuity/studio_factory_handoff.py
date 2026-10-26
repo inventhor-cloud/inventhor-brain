@@ -211,12 +211,14 @@ def advise_studio_factory_handoff(
         need(snapshot.iteration > 1, "REPAIR_REQUIRES_FAILED_PRIOR_ITERATION")
     if phase in ("QA_FAILED", "QA_PASSED") and snapshot.iteration == 1:
         # First Factory pass OR failure cannot claim unrelated prior run IDs.
+        # Preserve the existing FIRST_PASS_* advice codes for callers.
+        prefix = "FIRST_PASS" if phase == "QA_PASSED" else "FIRST_FAILURE"
         need(not snapshot.previous_failed_build_sha256,
-             "FIRST_QA_CARRIES_OLD_FAILED_BUILD")
+             prefix + "_CARRIES_OLD_FAILED_BUILD")
         need(not snapshot.previous_failed_factory_run_id,
-             "FIRST_QA_CARRIES_OLD_FAILED_QA_RUN")
+             prefix + "_CARRIES_OLD_FAILED_QA_RUN")
         need(not snapshot.previous_failure_evidence_ref,
-             "FIRST_QA_CARRIES_OLD_FAILURE_EVIDENCE")
+             prefix + "_CARRIES_OLD_FAILURE_EVIDENCE")
     if phase in ("REPAIRED_RUNNING", "QA_FAILED", "QA_PASSED") and snapshot.iteration > 1:
         need(bool(snapshot.previous_failed_build_sha256),
              "FAILED_BUILD_REFERENCE_MISSING")
