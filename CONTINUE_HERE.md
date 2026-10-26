@@ -1,5 +1,8 @@
 # SON SAHİP SÖKÜM TALİMATI — 2026-10-26
 
+> **26 EKİM — KOD İLERLEMESİ / CODEX DEVİR:** [Operator taslak PR #5](https://github.com/inventhor-cloud/inventhor-operator-core/pull/5) ile iki Beyin transportu doğrudan çekirdek derlemeye bağlandı, aynı transportun plugin olarak ikinci kez yüklenmesi engellendi ve çekirdek salt-okunur STATUS komutu modülsüz çalışabilir hâle getirildi. [Windows kaynak CI](https://github.com/inventhor-cloud/inventhor-operator-core/actions/runs/40404820824): **150/150 PASS**, servis publish, WPF derlemesi ve predeploy testleri başarılı. **TAM SÖKÜM veya NATIVE CANLI TEST DEĞİLDİR.** Codex mevcut Organizer TASK_ID/lease+yerel diff üzerinden doğrulamadan merge/install yapmasın. Kalan eski executor/plugin, 16-modül dağıtım betiği, Studio build/run ve Fabrika QA için [açık kaynak denetimi](validation_reports/OPERATOR_OPTIONAL_MODULE_COUPLING_20261026.md).
+
+
 > **ÇEKİRDEK-BAĞIMSIZLIK DENETİMİ:** Hiçbir opsiyonel/legacy modül Operator, Inventhor, Organizer, Studio, QA için temel gereklilik olamaz. Kaynakta OperatorWorker PluginCatalog üzerinden yürütücü/transport alıyor ve eski kurulum 16 modül istiyor; bu bir **kaynak mimari kusuru**, kaçınılmaz çekirdek bağımlılığı değildir. [Kanıt ve düzeltme sırası](validation_reports/OPERATOR_OPTIONAL_MODULE_COUPLING_20261026.md). Mevcut native task+lease ile önce bağımsız çekirdek işlevini ve boş plugin klasörü boot/QA'yı doğrula; sonra tam söküm. PC kurulu durumu doğrulanmadı.
 
 
