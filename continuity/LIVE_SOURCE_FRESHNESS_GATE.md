@@ -22,7 +22,7 @@ Scope: GPT, Codex and INVENTHOR/Operator now. Additional providers remain backlo
 
 ## Owner priority and non-interruption
 
-The current owner priority is the actual QA Factory end-to-end acceptance (including independent UI witness, trusted QA evidence, signed release, canary and rollback), while Brain housekeeping may proceed in separate non-conflicting scope. The initial collaboration roster is GPT, Codex and INVENTHOR. New provider integrations are **planned, not current scope**.
+The current owner priority (26 Oct 2026) is **ONE full application-production system** consisting exactly of **INVENTHOR, OPERATOR, ORGANIZER, STUDIO_DESIGN and QA_FACTORY** (QA and Fabrika are the same existing service). Real Studio design/render/run/edit must be validated with Operator and canonical Organizer, then the **same QA Factory** must observe real failure, correction and retest using exact build revision/hash. Brain source housekeeping may run only in separately owned non-conflicting files. Legacy new-module/program ideas are deferred. The initial collaboration roster is GPT, Codex and INVENTHOR. New provider integrations are **planned, not current scope**.
 
 A newly mentioned feature is an **idea/backlog candidate by default**, not an implicit preemption. Deduplicate against the canonical work list, record its goal and intended target, then return to the current priority. A new active work assignment or priority override requires a clear owner instruction and normal task-admission safeguards.
 
