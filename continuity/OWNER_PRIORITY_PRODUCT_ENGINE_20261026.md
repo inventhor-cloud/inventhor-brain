@@ -1,3 +1,5 @@
+> **SON SAHİP TAM SÖKÜM ÜST EMRİ — 26 EKİM 2026:** Bu metnin eski 'pasifleştir / ileride ayrı program' anlatımları son kararla geçersizdir. **INVENTHOR, OPERATOR, ORGANIZER, STUDIO_DESIGN, QA_FACTORY** dışında kalan bütün bağımsız noncore modüller aktif sistemden menü/registry/servis/startup/bağımlılık dahil tamamen sökülecek. Gerekli iç yetenekler beş sisteme taşınarak korunacak, eski plugin'e 0 aktif bağımlılık kalacak. Native kurulum/sökümün yapıldığı henüz doğrulanmadı. Yeni AI/Codex [OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md](OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md) belgesini **önce** okumalıdır.
+
 > **LATEST OWNER ARCHITECTURE — 2026-10-26:** Exactly **INVENTHOR / OPERATOR / ORGANIZER / STUDIO_DESIGN / QA_FACTORY**. QA and Fabrika are one. This document must be interpreted together with the [machine contract](../system_constitution/ACTIVE_PRODUCT_ARCHITECTURE_20261026.json); older four-core/Organizer-internal phrasing is superseded. Source and GitHub mirrors are not native execution authority.
 
 # INVENTHOR — TEK HEDEF: GERÇEK UYGULAMA ÜRETİM SİSTEMİ
