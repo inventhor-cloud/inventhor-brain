@@ -1,7 +1,7 @@
 """Source-only Studio Design -> existing QA Factory cycle verifier.
 
-Exactly four owner-facing systems: INVENTHOR (existing Organizer inside),
-Operator, Studio Design and the existing Quality Factory. This validates
+Exactly five architectural systems: INVENTHOR, Operator, the existing
+canonical Organizer, Studio Design and the existing Quality Factory (QA). This validates
 reported handoff identity and evidence consistency. It does not create a
 Studio, Factory, queue, job, application or installed workflow; native host
 must authenticate every fact and acquire existing Organizer lease itself.
@@ -40,6 +40,8 @@ class StudioFactorySnapshot:
     build_sha256: str = ""
     factory_tested_sha256: str = ""
     previous_failed_build_sha256: str = ""
+    previous_failed_factory_run_id: str = ""
+    previous_failure_evidence_ref: str = ""
     prior_design_revision: int = 0
     iteration: int = 1
     real_preview_verified: bool = False
@@ -148,7 +150,10 @@ def advise_studio_factory_handoff(
         value = getattr(snapshot, field)
         if not isinstance(value, str) or (value and not SHA.fullmatch(value)):
             raise StudioFactoryDenied("INVALID_" + field.upper())
-    for field in ("factory_run_id", "defect_evidence_ref"):
+    for field in (
+        "factory_run_id", "defect_evidence_ref",
+        "previous_failed_factory_run_id", "previous_failure_evidence_ref",
+    ):
         value = getattr(snapshot, field)
         if not isinstance(value, str) or len(value) > 128 or (
             value and not ID.fullmatch(value)
@@ -171,8 +176,14 @@ def advise_studio_factory_handoff(
     }
     phase = snapshot.phase
     if phase == "DESIGN_EDITED":
-        # Render / launch is the next real milestone, not presumed complete.
+        # An edited design cannot inherit an old build/QA certificate.
         need(snapshot.factory_verdict == "NONE", "PREMATURE_FACTORY_VERDICT")
+        need(not snapshot.build_sha256, "DESIGN_MUST_NOT_CARRY_OLD_BUILD")
+        need(not snapshot.factory_tested_sha256, "DESIGN_MUST_NOT_CARRY_OLD_QA")
+        need(not snapshot.factory_run_id, "DESIGN_MUST_NOT_CARRY_OLD_QA_RUN")
+        need(not snapshot.qa_witness_verified, "DESIGN_MUST_NOT_CLAIM_QA_WITNESS")
+        need(not snapshot.real_program_launch_verified,
+             "DESIGN_MUST_NOT_CLAIM_REAL_LAUNCH")
     else:
         need(bool(snapshot.build_sha256), "BUILD_HASH_MISSING")
         need(snapshot.real_preview_verified, "REAL_PREVIEW_NOT_VERIFIED")
@@ -200,6 +211,18 @@ def advise_studio_factory_handoff(
         need(snapshot.prior_design_revision < snapshot.design_revision
              and snapshot.prior_design_revision >= 1,
              "STUDIO_REVISION_DID_NOT_ADVANCE")
+        # A new build hash alone is not a proven fix/retest: the previous
+        # exact failed Factory run and its defect must be carried forward.
+        need(bool(snapshot.previous_failed_factory_run_id),
+             "PRIOR_FAILED_FACTORY_RUN_MISSING")
+        need(bool(snapshot.previous_failure_evidence_ref),
+             "PRIOR_FAILURE_EVIDENCE_MISSING")
+        if phase == "QA_PASSED":
+            need(snapshot.factory_run_id != snapshot.previous_failed_factory_run_id,
+                 "SAME_FACTORY_RUN_REUSED_FOR_RETEST")
+    if phase == "QA_PASSED":
+        need(not snapshot.defect_evidence_ref,
+             "CURRENT_PASS_CARRIES_FAILURE_EVIDENCE")
     if phase == "QA_PASSED":
         need(snapshot.factory_verdict == "PASS", "FACTORY_PASS_NOT_RECORDED")
         need(snapshot.rollback_verified, "ROLLBACK_NOT_VERIFIED")
