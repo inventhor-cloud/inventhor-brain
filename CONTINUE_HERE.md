@@ -1,3 +1,11 @@
+# ÜST MİMARİ TALİMAT — 2026-10-26
+
+**HEDEF = SADECE BEŞ İŞLEVSEL PARÇA:** INVENTHOR, OPERATOR, ORGANIZER, STUDIO DESIGN, KALİTE FABRİKASI (QA). **QA/Fabrika aynıdır.** Tek uygulama üretim zincirini bitir. Yeni modül, ürün, ayrı program, provider veya yan projede geliştirme yapma. Eski modülleri yalnızca sakla/gelecek havuzunda tut; ancak güvenli ve geri alınabilir temizliğini çekirdek bağlantıları koruyarak yap. Organizer ayrı yetkili tek kanonik kayıt, INVENTHOR arayüzü içinde görülebilir ama kopyalanamaz.
+
+**Önce şunu oku:** [Machine contract](system_constitution/ACTIVE_PRODUCT_ARCHITECTURE_20261026.json) ve [Architecture owner contract](https://github.com/inventhor-cloud/inventhor-brain-architecture/blob/feat/advisory-architecture-guard-v1-20261015/constitution/OWNER_ACTIVE_PRODUCTION_ARCHITECTURE_20261026.md). Bunlar önceki 25 Ekim modül/program planlarını ve aşağıdaki dört çekirdek sözcüklerini **aktif öncelikte geçersiz kılar**. Kaynak CI başarıları kurulu program veya QA başarı beyanı değildir. Yerel mevcut Organizer TASK_ID/lease alınmadan görev yazılamaz.
+
+---
+
 # GÜNCEL ÖNCELİK — 2026-10-26
 
 **SADECE UYGULAMA ÜRETEN ANA SİSTEM:** INVENTHOR (Brain/Main + mevcut Organizer), OPERATOR, STUDIO DESIGN, KALİTE FABRİKASI. Bu dört bileşen gerçek tasarım→birebir görüntü→çalıştırma→değiştirme→QA→onarım→yeniden QA akışında çalışacak. Başka modül/program geliştirme ve eski modülleri ayrı uygulamaya dönüştürme çalışması **DURDURULDU/GELECEK HAVUZUNDA**. Sadece gerekliyse yedekli, geri alınabilir, bağımlılık doğrulanmış non-core devre dışı bırakma.
