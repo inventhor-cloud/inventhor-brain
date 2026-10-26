@@ -1,3 +1,12 @@
+# GÜNCEL ÖNCELİK — 2026-10-26
+
+**SADECE UYGULAMA ÜRETEN ANA SİSTEM:** INVENTHOR (Brain/Main + mevcut Organizer), OPERATOR, STUDIO DESIGN, KALİTE FABRİKASI. Bu dört bileşen gerçek tasarım→birebir görüntü→çalıştırma→değiştirme→QA→onarım→yeniden QA akışında çalışacak. Başka modül/program geliştirme ve eski modülleri ayrı uygulamaya dönüştürme çalışması **DURDURULDU/GELECEK HAVUZUNDA**. Sadece gerekliyse yedekli, geri alınabilir, bağımlılık doğrulanmış non-core devre dışı bırakma.
+
+**Son sahibi yönergesi ve Codex/Organizer taşınma sözleşmesi:** [OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md](continuity/OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md).
+**Eski 25 Ekim 'ayrı program' bölümleri bugün için GEÇERSİZ ÖNCELİKTİR; kaynak arşividir.** Bu bulut belge/PR, kurulu Organizer yetkisi veya QA kabulü değildir. Yerel Codex mevcut orijinal TASK_ID/lease üzerine yeni hedefi işlemelidir.
+
+---
+
 # Continue Here
 
 **IMPORTANT (2026-10-22):** These are public cloud reference files, not live local work authority. The operator and Main may have newer installed state; see [live source/freshness gate](continuity/LIVE_SOURCE_FRESHNESS_GATE.md) and obtain exact task-scoped handoff from the owner-authorized canonical Organizer before any write, status claim or restart. The earlier project/next task noted below is historical, not the current priority. Default: new ideas go to intake without interrupting active QA or separately scoped Brain housekeeping. No new providers are in the immediate GPT/Codex/INVENTHOR roster.
