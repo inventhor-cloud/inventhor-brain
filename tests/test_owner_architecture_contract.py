@@ -82,6 +82,16 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(any("ZERO" in line.upper() for line in start))
         self.assertEqual(len(self.policy["core_systems"]), 5)
 
+    def test_future_programs_are_separate_and_deferred(self):
+        future = self.policy["future_program_architecture"]
+        self.assertEqual(future["priority_now"],
+                         "DEFERRED_NO_STANDALONE_PROGRAM_IMPLEMENTATION")
+        self.assertTrue(future["installed_app_not_required_to_embed_inventhor"])
+        self.assertTrue(future["remove_all_legacy_noncore_runtime_dependencies_now"])
+        self.assertTrue(future["no_duplicate_brain_operator_organizer_design_studio_factory"])
+        self.assertFalse(future["native_installed_computer_access_verified"])
+        self.assertTrue(future["source_contract_only"])
+
     def test_no_expansion_or_installed_success_from_source(self):
         paused = self.policy["out_of_scope_now"]
         self.assertTrue(any("Converting legacy modules" in x for x in paused))
