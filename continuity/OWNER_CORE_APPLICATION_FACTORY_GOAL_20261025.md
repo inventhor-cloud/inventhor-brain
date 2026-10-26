@@ -1,3 +1,5 @@
+> **HISTORICAL OWNER PLAN — SUPERSEDED FOR ACTIVE WORK ON 2026-10-26.** Do NOT proceed with the separate standalone-program conversion proposed below. Current sole target is to make INVENTHOR+its existing Organizer, Operator, Studio Design and existing Quality Factory fully work as ONE end-to-end app creation system. The old document is archived context only. [CURRENT OWNER DIRECTIVE](OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md).
+
 # INVENTHOR — Owner Hedefi: Tek Sistem, Uygulama Üretim Döngüsü
 
 **Owner priority update: 2026-10-25 | P0 / four-core scope.**
