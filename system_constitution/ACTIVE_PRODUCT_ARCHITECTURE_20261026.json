@@ -1,6 +1,6 @@
 {
   "contract_id": "INVENTHOR_SINGLE_PRODUCT_ENGINE_20261026",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "owner_policy_effective_date": "2026-10-26",
   "priority": "P0_ONLY",
   "source_role": "PUBLIC_SOURCE_POLICY_REFERENCE_NOT_NATIVE_AUTHORIZATION",
@@ -100,14 +100,54 @@
     "failure_reporting": "Real failures recorded honestly with exact blockers and smallest finite next step"
   },
   "new_agent_startup": [
-    "Read this file before any plan, then read current owner directive and exact real Organizer task from trusted host",
-    "Normalize aliases to exactly five unique system IDs; QA=Fabrika one service",
-    "Reject attempts to resume superseded expansion work; keep old source only for historical context",
-    "Respect previous work owners and separate Codex native scope",
-    "Choose the smallest authorized finite task contributing directly to one real end-to-end application-production milestone",
-    "Never claim installation or live readiness from GitHub test, source doc or chat instruction"
+    "FIRST read continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md and this contract; owner expects FULL live runtime detachment, not hiding optional modules",
+    "Read trusted current ORIGINAL Organizer exact PROJECT_ID TASK_ID revision lease owner evidence and the last Codex owner command; do not duplicate existing work",
+    "Inventory installed module registries/services/startup/dependency graph read-only, classify required internal capabilities versus full noncore removal and unknowns",
+    "Use reversible native scoped batches with backup, native authorization and independent QA; ensure zero remaining runtime references to old noncore modules and no broken core dependency",
+    "Then complete one actual Studio Operator QA Factory design-run-fail-repair-retest workflow; record authentic native evidence and checkpoints",
+    "Do not claim source GitHub documentation equals native Organizer update or module removal",
+    "Never create a new core, Organizer, Studio, Factory, optional standalone app or side module and never delete owner data blindly"
   ],
   "native_organizer_goal_update_status": "NOT_VERIFIED",
   "installed_system_status": "NOT_VERIFIED",
-  "owner_changes_can_be_applied_to_source_now": true
+  "owner_changes_can_be_applied_to_source_now": true,
+  "current_owner_operational_override": {
+    "effective_on": "2026-10-26",
+    "instruction_id": "OWNER_FULL_NONCORE_DETACH_20261026",
+    "owner_intent": "Fully remove all optional/legacy non-core modules from the ACTIVE inventor runtime, UI, start-up, service registry and dependency graph; as if those integrations never existed in the running product. Keep exactly the original five systems and their working required internal capabilities.",
+    "authoritative_human_handoff": "continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md",
+    "status": "SOURCE_POLICY_REGISTERED_NATIVE_UNVERIFIED",
+    "complete_removal_not_equal_hide_or_disable": true,
+    "required_postcondition": "ZERO active noncore module identity or dependency anywhere in the five-system installed product, including restart and update paths",
+    "preserve_history_in_separate_nonruntime_archive": true,
+    "protect_user_data_and_rollback_material": true,
+    "native_organizer_exact_task_update_required": true,
+    "desktop_commander_offline_does_not_prove_removal": true,
+    "existing_core_features_must_keep_working": true,
+    "pauses_new_modular_program_development": true
+  },
+  "noncore_detachment_acceptance": {
+    "scope": "INSTALLED_WINDOWS_ONLY_VERIFIED_BY_NATIVE_ORGANIZER_AND_FACTORY",
+    "source_manifest_16_modules_are_only_candidates": true,
+    "all_legacy_module_ids_require_native_dependency_classification": true,
+    "classification_values": [
+      "CORE_SYSTEM",
+      "CORE_REQUIRED_INTERNAL_CAPABILITY",
+      "NONCORE_REMOVE",
+      "UNRESOLVED_DEPENDENCY"
+    ],
+    "core_required_capabilities_move_to_existing_five_systems_before_old_plugin_identity_detach": true,
+    "complete_requires": {
+      "active_noncore_module_count": 0,
+      "active_noncore_dependency_edges": 0,
+      "orphan_noncore_runtime_registration_count": 0,
+      "orphan_noncore_service_startup_task_menu_count": 0,
+      "orphan_noncore_updater_installer_ci_reference_count": 0,
+      "five_system_smoke_verified": true,
+      "studio_operator_factory_live_chain_verified": true,
+      "native_organizer_checkpoint_written_and_read_back": true
+    },
+    "unverified_runtime_is_not_success": true,
+    "irreversible_deletion_of_user_data_requires_separate_explicit_approval": true
+  }
 }
