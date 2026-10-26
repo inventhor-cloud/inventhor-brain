@@ -218,6 +218,72 @@ class StudioFactoryHandoffTests(unittest.TestCase):
             self.assertIn(name,blocked.blockers)
         self.assertFalse(blocked.may_release)
 
+    def test_second_qa_failure_requires_prior_failure_lineage(self):
+        s=built("QA_FAILED",iteration=2,build_sha256=HASH2,
+                factory_tested_sha256=HASH2, factory_run_id="QA_FAIL_2",
+                factory_verdict="FAIL",qa_witness_verified=True,
+                defect_evidence_ref="BUG_2")
+        blocked=judge(s)
+        self.assertEqual(blocked.disposition,"BLOCKED")
+        for name in ("FAILED_BUILD_REFERENCE_MISSING",
+                     "PRIOR_FAILED_FACTORY_RUN_MISSING",
+                     "PRIOR_FAILURE_EVIDENCE_MISSING",
+                     "STUDIO_REVISION_DID_NOT_ADVANCE"):
+            self.assertIn(name,blocked.blockers)
+
+    def test_second_qa_failure_with_new_revision_preserves_repair_path(self):
+        s=built("QA_FAILED",iteration=2,build_sha256=HASH2,
+                previous_failed_build_sha256=HASH1,
+                previous_failed_factory_run_id="QA_FAIL_1",
+                previous_failure_evidence_ref="BUG_1",
+                prior_design_revision=3,design_revision=4,
+                factory_tested_sha256=HASH2,factory_run_id="QA_FAIL_2",
+                factory_verdict="FAIL",qa_witness_verified=True,
+                defect_evidence_ref="BUG_2")
+        a=judge(s)
+        self.assertEqual(a.disposition,"NATIVE_PREFLIGHT_REQUIRED")
+        self.assertEqual(a.next_action,
+                         "REPAIR_DOCUMENT_IN_STUDIO_THEN_REBUILD")
+        self.assertFalse(a.may_execute)
+
+    def test_second_qa_failure_cannot_reuse_previous_factory_run(self):
+        s=built("QA_FAILED",iteration=2,build_sha256=HASH2,
+                previous_failed_build_sha256=HASH1,
+                previous_failed_factory_run_id="QA_FAIL_1",
+                previous_failure_evidence_ref="BUG_1",
+                prior_design_revision=3,design_revision=4,
+                factory_tested_sha256=HASH2,factory_run_id="QA_FAIL_1",
+                factory_verdict="FAIL",qa_witness_verified=True,
+                defect_evidence_ref="BUG_2")
+        self.assertIn("SAME_FACTORY_RUN_REUSED_FOR_RETEST",
+                      judge(s).blockers)
+
+    def test_retried_build_cannot_disguise_as_first_build(self):
+        s=built("BUILD_RUNNING",iteration=2,build_sha256=HASH2)
+        self.assertIn("RETRY_MASQUERADES_AS_FIRST_BUILD",
+                      judge(s).blockers)
+
+    def test_first_failure_cannot_import_previous_project_failure(self):
+        s=built("QA_FAILED",iteration=1,
+                factory_tested_sha256=HASH1,factory_run_id="QA_FAIL_1",
+                factory_verdict="FAIL",qa_witness_verified=True,
+                defect_evidence_ref="BUG_1",
+                previous_failed_build_sha256=HASH2,
+                previous_failed_factory_run_id="PREVIOUS_UNRELATED_RUN",
+                previous_failure_evidence_ref="PREVIOUS_UNRELATED_BUG")
+        blockers=judge(s).blockers
+        for name in ("FIRST_FAILURE_CARRIES_OLD_FAILED_BUILD",
+                     "FIRST_FAILURE_CARRIES_OLD_FAILED_QA_RUN",
+                     "FIRST_FAILURE_CARRIES_OLD_FAILURE_EVIDENCE"):
+            self.assertIn(name,blockers)
+
+    def test_unhashable_or_non_string_phase_fails_with_specific_denial(self):
+        for bad in ([], {}, 99, None):
+            with self.subTest(bad=bad):
+                with self.assertRaises(StudioFactoryDenied) as ex:
+                    judge(phase=bad)
+                self.assertEqual(ex.exception.code,"INVALID_PHASE")
+
     def test_wrong_project_and_stale_task_block(self):
         for s,code in (
             (replace(base(),project_id="ANOTHER_PROJECT"),"PROJECT_SCOPE_MISMATCH"),
