@@ -20,7 +20,7 @@ Do not copy entire chat transcripts into continuity state. Store compact structu
 
 ## Provider-neutral rule
 
-GPT, Codex, Gemini or another future provider receives the same resume packet. Provider-specific chat history is optional context, never canonical project truth.
+The current authorized roster GPT, Codex and INVENTHOR uses the **same native Organizer task-scoped handoff**; future providers are deferred and must not be self-enabled. Provider-specific chat history is optional context, never canonical project truth.
 
 ## Operator rule
 
