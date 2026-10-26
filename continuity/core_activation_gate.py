@@ -1,4 +1,4 @@
-"""Four-core activation readiness advisory for the EXISTING INVENTHOR Brain.
+"""Five-system activation readiness advisory for the EXISTING INVENTHOR Brain.
 
 No queue, service, installer, cleanup module, native lease or PC side effect.
 GitHub/source input is never a live attestation. A real native Main/Organizer
@@ -10,8 +10,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import re
 
-# Four owner-facing systems. The ORIGINAL Organizer remains internal to INVENTHOR.
-CORE = ("INVENTHOR", "OPERATOR", "STUDIO_DESIGN", "QA_FACTORY")
+# Five owner-named functional components; QA and Factory are one system.
+# The ONE existing Organizer can be exposed inside INVENTHOR UI without cloning it.
+CORE = ("INVENTHOR", "OPERATOR", "ORGANIZER", "STUDIO_DESIGN", "QA_FACTORY")
 REQUIRED_LINKS = (
     "BRAIN_OPERATOR", "BRAIN_ORGANIZER", "OPERATOR_ORGANIZER",
     "OPERATOR_QA", "QA_ORGANIZER", "PROGRAM_ACTION_BRIDGE",
@@ -63,7 +64,7 @@ class CoreActivationAdvice:
     disposition: str
     blockers: tuple[str, ...]
     next_action: str
-    source_class: str = "FOUR_CORE_SOURCE_ADVISORY_NOT_RUNTIME_ATTESTATION"
+    source_class: str = "FIVE_SYSTEM_SOURCE_ADVISORY_NOT_RUNTIME_ATTESTATION"
     native_snapshot_authenticated: bool = False
     activation_executed: bool = False
     live_status_verified: bool = False
