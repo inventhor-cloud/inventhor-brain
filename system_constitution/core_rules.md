@@ -1,3 +1,11 @@
+# GÜNCEL SAHİP MİMARİ KURALI — 2026-10-26
+
+**Üst hedef ve isimler:** Beş mimari sistem vardır: `INVENTHOR`, `OPERATOR`, `ORGANIZER`, `STUDIO_DESIGN`, `QA_FACTORY` (**QA = Fabrika, ikinci bir QA değil**). Tek hedef bunların gerçek uygulama oluşturma, tasarlama, birebir görme, çalıştırma, değişiklik, gerçek QA, hata düzeltme ve yeniden test yapabilmesidir. Başka modül/ayrı program geliştirmek YASAK AKTİF KAPSAMDIR; eski kaynaklar saklanır. Dört çekirdek/Organizer içeride veya 25 Ekim "modülleri ayrı programa dönüştür" hedefleri **bu üst kuralla geçersiz aktif önceliktir**. Organizer aynı tek kanonik proje/görev/lease/handoff evidences sistemidir.
+
+**Tek makine-okunur kaynak:** [ACTIVE_PRODUCT_ARCHITECTURE_20261026.json](ACTIVE_PRODUCT_ARCHITECTURE_20261026.json). Geliştirme sırasında mevcut yerel Organizer yetki/kilit/kanıt kontrolü atlanamaz; GitHub yalnızca kaynak/handoff aynasıdır. Aşağıdaki eski "INVENTHOR modüler olmalı" kuralı kod içi ayrım anlamındadır, **yeni modül üretme yetkisi değildir**.
+
+---
+
 # INVENTHOR System Constitution
 
 1. INVENTHOR must remain modular.
