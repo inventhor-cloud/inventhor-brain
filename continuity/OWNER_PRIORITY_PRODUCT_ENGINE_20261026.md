@@ -1,16 +1,19 @@
+> **LATEST OWNER ARCHITECTURE — 2026-10-26:** Exactly **INVENTHOR / OPERATOR / ORGANIZER / STUDIO_DESIGN / QA_FACTORY**. QA and Fabrika are one. This document must be interpreted together with the [machine contract](../system_constitution/ACTIVE_PRODUCT_ARCHITECTURE_20261026.json); older four-core/Organizer-internal phrasing is superseded. Source and GitHub mirrors are not native execution authority.
+
 # INVENTHOR — TEK HEDEF: GERÇEK UYGULAMA ÜRETİM SİSTEMİ
 
 **Owner instruction: 2026-10-26. Current top priority; overrides previous 2026-10-25 proposal to convert historic modules into individual standalone apps NOW.**
 **STATUS: OWNER INTENT / SOURCE MIRROR ONLY.** This is not a local installed change, canonical Organizer work item, native approval token, or finished release.
 
-## Product scope — only four systems may receive active development
+## Product scope — EXACTLY five named systems may receive active development
 
-1. **INVENTHOR** — existing intelligent assistant/Brain/Main with the **EXISTING Organizer canonical registry and worker coordination integrated internally**, not a new fifth product/UI, queue, ledger or app.
-2. **OPERATOR** — existing executor for owner-authorized program changes, project/build/test actions, revision verification and real ACK; no second executor.
-3. **STUDIO DESIGN** — the single real application design and creation workspace: actual canvas, native visual controls and editable project, exact interactive render/preview and actual running output, save/version/diff, program editing and owner changes of mind. Reuse existing Studio/Design source; do not invent another stand-alone Studio.
-4. **KALİTE FABRİKASI / QA** — the single existing end-to-end application factory tester: build, launch, UI interactions, logic, security, accessibility, regression, defect findings, rollback and independent build acceptance.
+1. **INVENTHOR** — one intelligent assistant/Brain/Main; owner context, plan, voice/text and result.
+2. **OPERATOR** — one permission-scoped executor; real design/build/run changes, verifiable results/ACK/rollback.
+3. **ORGANIZER** — the **existing ONE canonical** Project/Work Item/lease/revision/evidence/idea/checkpoint system shared by AI workers. May appear integrated in INVENTHOR's interface but remains its own architectural responsibility; no duplicate queue or ledger.
+4. **STUDIO DESIGN** — the existing real editable app designer and creation workspace; actual canvas and project, interactive render, real program launch and revisions. Never a fake preview or second Studio.
+5. **KALİTE FABRİKASI / QA** — the **existing ONE** app-quality/test Factory; build, launch, UI, logic, security, accessibility, regression, defect evidence, repair feedback, rollback and independent acceptance. **QA and Fabrika are synonyms, not separate systems.**
 
-**No additional active products or feature-module development now.** All other historic modules, future separate programs, antivirus, cleanup tools, Viktorija and expansion concepts = **PAUSED / FUTURE BACKLOG ONLY** in the existing Organizer. Do not begin conversion into separate programs, build their apps, extend their APIs, polish their UI, or create a program marketplace. Preserve source, archives and backups. Remove/deactivate embedded non-core startup/menu/service links **only as required to make these four systems clean**, after dependencies, live task owner/lease, reversible backup, safety and tests. Native core transport/security dependencies are NOT new feature modules and cannot be removed blindly.
+**No additional active products or feature-module development now.** All other historic modules, future separate programs, antivirus, cleanup tools, Viktorija and expansion concepts = **PAUSED / FUTURE BACKLOG ONLY** in the existing Organizer. Do not begin conversion into separate programs, build their apps, extend their APIs, polish their UI, or create a program marketplace. Preserve source, archives and backups. Remove/deactivate embedded non-core startup/menu/service links **only as required to make these five systems clean**, after dependencies, live task owner/lease, reversible backup, safety and tests. Native core transport/security dependencies are NOT new feature modules and cannot be removed blindly.
 
 ## The exact working capability to ship
 
@@ -49,7 +52,7 @@ EXISTING KALİTE FABRİKASI tests EXACT project/build revision/hash
 ## Native Codex / Organizer execution order (same current task, no duplicates)
 
 1. Read fresh exact active Organizer task/project IDs, revision, owner, lease, plan and checkpoint on owner's PC. Codex has already received commands; deduplicate against those. Do not fork tasks or overwrite another worker's native files.
-2. Reconcile **existing canonical goal and acceptance** with this current FOUR SYSTEM product focus. Place *all other module/program development* in future backlog. **No current effort on detached programs** beyond safe inactive inventory and essential non-core integration cleanup.
+2. Reconcile **existing canonical goal and acceptance** with this current FIVE SYSTEM product focus. Place *all other module/program development* in future backlog. **No current effort on detached programs** beyond safe inactive inventory and essential non-core integration cleanup.
 3. Inventory and classify currently installed services/module dependencies, deactivate only non-core run/startup/navigation registrations with independent snapshot/rollback. Preserve source/user data; permanent deletion requires specific owner approval.
 4. Review Operator PR#3 17 local overlapping changes and intentionally removed Cleanup source; never blindly merge or restore. Existing Organizer + Operator connection must work with native authenticated ACK.
 5. Implement/finish a single genuine Studio design edit + real program interactive run through existing Operator. Record exact project/program/build/file revisions, independent read-back and abort/undo.
