@@ -15,7 +15,7 @@
 
 ---
 
-# Continue Here
+# Historical source records / superseded priorities
 
 **IMPORTANT (2026-10-22):** These are public cloud reference files, not live local work authority. The operator and Main may have newer installed state; see [live source/freshness gate](continuity/LIVE_SOURCE_FRESHNESS_GATE.md) and obtain exact task-scoped handoff from the owner-authorized canonical Organizer before any write, status claim or restart. The earlier project/next task noted below is historical, not the current priority. Default: new ideas go to intake without interrupting active QA or separately scoped Brain housekeeping. No new providers are in the immediate GPT/Codex/INVENTHOR roster.
 
