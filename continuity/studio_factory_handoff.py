@@ -126,7 +126,7 @@ def advise_studio_factory_handoff(
         raise StudioFactoryDenied("PROJECT_SCOPE_MISMATCH")
     if snapshot.native_task_revision != expected_native_revision:
         raise StudioFactoryDenied("STALE_NATIVE_TASK_REVISION")
-    if snapshot.phase not in PHASES:
+    if not isinstance(snapshot.phase, str) or snapshot.phase not in PHASES:
         raise StudioFactoryDenied("INVALID_PHASE")
     if (not isinstance(now, datetime) or now.tzinfo is None
         or now.utcoffset() is None
@@ -189,6 +189,10 @@ def advise_studio_factory_handoff(
         need(snapshot.real_preview_verified, "REAL_PREVIEW_NOT_VERIFIED")
         need(snapshot.real_program_launch_verified, "REAL_PROGRAM_NOT_VERIFIED")
 
+    if phase == "BUILD_RUNNING":
+        # Later iterations MUST pass the repair-lineage checks, never be
+        # relabeled as an initial unverified build to skip prior QA evidence.
+        need(snapshot.iteration == 1, "RETRY_MASQUERADES_AS_FIRST_BUILD")
     if phase in ("BUILD_RUNNING", "REPAIRED_RUNNING"):
         need(snapshot.factory_verdict == "NONE", "STALE_FACTORY_VERDICT")
         need(not snapshot.factory_tested_sha256, "OLD_QA_RESULT_REUSED")
@@ -205,16 +209,15 @@ def advise_studio_factory_handoff(
         need(snapshot.iteration < 5, "REPAIR_ITERATION_BUDGET_EXHAUSTED")
     if phase == "REPAIRED_RUNNING":
         need(snapshot.iteration > 1, "REPAIR_REQUIRES_FAILED_PRIOR_ITERATION")
-    if phase == "QA_PASSED" and snapshot.iteration == 1:
-        # First-pass success is valid; it must not inherit failed-run metadata
-        # belonging to an unrelated prior build or project.
+    if phase in ("QA_FAILED", "QA_PASSED") and snapshot.iteration == 1:
+        # First Factory pass OR failure cannot claim unrelated prior run IDs.
         need(not snapshot.previous_failed_build_sha256,
-             "FIRST_PASS_CARRIES_OLD_FAILED_BUILD")
+             "FIRST_QA_CARRIES_OLD_FAILED_BUILD")
         need(not snapshot.previous_failed_factory_run_id,
-             "FIRST_PASS_CARRIES_OLD_FAILED_QA_RUN")
+             "FIRST_QA_CARRIES_OLD_FAILED_QA_RUN")
         need(not snapshot.previous_failure_evidence_ref,
-             "FIRST_PASS_CARRIES_OLD_FAILURE_EVIDENCE")
-    if phase in ("REPAIRED_RUNNING", "QA_PASSED") and snapshot.iteration > 1:
+             "FIRST_QA_CARRIES_OLD_FAILURE_EVIDENCE")
+    if phase in ("REPAIRED_RUNNING", "QA_FAILED", "QA_PASSED") and snapshot.iteration > 1:
         need(bool(snapshot.previous_failed_build_sha256),
              "FAILED_BUILD_REFERENCE_MISSING")
         need(snapshot.previous_failed_build_sha256 != snapshot.build_sha256,
@@ -228,7 +231,7 @@ def advise_studio_factory_handoff(
              "PRIOR_FAILED_FACTORY_RUN_MISSING")
         need(bool(snapshot.previous_failure_evidence_ref),
              "PRIOR_FAILURE_EVIDENCE_MISSING")
-        if phase == "QA_PASSED":
+        if phase in ("QA_FAILED", "QA_PASSED"):
             need(snapshot.factory_run_id != snapshot.previous_failed_factory_run_id,
                  "SAME_FACTORY_RUN_REUSED_FOR_RETEST")
     if phase == "QA_PASSED":
