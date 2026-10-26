@@ -47,6 +47,41 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
             self.assertIn(needed, phases)
         self.assertIn("STUDIO_REAL_RENDER", REQUIRED_LINKS)
 
+    def test_owner_latest_order_requires_total_live_detach(self):
+        policy = self.policy
+        order = policy["current_owner_operational_override"]
+        self.assertEqual(order["instruction_id"], "OWNER_FULL_NONCORE_DETACH_20261026")
+        self.assertTrue(order["complete_removal_not_equal_hide_or_disable"])
+        self.assertTrue(order["protect_user_data_and_rollback_material"])
+        self.assertTrue(order["native_organizer_exact_task_update_required"])
+        self.assertEqual(order["status"], "SOURCE_POLICY_REGISTERED_NATIVE_UNVERIFIED")
+        self.assertEqual(policy["version"], "1.1.0")
+        self.assertTrue((ROOT / order["authoritative_human_handoff"]).is_file())
+
+    def test_noncore_detach_must_have_zero_active_runtime_dependencies(self):
+        detachment = self.policy["noncore_detachment_acceptance"]
+        expected = detachment["complete_requires"]
+        for item in (
+            "active_noncore_module_count",
+            "active_noncore_dependency_edges",
+            "orphan_noncore_runtime_registration_count",
+            "orphan_noncore_service_startup_task_menu_count",
+            "orphan_noncore_updater_installer_ci_reference_count",
+        ):
+            self.assertEqual(expected[item], 0)
+        self.assertTrue(expected["five_system_smoke_verified"])
+        self.assertTrue(expected["studio_operator_factory_live_chain_verified"])
+        self.assertTrue(expected["native_organizer_checkpoint_written_and_read_back"])
+        self.assertTrue(detachment["unverified_runtime_is_not_success"])
+        self.assertTrue(detachment["core_required_capabilities_move_to_existing_five_systems_before_old_plugin_identity_detach"])
+
+    def test_new_ai_must_start_with_full_detach_handoff(self):
+        start = self.policy["new_agent_startup"]
+        self.assertIn("OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md", start[0])
+        self.assertTrue(any("EXACT" in line or "exact" in line for line in start))
+        self.assertTrue(any("ZERO" in line.upper() for line in start))
+        self.assertEqual(len(self.policy["core_systems"]), 5)
+
     def test_no_expansion_or_installed_success_from_source(self):
         paused = self.policy["out_of_scope_now"]
         self.assertTrue(any("Converting legacy modules" in x for x in paused))
