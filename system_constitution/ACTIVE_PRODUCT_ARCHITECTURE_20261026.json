@@ -1,6 +1,6 @@
 {
   "contract_id": "INVENTHOR_SINGLE_PRODUCT_ENGINE_20261026",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "owner_policy_effective_date": "2026-10-26",
   "priority": "P0_ONLY",
   "source_role": "PUBLIC_SOURCE_POLICY_REFERENCE_NOT_NATIVE_AUTHORIZATION",
@@ -86,7 +86,7 @@
     "Second Brain, Operator, Organizer, Design Studio, Factory, QA or parallel task ledger",
     "Rebuilding finished/terminal tasks or reviving quarantined work"
   ],
-  "legacy_policy": "LATEST OWNER DIRECTION 2026-10-26: FULLY DETACH every optional historical noncore module from the five-system ACTIVE runtime, UI, registry, services, startup, dependency graph, build/CI/install/updaters (not merely hide or disable). Migrate mandatory core functions into existing core-owned internal capabilities before removing old plugin module identities; require zero active noncore refs. Preserve genuine audit history, rollback backups and owner-owned data in nonruntime archive. Actual native Organizer authorization, current lease, reversible batches and installed independent Factory verification required. DO NOT CLAIM REMOVED until native proof.",
+  "legacy_policy": "FINAL OWNER RULE: core must have ZERO dependency on optional historical modules. If any mandatory transport, executor, startup, Studio build or QA route requires a legacy plugin, it is an ARCHITECTURE_DEFECT to refactor into a core-owned implementation before fully removing the module. Do NOT defend the plugin dependency as mandatory. Preserve user data and genuine historic evidence in separate backups; complete native cleanup only with original Organizer lease, supported approvals, rollback and independent QA.",
   "execution_policy": {
     "first_action": "Read real owner-controlled existing Organizer work identity, task revision, active lease, checkpoint, dependencies; deduplicate owner's Codex instructions",
     "reuse_ids": true,
@@ -101,6 +101,7 @@
   },
   "new_agent_startup": [
     "FIRST read continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md and this contract; owner expects FULL live runtime detachment, not hiding optional modules",
+    "ARCHITECTURE INVARIANT: five core systems require ZERO historical optional modules. Operator source currently couples executor/transport startup to PluginCatalog and 16-module deploy script; treat this as a defect requiring core-owned refactor, not reason to keep plugins. Verify actual native checkout and lease.",
     "OWNER LATEST CLARIFICATION 2026-10-26: Legacy noncore modules are fully removed NOW from live INVENTHOR; someday they MAY be separate ordinary apps. INVENTHOR+single OPERATOR can control actual devices/apps through authorized OS/UI/API adapters without embedding each program as a module; future standalone app development remains PAUSED.",
     "Read trusted current ORIGINAL Organizer exact PROJECT_ID TASK_ID revision lease owner evidence and the last Codex owner command; do not duplicate existing work",
     "Inventory installed module registries/services/startup/dependency graph read-only, classify required internal capabilities versus full noncore removal and unknowns",
@@ -163,5 +164,40 @@
     "no_duplicate_brain_operator_organizer_design_studio_factory": true,
     "native_installed_computer_access_verified": false,
     "source_contract_only": true
+  },
+  "core_dependency_invariant": {
+    "rule_id": "NO_CORE_DEPENDENCY_ON_OPTIONAL_MODULES",
+    "owner_clarification_date": "2026-10-26",
+    "required": true,
+    "meaning": "The five architectural systems and every mandatory path between them MUST be able to initialize and perform their core application creation, execution and QA work WITHOUT any historical optional plugin/module installation. Any such dependency is an architectural defect, not justification to preserve the module.",
+    "native_operator_must_start_with_zero_legacy_plugins": true,
+    "native_organizer_handoff_must_work_without_legacy_plugins": true,
+    "brain_operator_transport_must_work_without_legacy_plugins": true,
+    "studio_build_run_and_existing_qa_must_work_without_legacy_plugins": true,
+    "base_capability_implementation": "Core-owned explicit interfaces/services in one of the five existing systems; NOT a legacy plugin/module requirement, not a duplicate product, not silent elevation.",
+    "optional_plugin_loader_cannot_be_required_by_core": true,
+    "core_build_and_install_must_not_publish_all_legacy_modules": true,
+    "release_gate_must_not_enforce_minimum_legacy_module_count": true,
+    "core_boot_with_empty_legacy_module_directory_is_mandatory": true,
+    "zero_dependency_edges_to_all_legacy_noncore_modules_required": true,
+    "native_source_coupling_observed": [
+      "OperatorWorker reads PluginCatalog.Load(modulesRoot) and derives all executor and transport instances from plugins",
+      "TaskEngine gets executor list from OperatorWorker and returns CAPABILITY_UNAVAILABLE with no matching executor",
+      "Build-Deploy-V2_1.ps1 publishes 16 module/transport projects and requires at least 16 modules in service heartbeat"
+    ],
+    "native_observation_status": "GITHUB_OPERATOR_SOURCE_ONLY_NOT_INSTALLED",
+    "source_reference": "inventhor-cloud/inventhor-operator-core @ 37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+    "required_corrective_order": [
+      "Read original canonical Organizer exact task/worker lease and verify actual installed sources; never overwrite Codex work",
+      "Audit native core service, transport, task engine, Studio/QA build and updater paths for optional-plugin hard dependency",
+      "Implement core-owned execution and secure authenticated native Brain-Operator transport without requiring old plugin catalogs",
+      "Run empty-plugin-directory core boot, signed real Organizer handoff, Studio build/run and existing QA fail-fix-retest acceptance",
+      "Remove old plugin bootstrap, module-count thresholds and UI/installer/CI registrations with versioned rollback",
+      "Re-run fresh native dependency graph, reboot, smoke and QA with zero active noncore module edges",
+      "Update original Organizer checkpoint with real evidence, never infer deployment from source CI"
+    ],
+    "native_refactor_completed": false,
+    "installed_clean_boot_verified": false,
+    "not_an_instruction_to_destructively_delete_without_backup": true
   }
 }
