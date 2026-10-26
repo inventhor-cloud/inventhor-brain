@@ -57,8 +57,11 @@ class OrganizerCliReader:
         if not self.organizer_root.is_dir() or self.organizer_root.is_symlink():
             raise NativeHandoffUnavailable("CANONICAL_ROOT_UNAVAILABLE")
         try:
-            with self.tool_path.open("rb") as f:
-                digest = sha256(f.read()).hexdigest()
+            digest_state = sha256()
+            with self.tool_path.open("rb") as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    digest_state.update(chunk)
+            digest = digest_state.hexdigest()
         except OSError as e:
             raise NativeHandoffUnavailable("PINNED_NATIVE_TOOL_UNREADABLE") from e
         if digest != self.expected_tool_sha256:
