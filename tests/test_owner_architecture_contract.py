@@ -55,7 +55,7 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(order["protect_user_data_and_rollback_material"])
         self.assertTrue(order["native_organizer_exact_task_update_required"])
         self.assertEqual(order["status"], "SOURCE_POLICY_REGISTERED_NATIVE_UNVERIFIED")
-        self.assertEqual(policy["version"], "1.1.0")
+        self.assertEqual(policy["version"], "1.2.0")
         self.assertTrue((ROOT / order["authoritative_human_handoff"]).is_file())
 
     def test_noncore_detach_must_have_zero_active_runtime_dependencies(self):
