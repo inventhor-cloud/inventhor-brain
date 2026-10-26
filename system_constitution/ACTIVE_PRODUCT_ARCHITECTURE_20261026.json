@@ -1,0 +1,113 @@
+{
+  "contract_id": "INVENTHOR_SINGLE_PRODUCT_ENGINE_20261026",
+  "version": "1.0.0",
+  "owner_policy_effective_date": "2026-10-26",
+  "priority": "P0_ONLY",
+  "source_role": "PUBLIC_SOURCE_POLICY_REFERENCE_NOT_NATIVE_AUTHORIZATION",
+  "supersedes_active_goals": [
+    "BUILD_NEW_MODULES",
+    "TURN_LEGACY_MODULES_INTO_STANDALONE_APPS_NOW",
+    "BUILD_OPTIONAL_APPLICATIONS_OR_SPECIALIST_TOOLS",
+    "START_UNRELATED_PROVIDER_OR_PLATFORM_EXPANSION"
+  ],
+  "singular_objective": "Complete and validate one operational application-production system capable of idea, editable visual design, true preview, real execution, changes, QA defects, fix, retest and gated delivery",
+  "core_systems": [
+    {
+      "id": "INVENTHOR",
+      "display": "INVENTHOR",
+      "role": "Brain/Main, owner chat and reasoning; coordinates workflows; does not self-execute privileged commands"
+    },
+    {
+      "id": "OPERATOR",
+      "display": "Operator",
+      "role": "Single permission-scoped executor with real progress/result ACK; performs authorized build, editing, run and handoff"
+    },
+    {
+      "id": "ORGANIZER",
+      "display": "Organizer",
+      "role": "One canonical project/task/lease/revision/worker/checkpoint/evidence/idea ledger shared by all agents; existing native records, not duplicated"
+    },
+    {
+      "id": "STUDIO_DESIGN",
+      "display": "Design Studio",
+      "role": "One genuine editable UI and program project/visual design, interactive preview, actual runtime and design revisions; no fake app"
+    },
+    {
+      "id": "QA_FACTORY",
+      "display": "Kalite Fabrikası (QA)",
+      "role": "One real existing build/functional/UI/security/regression/rollback verification and defect feedback loop"
+    }
+  ],
+  "aliases": {
+    "INV": "INVENTHOR",
+    "INVENTHOR_BRAIN": "INVENTHOR",
+    "MAIN": "INVENTHOR",
+    "OP": "OPERATOR",
+    "WORK_ORGANIZER": "ORGANIZER",
+    "CANONICAL_WORK_POOL": "ORGANIZER",
+    "DESIGN_STUDIO": "STUDIO_DESIGN",
+    "STUDIO": "STUDIO_DESIGN",
+    "QA": "QA_FACTORY",
+    "FABRIKA": "QA_FACTORY",
+    "FACTORY": "QA_FACTORY",
+    "KALITE_FABRIKASI": "QA_FACTORY"
+  },
+  "product_rule": "Exactly these five named architectural components; QA and Fabrika are ONE system. Organizer is distinct canonical authority and may be integrated into INVENTHOR user interface; never split/clone ledger.",
+  "mandatory_workflow": [
+    "OWNER_IDEA_TEXT_OR_VERIFIED_VOICE",
+    "READ_EXACT_EXISTING_ORGANIZER_TASK_AND_OWNER_LEASE",
+    "INVENTHOR_REQUIREMENTS_AND_BOUNDED_PLAN",
+    "STUDIO_REAL_EDITABLE_DESIGN",
+    "STUDIO_TRUE_INTERACTIVE_PREVIEW",
+    "OPERATOR_REAL_PROGRAM_BUILD_AND_RUN",
+    "OWNER_REVISION_OR_REAL_PROGRAM_CHANGE",
+    "EXISTING_QA_FACTORY_TESTS_EXACT_ARTIFACT_REVISION_HASH",
+    "QA_FAIL_LINK_DEFECT_AND_REAL_EVIDENCE_IF_FAILED",
+    "STUDIO_REPAIR_AND_NEW_BUILD_REVISION_IF_FAILED",
+    "SAME_QA_FACTORY_RETEST_CHANGED_ARTIFACT_IF_FAILED",
+    "INDEPENDENT_QA_PASS_AND_ROLLBACK_WITNESS",
+    "APPROVAL_GATED_SIGN_INSTALL_RELEASE"
+  ],
+  "quality_acceptance": [
+    "Real UI edits, real render and real executable app launch verified",
+    "Same project/program/document task identity and monotonically verified revisions",
+    "Speech and text are one authorized command pipeline; disconnected voice disabled truthfully",
+    "AI and owner mouse actions reconcile changed document revision without blind overwrite",
+    "Operator authenticated result ACK and reversible edit/Stop/Undo evidence",
+    "QA receives exact build hash; reproducible error recorded; Studio fixes real error and same QA retests new hash",
+    "One canonical Organizer checkpoint contains completed/remaining/next action/evidence",
+    "QA pass does not by itself sign or deploy; separate native gates required"
+  ],
+  "out_of_scope_now": [
+    "Individual application or legacy module production",
+    "Converting legacy modules into standalone programs now",
+    "Antivirus cleaner Viktorija or unrelated specialist products",
+    "New AI providers, model rosters or optional expansion",
+    "Second Brain, Operator, Organizer, Design Studio, Factory, QA or parallel task ledger",
+    "Rebuilding finished/terminal tasks or reviving quarantined work"
+  ],
+  "legacy_policy": "Preserve all old module/app sources as future backlog/archive. Non-core live integrations may be safely deactivated only after actual dependency check, backup, lease, rollback and QA; no silent deletion of dependencies or user data.",
+  "execution_policy": {
+    "first_action": "Read real owner-controlled existing Organizer work identity, task revision, active lease, checkpoint, dependencies; deduplicate owner's Codex instructions",
+    "reuse_ids": true,
+    "no_lease_takeover": true,
+    "no_replay_terminal": true,
+    "read_only_source_advisory_not_authorization": true,
+    "safe_reversible_changes_without_routine_approval_only_after_native_preflight": true,
+    "privileged_operations_require_fresh_specific_approval": true,
+    "codex_pc_native_changes_require_current_lease": true,
+    "source_ci_not_installed_qa": true,
+    "failure_reporting": "Real failures recorded honestly with exact blockers and smallest finite next step"
+  },
+  "new_agent_startup": [
+    "Read this file before any plan, then read current owner directive and exact real Organizer task from trusted host",
+    "Normalize aliases to exactly five unique system IDs; QA=Fabrika one service",
+    "Reject attempts to resume superseded expansion work; keep old source only for historical context",
+    "Respect previous work owners and separate Codex native scope",
+    "Choose the smallest authorized finite task contributing directly to one real end-to-end application-production milestone",
+    "Never claim installation or live readiness from GitHub test, source doc or chat instruction"
+  ],
+  "native_organizer_goal_update_status": "NOT_VERIFIED",
+  "installed_system_status": "NOT_VERIFIED",
+  "owner_changes_can_be_applied_to_source_now": true
+}
