@@ -100,8 +100,8 @@
     "failure_reporting": "Real failures recorded honestly with exact blockers and smallest finite next step"
   },
   "new_agent_startup": [
-    "OWNER LATEST CLARIFICATION 2026-10-26: Legacy noncore modules are fully removed NOW from live INVENTHOR; someday they MAY be separate ordinary apps. INVENTHOR+single OPERATOR can control actual devices/apps through authorized OS/UI/API adapters without embedding each program as a module; future standalone app development remains PAUSED.",
     "FIRST read continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md and this contract; owner expects FULL live runtime detachment, not hiding optional modules",
+    "OWNER LATEST CLARIFICATION 2026-10-26: Legacy noncore modules are fully removed NOW from live INVENTHOR; someday they MAY be separate ordinary apps. INVENTHOR+single OPERATOR can control actual devices/apps through authorized OS/UI/API adapters without embedding each program as a module; future standalone app development remains PAUSED.",
     "Read trusted current ORIGINAL Organizer exact PROJECT_ID TASK_ID revision lease owner evidence and the last Codex owner command; do not duplicate existing work",
     "Inventory installed module registries/services/startup/dependency graph read-only, classify required internal capabilities versus full noncore removal and unknowns",
     "Use reversible native scoped batches with backup, native authorization and independent QA; ensure zero remaining runtime references to old noncore modules and no broken core dependency",
