@@ -60,7 +60,14 @@ class CoreActivationGateTests(unittest.TestCase):
         self.assertIn("BRAIN_OPERATOR:NO_AUTHENTICATED_ACK",
                       review(links=tuple(links)).blockers)
         self.assertIn("PROGRAM_ACTION_BRIDGE:MISSING",
-                      review(links=tuple(links[:-1])).blockers)
+                      review(links=tuple(links[:5] + links[6:])).blockers)
+
+    def test_studio_design_is_mandatory_and_never_faked(self):
+        incomplete = complete().components[:2] + complete().components[3:]
+        self.assertIn("STUDIO_DESIGN:MISSING",
+                      review(components=incomplete).blockers)
+        self.assertIn("STUDIO_REAL_RENDER:MISSING",
+                      review(links=complete().links[:-1]).blockers)
 
     def test_noncore_is_not_reactivated_or_deleted(self):
         advice = review(active_noncore_ids=("VIKTORIJA", "CLEANUP"))
@@ -78,9 +85,9 @@ class CoreActivationGateTests(unittest.TestCase):
         c[0] = replace(c[0], signature_verified=False,
                        rollback_verified=False, heartbeat_fresh=False)
         blockers = review(components=tuple(c)).blockers
-        for expected in ("INVENTHOR_BRAIN:SIGNER_NOT_VERIFIED",
-                         "INVENTHOR_BRAIN:ROLLBACK_NOT_VERIFIED",
-                         "INVENTHOR_BRAIN:HEARTBEAT_NOT_FRESH"):
+        for expected in ("INVENTHOR:SIGNER_NOT_VERIFIED",
+                         "INVENTHOR:ROLLBACK_NOT_VERIFIED",
+                         "INVENTHOR:HEARTBEAT_NOT_FRESH"):
             self.assertIn(expected, blockers)
 
     def test_missing_core_or_link_is_blocked(self):
