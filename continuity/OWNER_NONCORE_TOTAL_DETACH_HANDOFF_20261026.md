@@ -65,3 +65,11 @@ Bunlar **"16 modülün hepsini kör sil" listesi DEĞİLDİR**. Kaynak manifesti
 - `STANDALONE_NEW_PROGRAM_OR_MODULAR_FEATURE_STARTED=FALSE`.
 
 **Bugünkü doğrulanmış durum:** GitHub'da sahip talimatı kaynak referansı kaydedilebilir, ancak INVENTHOR PC Desktop Commander bağlantısı OFFLINE. Buradan `ACTIVE_NONCORE_MODULE_COUNT=0` veya native Organizer checkpoint'i `DONE` gösterme; gerçek söküm henüz bu sohbet üzerinden yapılmadı.
+
+## Sahip son açıklama (26 Ekim 2026): programlar ayrı olacak
+
+Eski gereksiz modüller INVENTHOR'un aktif çalışmasından **şimdi tamamen kaldırılacak**. İleride uygun görülen işlevler **ayrı normal programlar** şeklinde yapılabilir; şimdi bunları üretmeye başlamıyoruz.
+
+Bu bağımsız programların INVENTHOR içerisine modül olarak eklenmesi gerekli değildir. INVENTHOR, **tek mevcut Operator** aracılığıyla, işletim sisteminin ve uygulamaların izin verdiği denetlenebilir bağlantılar üzerinden cihazlarda ve programlarda işlem yapabilecek. Bu hedef gerçek erişimin kurulduğu anlamına gelmez; uygulama desteği, kullanıcının verdiği izinler, gerçek eylem sonucu ve geri alma sınırları korunacak.
+
+Beş sistem (INVENTHOR, OPERATOR, ORGANIZER, STUDIO_DESIGN, QA_FACTORY) değişmez. Eski modülün canlı sisteme bağımlılığı sıfır olmalı, geçmiş kaynaklar ve kullanıcı verileri güvenli biçimde korunmalıdır. Bu açıklama önceki bağımsız programları **hemen geliştirme** yönündeki görevlerin yerini alır. Kaynak sözleşmesi 1.2.0, yerel Organizer güncellemesi ve gerçek söküm henüz doğrulanmadı.
