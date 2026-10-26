@@ -194,6 +194,30 @@ class StudioFactoryHandoffTests(unittest.TestCase):
         self.assertFalse(a.factory_pass_attested)
         self.assertFalse(a.may_release)
 
+    def test_repair_phase_without_prior_failure_cannot_retest(self):
+        fake=built("REPAIRED_RUNNING",iteration=1,build_sha256=HASH2)
+        result=judge(fake)
+        self.assertEqual(result.disposition,"BLOCKED")
+        self.assertIn("REPAIR_REQUIRES_FAILED_PRIOR_ITERATION",result.blockers)
+        self.assertFalse(result.may_execute)
+
+    def test_first_pass_cannot_inherit_old_failed_build_or_qa_run(self):
+        s=built("QA_PASSED",iteration=1,
+                factory_tested_sha256=HASH1,
+                factory_run_id="FIRST_QA_RUN",factory_verdict="PASS",
+                qa_witness_verified=True,rollback_verified=True,
+                previous_failed_build_sha256=HASH2,
+                previous_failed_factory_run_id="OLD_FAILURE",
+                previous_failure_evidence_ref="OLD_DEFECT")
+        blocked=judge(s)
+        for name in (
+            "FIRST_PASS_CARRIES_OLD_FAILED_BUILD",
+            "FIRST_PASS_CARRIES_OLD_FAILED_QA_RUN",
+            "FIRST_PASS_CARRIES_OLD_FAILURE_EVIDENCE",
+        ):
+            self.assertIn(name,blocked.blockers)
+        self.assertFalse(blocked.may_release)
+
     def test_wrong_project_and_stale_task_block(self):
         for s,code in (
             (replace(base(),project_id="ANOTHER_PROJECT"),"PROJECT_SCOPE_MISMATCH"),
