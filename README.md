@@ -1,3 +1,9 @@
+# CURRENT OWNER PRIORITY — 2026-10-26
+
+Only finish the real app-production pipeline across **INVENTHOR**, **OPERATOR**, **ORGANIZER**, **STUDIO_DESIGN**, **QA_FACTORY** (**QA and Fabrika are one**). No new modules or optional programs are in active development. Design a real editable app, preview and launch it, change it, submit the exact build to the same existing Factory, repair errors and retest. Start from [machine-readable owner contract](system_constitution/ACTIVE_PRODUCT_ARCHITECTURE_20261026.json) and [read-first continuation](CONTINUE_HERE.md). This public GitHub repository is SOURCE REFERENCE ONLY; native installed/QA status is not verified by CI. All legacy federation/module expansion catalogs are historical or deferred, not permission to run work.
+
+---
+
 # INVENTHOR Brain
 
 INVENTHOR Brain is the central brain and mentor layer of the INVENTHOR system.
