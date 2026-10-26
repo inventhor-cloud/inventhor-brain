@@ -77,6 +77,15 @@ class CliHandoffTests(unittest.TestCase):
         self.deny("PINNED_NATIVE_TOOL_CHANGED", reader.read_task, "QA_TASK")
         self.assertEqual(self.calls, [])
 
+    def test_large_pinned_tool_reads_in_bounded_chunks(self):
+        # The read-only reader must hash installed tools without allocating
+        # an executable-sized byte string or changing any real PC resource.
+        self.tool.write_bytes(b"trusted-fixture-" * 100000)
+        self.sha = sha256(self.tool.read_bytes()).hexdigest()
+        observed = self.reader().read_task("QA_TASK")
+        self.assertEqual(observed.task_id, "QA_TASK")
+        self.assertEqual(len(self.calls), 1)
+
     def test_tool_changed_during_invocation_is_rejected(self):
         def changed_binary_during_read(args, **opts):
             self.calls.append((args, opts))
