@@ -10,10 +10,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import re
 
-CORE = ("INVENTHOR_BRAIN", "OPERATOR", "ORGANIZER", "QA_FACTORY")
+# Four owner-facing systems. The ORIGINAL Organizer remains internal to INVENTHOR.
+CORE = ("INVENTHOR", "OPERATOR", "STUDIO_DESIGN", "QA_FACTORY")
 REQUIRED_LINKS = (
     "BRAIN_OPERATOR", "BRAIN_ORGANIZER", "OPERATOR_ORGANIZER",
     "OPERATOR_QA", "QA_ORGANIZER", "PROGRAM_ACTION_BRIDGE",
+    "INVENTHOR_STUDIO", "STUDIO_OPERATOR", "STUDIO_QA",
+    "STUDIO_REAL_RENDER",
 )
 _HASH = re.compile(r"^[a-f0-9]{64}$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
