@@ -1,5 +1,8 @@
 # SAHİP SON TALİMATI — GEREKSİZ MODÜLLERİN TAMAMEN SÖKÜLMESİ
 
+> **ÇEKİRDEK BAĞIMSIZLIĞI = DEĞİŞMEZ KURAL (26 EKİM 2026):** Beş sistemin temel işlevi hiçbir sökülebilir eski modüle bağlı olamaz. Varsa **MİMARİ HATA** olarak işaretle; modülü "zorunlu" diyerek içeride tutma. Kaynakta OperatorWorker'ın iş yürütücü ve bağlantıları PluginCatalog'dan aldığı, eski deploy betiğinin 16 modülü istediği gözlendi. Bunlar [kaynak mimari kusuru raporunda](../validation_reports/OPERATOR_OPTIONAL_MODULE_COUPLING_20261026.md) kayıtlıdır. Yerel Codex mevcut Organizer task/lease'i doğrulasın; önce core-owned gerçek alternatiflerini inşa/test et, ardından eski runtime modüllerini tüm bağımlılıklarıyla sök. **Boş eski-modül klasörüyle beşli canlı smoke+QA geçmeden DONE yok.** GitHub bu yerel sonucu doğrulamaz.
+
+
 **Tarih:** 26 Ekim 2026 — önceki hedeflerden daha güncel sahip talimatı.
 **Durum:** `OWNER_INTENT_RECORDED_IN_GITHUB_MIRROR`; Windows'taki kanonik Organizer'da uygulanıp tamamlandığı **DOĞRULANMADI**.
 **Önemli:** Bu belge mevcut göreve verilen talimatın bir referansıdır; **yeni Organizer, yeni görev, yeni yazma yetkisi, yerel bilgisayarda söküm, kurulum veya QA kanıtı oluşturmaz**.
