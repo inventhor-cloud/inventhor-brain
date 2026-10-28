@@ -1,5 +1,8 @@
 # SON SAHİP SÖKÜM TALİMATI — 2026-10-26
 
+> **EN SON SAHİP KARARI — 28 EKİM 2026 — İLK OKU:** **ŞİMDİ P0: GEREKSİZ MODÜLLERİ ÇEKİRDEKTEN TAMAMEN SÖK, 0 AKTİF BAĞIMLILIK KALDIR.** Sonra **P1:** mevcut tek Operator + Studio + QA Fabrikası gerçek uygulama yapıp test etsin. Bunlar tamamlanınca **P2:** formatlanmış/başka bilgisayara doğrulanmış bulut sürümünü indir, **aynı hesapla giriş yap, şifreli Organizer/proje yedeğini geri yükle**, yeni cihaz kimliği ve pairing key üret. Bulut geliştirmesi şu an sökümü geciktirmeyecek. Yeni modül/ayrı program/ikinci çekirdek yok. **İlk gerçek talimat:** [OWNER_PRIORITY_CLEAN_CORE_THEN_CLOUD_20261028.md](continuity/OWNER_PRIORITY_CLEAN_CORE_THEN_CLOUD_20261028.md); [tek makine sözleşmesi v1.5](system_constitution/ACTIVE_PRODUCT_ARCHITECTURE_20261026.json). Kaynak ilerlemesi yerel Organizer checkpoint veya Windows söküm kanıtı değildir.
+
+
 
 > **ÇEKİRDEK-BAĞIMSIZLIK DENETİMİ:** Hiçbir opsiyonel/legacy modül Operator, Inventhor, Organizer, Studio, QA için temel gereklilik olamaz. Kaynakta OperatorWorker PluginCatalog üzerinden yürütücü/transport alıyor ve eski kurulum 16 modül istiyor; bu bir **kaynak mimari kusuru**, kaçınılmaz çekirdek bağımlılığı değildir. [Kanıt ve düzeltme sırası](validation_reports/OPERATOR_OPTIONAL_MODULE_COUPLING_20261026.md). Mevcut native task+lease ile önce bağımsız çekirdek işlevini ve boş plugin klasörü boot/QA'yı doğrula; sonra tam söküm. PC kurulu durumu doğrulanmadı.
 
