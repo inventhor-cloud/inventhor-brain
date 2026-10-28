@@ -22,6 +22,7 @@ REQUIRED = (
     "continuity/OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md",
     "continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md",
     "continuity/OWNER_PORTABLE_NEW_PC_BOOTSTRAP_20261028.md",
+    "continuity/OWNER_PRIORITY_CLEAN_CORE_THEN_CLOUD_20261028.md",
     "continuity/OWNER_WORK_INTAKE_POLICY.md",
     "continuity/studio_factory_handoff.py",
     "continuity/core_activation_gate.py",
@@ -111,6 +112,47 @@ def inspect_source() -> list[str]:
             errors.append("NONCORE_ZERO_POSTCONDITION_MISSING:" + name)
     if not isinstance(remove, dict) or remove.get("unverified_runtime_is_not_success") is not True:
         errors.append("FALSE_NONCORE_REMOVAL_ATTESTATION")
+    owner_sequence = policy.get("owner_execution_sequence_20261028")
+    if not isinstance(owner_sequence, dict):
+        errors.append("CURRENT_OWNER_CLEAN_FIRST_CLOUD_LATER_MISSING")
+    else:
+        if owner_sequence.get("phase_order") != [
+            "P0_FULL_NONCORE_DETACH",
+            "P1_COMPLETE_ONE_REAL_FIVE_SYSTEM_APP_FACTORY",
+            "P2_CLOUD_ACCOUNT_RESTORE_FRESH_COMPUTER",
+        ] or owner_sequence.get("current_phase") != "P0_FULL_NONCORE_DETACH":
+            errors.append("CURRENT_OWNER_EXECUTION_ORDER_DRIFT")
+        if owner_sequence.get("source_status") != "CURRENT_OWNER_PRIORITY_RECORDED_NATIVE_NOT_EXECUTED":
+            errors.append("FALSE_CLEAN_CORE_NATIVE_SUCCESS")
+        if owner_sequence.get("native_organizer_checkpoint_written_and_read_back") is not False:
+            errors.append("FALSE_NATIVE_ORGANIZER_CLOUD_PRIORITY_WRITTEN")
+        if owner_sequence.get("authoritative_read_first") != "continuity/OWNER_PRIORITY_CLEAN_CORE_THEN_CLOUD_20261028.md":
+            errors.append("CURRENT_OWNER_HIGHEST_PRIORITY_HANDOFF_MISSING")
+        p0 = owner_sequence.get("p0")
+        if not isinstance(p0, dict) or not all(
+            p0.get(key) is True for key in (
+                "require_zero_legacy_module_dependency_in_all_five_cores",
+                "require_zero_active_runtime_optional_modules",
+                "prohibit_hide_only_or_disable_only_as_completion",
+                "native_acceptance_not_verified",
+            )
+        ):
+            errors.append("CORE_DETACHMENT_PRIORITY_WEAKENED")
+        p2 = owner_sequence.get("p2")
+        if not isinstance(p2, dict) or not all(
+            p2.get(key) is True for key in (
+                "cloud_development_deferred_until_p0_and_p1_acceptance",
+                "restore_same_user_after_pc_format",
+                "account_login_then_encrypted_versioned_organizer_and_projects_restore",
+                "new_machine_device_identity_and_pairing_secrets",
+                "cross_account_privacy_isolation",
+                "fresh_pc_acceptance_not_verified",
+            )
+        ):
+            errors.append("FUTURE_CLOUD_ACCOUNT_RESTORE_REQUIREMENTS_LOST")
+    if not policy.get("new_agent_startup", [])[0].startswith("CURRENT OWNER PRIORITY (2026-10-28)"):
+        errors.append("RESET_AGENT_NEWEST_OWNER_PRIORITY_NOT_FIRST")
+
     portable = policy.get("portable_new_computer_installation")
     if not isinstance(portable, dict):
         errors.append("PORTABLE_FRESH_MACHINE_REQUIREMENT_MISSING")
