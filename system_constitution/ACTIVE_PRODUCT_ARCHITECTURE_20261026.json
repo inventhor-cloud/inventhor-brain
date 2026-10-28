@@ -1,6 +1,6 @@
 {
   "contract_id": "INVENTHOR_SINGLE_PRODUCT_ENGINE_20261026",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "owner_policy_effective_date": "2026-10-26",
   "priority": "P0_ONLY",
   "source_role": "PUBLIC_SOURCE_POLICY_REFERENCE_NOT_NATIVE_AUTHORIZATION",
@@ -100,6 +100,7 @@
     "failure_reporting": "Real failures recorded honestly with exact blockers and smallest finite next step"
   },
   "new_agent_startup": [
+    "CURRENT OWNER PRIORITY (2026-10-28): FIRST read continuity/OWNER_PRIORITY_CLEAN_CORE_THEN_CLOUD_20261028.md and owner_execution_sequence_20261028. P0 = fully remove old noncore modules and ZERO core dependency, no hide-only solutions. P1 = one real five-system app factory. P2 = portable signed cloud account reinstallation and same-account encrypted restore on any newly supported Windows PC after format.",
     "FIRST read continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md and this contract; owner expects FULL live runtime detachment, not hiding optional modules",
     "ARCHITECTURE INVARIANT: five core systems require ZERO historical optional modules. Operator source currently couples executor/transport startup to PluginCatalog and 16-module deploy script; treat this as a defect requiring core-owned refactor, not reason to keep plugins. Verify actual native checkout and lease.",
     "P0 PORTABILITY: read continuity/OWNER_PORTABLE_NEW_PC_BOOTSTRAP_20261028.md. Support copyable user-mode bundle AND safe one-click installation on a separate Windows PC, with fresh identity/Organizer and no copied keys. No clean machine acceptance exists yet; do not state portable installed or release ready.",
@@ -243,6 +244,46 @@
     "fresh_pc_one_click_install_tested": false,
     "offline_first_run_tested": false,
     "native_organizer_checkpoint_updated": false,
-    "reference": "continuity/OWNER_PORTABLE_NEW_PC_BOOTSTRAP_20261028.md"
+    "reference": "continuity/OWNER_PORTABLE_NEW_PC_BOOTSTRAP_20261028.md",
+    "delivery_phase": "P2_AFTER_FULL_MODULE_DETACH_AND_ONE_REAL_APP_FACTORY",
+    "priority_explanation": "Non-negotiable final product acceptance requirement, NOT first execution milestone. Current P0 is total noncore module removal; then P1 real factory; then P2 cloud account reinstall."
+  },
+  "owner_execution_sequence_20261028": {
+    "owner_instruction_date": "2026-10-28",
+    "authoritative_read_first": "continuity/OWNER_PRIORITY_CLEAN_CORE_THEN_CLOUD_20261028.md",
+    "current_phase": "P0_FULL_NONCORE_DETACH",
+    "phase_order": [
+      "P0_FULL_NONCORE_DETACH",
+      "P1_COMPLETE_ONE_REAL_FIVE_SYSTEM_APP_FACTORY",
+      "P2_CLOUD_ACCOUNT_RESTORE_FRESH_COMPUTER"
+    ],
+    "p0": {
+      "require_zero_legacy_module_dependency_in_all_five_cores": true,
+      "require_zero_active_runtime_optional_modules": true,
+      "prohibit_hide_only_or_disable_only_as_completion": true,
+      "prioritize_existing_operator_plugin_loader_and_16_module_deploy_cleanup": true,
+      "preserve_user_data_and_rollback": true,
+      "native_acceptance_not_verified": true,
+      "no_new_parallel_project_or_module": true
+    },
+    "p1": {
+      "only_existing_design_studio_operator_qa_factory": true,
+      "one_real_app_studio_render_build_run_qa_fix_retest_required": true,
+      "native_acceptance_not_verified": true
+    },
+    "p2": {
+      "cloud_development_deferred_until_p0_and_p1_acceptance": true,
+      "restore_same_user_after_pc_format": true,
+      "download_verified_releasable_bundle_from_supported_cloud": true,
+      "account_login_then_encrypted_versioned_organizer_and_projects_restore": true,
+      "new_machine_device_identity_and_pairing_secrets": true,
+      "cross_account_privacy_isolation": true,
+      "cloud_provider_adapter_not_invented_as_universal_any_cloud_support": true,
+      "fresh_pc_acceptance_not_verified": true,
+      "new_user_fresh_install_distinct_from_same_user_restore": true
+    },
+    "priority_note": "Portability is non-negotiable for the FINISHED product, but cloud implementation is P2 in execution order. P0 must not be delayed by a new cloud service.",
+    "source_status": "CURRENT_OWNER_PRIORITY_RECORDED_NATIVE_NOT_EXECUTED",
+    "native_organizer_checkpoint_written_and_read_back": false
   }
 }
