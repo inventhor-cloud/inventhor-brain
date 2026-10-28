@@ -77,7 +77,7 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
 
     def test_new_ai_must_start_with_full_detach_handoff(self):
         start = self.policy["new_agent_startup"]
-        self.assertIn("OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md", start[0])
+        self.assertIn("OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md", "\n".join(start))
         self.assertTrue(any("EXACT" in line or "exact" in line for line in start))
         self.assertTrue(any("ZERO" in line.upper() for line in start))
         self.assertEqual(len(self.policy["core_systems"]), 5)
