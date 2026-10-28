@@ -55,7 +55,7 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(order["protect_user_data_and_rollback_material"])
         self.assertTrue(order["native_organizer_exact_task_update_required"])
         self.assertEqual(order["status"], "SOURCE_POLICY_REGISTERED_NATIVE_UNVERIFIED")
-        self.assertEqual(policy["version"], "1.4.0")
+        self.assertEqual(policy["version"], "1.5.0")
         self.assertTrue((ROOT / order["authoritative_human_handoff"]).is_file())
 
     def test_noncore_detach_must_have_zero_active_runtime_dependencies(self):
@@ -112,6 +112,32 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(future["no_duplicate_brain_operator_organizer_design_studio_factory"])
         self.assertFalse(future["native_installed_computer_access_verified"])
         self.assertTrue(future["source_contract_only"])
+
+    def test_current_owner_execution_order_is_clean_first_cloud_later(self):
+        steps = self.policy["owner_execution_sequence_20261028"]
+        self.assertEqual(steps["phase_order"], [
+            "P0_FULL_NONCORE_DETACH",
+            "P1_COMPLETE_ONE_REAL_FIVE_SYSTEM_APP_FACTORY",
+            "P2_CLOUD_ACCOUNT_RESTORE_FRESH_COMPUTER",
+        ])
+        self.assertEqual(steps["current_phase"], "P0_FULL_NONCORE_DETACH")
+        self.assertTrue((ROOT / steps["authoritative_read_first"]).is_file())
+        self.assertTrue(steps["p0"]["require_zero_legacy_module_dependency_in_all_five_cores"])
+        self.assertTrue(steps["p0"]["require_zero_active_runtime_optional_modules"])
+        self.assertTrue(steps["p0"]["prohibit_hide_only_or_disable_only_as_completion"])
+        self.assertTrue(steps["p0"]["native_acceptance_not_verified"])
+        self.assertTrue(steps["p1"]["one_real_app_studio_render_build_run_qa_fix_retest_required"])
+        self.assertTrue(steps["p2"]["cloud_development_deferred_until_p0_and_p1_acceptance"])
+        self.assertTrue(steps["p2"]["restore_same_user_after_pc_format"])
+        self.assertTrue(steps["p2"]["account_login_then_encrypted_versioned_organizer_and_projects_restore"])
+        self.assertTrue(steps["p2"]["new_machine_device_identity_and_pairing_secrets"])
+        self.assertTrue(steps["p2"]["cross_account_privacy_isolation"])
+        self.assertFalse(steps["native_organizer_checkpoint_written_and_read_back"])
+        self.assertIn("OWNER_PRIORITY_CLEAN_CORE_THEN_CLOUD_20261028.md",
+                      self.policy["new_agent_startup"][0])
+        self.assertEqual(
+            self.policy["portable_new_computer_installation"]["delivery_phase"],
+            "P2_AFTER_FULL_MODULE_DETACH_AND_ONE_REAL_APP_FACTORY")
 
     def test_fresh_computer_portable_and_one_click_install_are_p0(self):
         portable = self.policy["portable_new_computer_installation"]
