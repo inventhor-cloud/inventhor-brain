@@ -204,7 +204,7 @@
   },
   "portable_new_computer_installation": {
     "owner_requirement_date": "2026-10-28",
-    "priority": "P0_CORE_ACCEPTANCE_REQUIREMENT",
+    "priority": "P2_AFTER_P0_CLEANUP_AND_P1_FACTORY",
     "feature_owner": "EXISTING_FIVE_SYSTEMS_NOT_NEW_MODULE",
     "definition": "INVENTHOR must be reproducible on a fresh supported computer from a signed, versioned release without the original PC, original user's directories, legacy optional modules, copied device secrets, or a manually built developer checkout.",
     "delivery_modes": [
@@ -246,7 +246,8 @@
     "native_organizer_checkpoint_updated": false,
     "reference": "continuity/OWNER_PORTABLE_NEW_PC_BOOTSTRAP_20261028.md",
     "delivery_phase": "P2_AFTER_FULL_MODULE_DETACH_AND_ONE_REAL_APP_FACTORY",
-    "priority_explanation": "Non-negotiable final product acceptance requirement, NOT first execution milestone. Current P0 is total noncore module removal; then P1 real factory; then P2 cloud account reinstall."
+    "priority_explanation": "Portability/cloud restore is mandatory in the final product but explicitly THIRD in implementation order. P0 is complete old module removal; P1 real 5-system Factory; P2 safe account restore on a newly supported PC.",
+    "mandatory_final_product_requirement": true
   },
   "owner_execution_sequence_20261028": {
     "owner_instruction_date": "2026-10-28",
