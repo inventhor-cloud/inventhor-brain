@@ -55,7 +55,7 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(order["protect_user_data_and_rollback_material"])
         self.assertTrue(order["native_organizer_exact_task_update_required"])
         self.assertEqual(order["status"], "SOURCE_POLICY_REGISTERED_NATIVE_UNVERIFIED")
-        self.assertEqual(policy["version"], "1.3.0")
+        self.assertEqual(policy["version"], "1.4.0")
         self.assertTrue((ROOT / order["authoritative_human_handoff"]).is_file())
 
     def test_noncore_detach_must_have_zero_active_runtime_dependencies(self):
@@ -112,6 +112,40 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
         self.assertTrue(future["no_duplicate_brain_operator_organizer_design_studio_factory"])
         self.assertFalse(future["native_installed_computer_access_verified"])
         self.assertTrue(future["source_contract_only"])
+
+    def test_fresh_computer_portable_and_one_click_install_are_p0(self):
+        portable = self.policy["portable_new_computer_installation"]
+        self.assertEqual(portable["priority"], "P0_CORE_ACCEPTANCE_REQUIREMENT")
+        self.assertEqual(portable["feature_owner"],
+                         "EXISTING_FIVE_SYSTEMS_NOT_NEW_MODULE")
+        self.assertEqual(
+            {m["mode"] for m in portable["delivery_modes"]},
+            {"PORTABLE_USER_MODE", "ONE_CLICK_LOCAL_INSTALL"})
+        text = "\n".join(portable["mandatory_acceptance"]).lower()
+        for requirement in (
+            "clean machine", "signed", "checksum", "no developer tools",
+            "device identity", "pairing", "rollback", "user consent",
+            "legacy", "organizer", "factory", "uninstall",
+        ):
+            self.assertIn(requirement, text)
+        self.assertTrue((ROOT / portable["reference"]).is_file())
+        for proof in (
+            "signed_release_tested",
+            "portable_user_mode_tested",
+            "fresh_pc_one_click_install_tested",
+            "offline_first_run_tested",
+            "native_organizer_checkpoint_updated",
+        ):
+            self.assertFalse(portable[proof])
+        self.assertEqual(portable["status"],
+            "SOURCE_OWNER_REQUIREMENT_RECORDED_FRESH_MACHINE_NOT_VERIFIED")
+
+    def test_portable_remains_one_five_core_system_not_a_side_product(self):
+        portable = self.policy["portable_new_computer_installation"]
+        self.assertEqual(len(self.policy["core_systems"]), 5)
+        self.assertTrue(any("OWNER_PORTABLE_NEW_PC_BOOTSTRAP_20261028.md"
+                            in row for row in self.policy["new_agent_startup"]))
+        self.assertIn("EXISTING_FIVE_SYSTEMS", portable["feature_owner"])
 
     def test_no_expansion_or_installed_success_from_source(self):
         paused = self.policy["out_of_scope_now"]
