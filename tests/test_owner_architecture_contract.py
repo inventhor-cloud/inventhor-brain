@@ -139,9 +139,10 @@ class CurrentOwnerArchitectureTests(unittest.TestCase):
             self.policy["portable_new_computer_installation"]["delivery_phase"],
             "P2_AFTER_FULL_MODULE_DETACH_AND_ONE_REAL_APP_FACTORY")
 
-    def test_fresh_computer_portable_and_one_click_install_are_p0(self):
+    def test_fresh_computer_cloud_restore_remains_mandatory_after_cleanup(self):
         portable = self.policy["portable_new_computer_installation"]
-        self.assertEqual(portable["priority"], "P0_CORE_ACCEPTANCE_REQUIREMENT")
+        self.assertEqual(portable["priority"], "P2_AFTER_P0_CLEANUP_AND_P1_FACTORY")
+        self.assertTrue(portable["mandatory_final_product_requirement"])
         self.assertEqual(portable["feature_owner"],
                          "EXISTING_FIVE_SYSTEMS_NOT_NEW_MODULE")
         self.assertEqual(
