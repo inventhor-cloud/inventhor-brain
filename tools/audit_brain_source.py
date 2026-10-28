@@ -157,8 +157,8 @@ def inspect_source() -> list[str]:
     if not isinstance(portable, dict):
         errors.append("PORTABLE_FRESH_MACHINE_REQUIREMENT_MISSING")
     else:
-        if portable.get("priority") != "P0_CORE_ACCEPTANCE_REQUIREMENT":
-            errors.append("PORTABILITY_NOT_P0")
+        if portable.get("priority") != "P2_AFTER_P0_CLEANUP_AND_P1_FACTORY" or portable.get("mandatory_final_product_requirement") is not True:
+            errors.append("CLOUD_RESTORE_MUST_REMAIN_MANDATORY_P2")
         modes = portable.get("delivery_modes")
         names = {x.get("mode") for x in modes if isinstance(x, dict)} if isinstance(modes, list) else set()
         if names != {"PORTABLE_USER_MODE", "ONE_CLICK_LOCAL_INSTALL"}:
