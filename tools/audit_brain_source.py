@@ -21,6 +21,7 @@ REQUIRED = (
     "system_constitution/core_rules.md",
     "continuity/OWNER_PRIORITY_PRODUCT_ENGINE_20261026.md",
     "continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md",
+    "continuity/OWNER_PORTABLE_NEW_PC_BOOTSTRAP_20261028.md",
     "continuity/OWNER_WORK_INTAKE_POLICY.md",
     "continuity/studio_factory_handoff.py",
     "continuity/core_activation_gate.py",
@@ -110,6 +111,26 @@ def inspect_source() -> list[str]:
             errors.append("NONCORE_ZERO_POSTCONDITION_MISSING:" + name)
     if not isinstance(remove, dict) or remove.get("unverified_runtime_is_not_success") is not True:
         errors.append("FALSE_NONCORE_REMOVAL_ATTESTATION")
+    portable = policy.get("portable_new_computer_installation")
+    if not isinstance(portable, dict):
+        errors.append("PORTABLE_FRESH_MACHINE_REQUIREMENT_MISSING")
+    else:
+        if portable.get("priority") != "P0_CORE_ACCEPTANCE_REQUIREMENT":
+            errors.append("PORTABILITY_NOT_P0")
+        modes = portable.get("delivery_modes")
+        names = {x.get("mode") for x in modes if isinstance(x, dict)} if isinstance(modes, list) else set()
+        if names != {"PORTABLE_USER_MODE", "ONE_CLICK_LOCAL_INSTALL"}:
+            errors.append("PORTABLE_INSTALL_MODE_DRIFT")
+        required_claims = (
+            "signed_release_tested", "portable_user_mode_tested",
+            "fresh_pc_one_click_install_tested", "offline_first_run_tested",
+            "native_organizer_checkpoint_updated",
+        )
+        for item in required_claims:
+            if portable.get(item) is not False:
+                errors.append("UNVERIFIED_PORTABILITY_CLAIM:" + item)
+        if portable.get("status") != "SOURCE_OWNER_REQUIREMENT_RECORDED_FRESH_MACHINE_NOT_VERIFIED":
+            errors.append("PORTABLE_CLEAN_INSTALL_FALSE_STATUS")
     rules = policy.get("execution_policy")
     if not isinstance(rules, dict):
         errors.append("EXECUTION_POLICY_MISSING")
