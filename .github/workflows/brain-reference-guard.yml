@@ -1,0 +1,20 @@
+name: Brain source hygiene and reference freshness
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit five-system owner contract and legacy snapshot boundaries
+        run: python3 tools/audit_brain_source.py
+      - name: Verify public mirror cannot advertise stale live work
+        run: python3 tools/verify_reference_freshness.py
+      - name: Check Python module syntax
+        run: python3 -m compileall -q continuity provider_independence tests tools
+      - name: Run all Brain source safety unit tests
+        run: python3 -m unittest discover -s tests -v

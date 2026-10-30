@@ -1,3 +1,22 @@
+# SON SAHİP CANLI SÖKÜM KURALI — 2026-10-26
+
+> **EK ÜST KURAL — MODÜL BAĞIMSIZLIĞI:** Beş çekirdeğin zorunlu iletişim, görev yürütme, Organizer handoff, Studio build/run ve QA yolları **isteğe bağlı eski modüllere ASLA bağımlı olamaz**. Böyle bir bağlantı bulunduysa `ARCHITECTURE_DEFECT` sayılır; eski eklentiyi korumak çözüm değildir. [Somut Operator kaynak bulgusu](../validation_reports/OPERATOR_OPTIONAL_MODULE_COUPLING_20261026.md). Gerçek beşli çekirdek eski eklenti klasörü boşken çalışmalı, görev yürütmeli ve QA testini geçmeli. Bu GitHub belgesi native başarı kanıtı değildir.
+
+
+Beş sistem: `INVENTHOR`, `OPERATOR`, `ORGANIZER`, `STUDIO_DESIGN`, `QA_FACTORY` (QA=Fabrika). Bunların dışındaki tarihsel bağımsız modüllerin aktif runtime'da **TAM SÖKÜMÜ** sahibin son emridir. Menüden gizlemek/yalnızca servisi kapatmak yeterli değildir; bütün runtime kayıtları ve dependency grafında **0 noncore aktif bağlantı** kalmalıdır. Beş çekirdek için gerekli yetenekler önce mevcut sistemlere güvenle taşınmalı, aksi hâlde söküm `BLOCKED`. Kaynağın ve eski verinin arşivde var olması, eski modülün canlı sistemde kalması değildir. İşlem ancak mevcut Organizer görev/lease, native envanter, yedek, QA, rollback ve gerçek yeniden başlatma testiyle kabul edilir. GitHub başarısı canlı söküm değildir.
+
+**Tek makine-okunur kural:** [ACTIVE_PRODUCT_ARCHITECTURE_20261026.json](ACTIVE_PRODUCT_ARCHITECTURE_20261026.json). **Tam, kesin işlem/handoff:** [OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md](../continuity/OWNER_NONCORE_TOTAL_DETACH_HANDOFF_20261026.md).
+
+---
+
+# GÜNCEL SAHİP MİMARİ KURALI — 2026-10-26
+
+**Üst hedef ve isimler:** Beş mimari sistem vardır: `INVENTHOR`, `OPERATOR`, `ORGANIZER`, `STUDIO_DESIGN`, `QA_FACTORY` (**QA = Fabrika, ikinci bir QA değil**). Tek hedef bunların gerçek uygulama oluşturma, tasarlama, birebir görme, çalıştırma, değişiklik, gerçek QA, hata düzeltme ve yeniden test yapabilmesidir. Başka modül/ayrı program geliştirmek YASAK AKTİF KAPSAMDIR; eski kaynaklar saklanır. Dört çekirdek/Organizer içeride veya 25 Ekim "modülleri ayrı programa dönüştür" hedefleri **bu üst kuralla geçersiz aktif önceliktir**. Organizer aynı tek kanonik proje/görev/lease/handoff evidences sistemidir.
+
+**Tek makine-okunur kaynak:** [ACTIVE_PRODUCT_ARCHITECTURE_20261026.json](ACTIVE_PRODUCT_ARCHITECTURE_20261026.json). Geliştirme sırasında mevcut yerel Organizer yetki/kilit/kanıt kontrolü atlanamaz; GitHub yalnızca kaynak/handoff aynasıdır. Aşağıdaki eski "INVENTHOR modüler olmalı" kuralı kod içi ayrım anlamındadır, **yeni modül üretme yetkisi değildir**.
+
+---
+
 # INVENTHOR System Constitution
 
 1. INVENTHOR must remain modular.

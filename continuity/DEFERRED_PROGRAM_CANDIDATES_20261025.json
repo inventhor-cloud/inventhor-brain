@@ -1,0 +1,261 @@
+{
+  "schema": "inventhor.deferred-program-candidate-inventory.v1",
+  "as_of": "2026-10-25",
+  "classification": "SOURCE_ONLY_REFERENCE_NOT_NATIVE_INVENTORY",
+  "scope": "Existing operator source manifest directories and existing brain source catalog; candidate program conversion only, no state mutation.",
+  "owner_goal": "Move each non-core user-facing legacy module into a separate recoverable app/project outside the integrated INVENTHOR runtime, each optionally controllable by Inventhor Brain and Operator through versioned permission-scoped app bridge.",
+  "rules": [
+    "Do not create independent software for mandatory four-core internal transport, security and service dependencies without native architecture classification.",
+    "Non-core product modules become individually listed deferred standalone program candidates; not embedded permanently in active INVENTHOR.",
+    "Each future program gets its own distinct program identity and isolated storage/configuration, while keeping authorized INVENTHOR/Operator command/response access.",
+    "Central AI+Operator control means all exposed capabilities within owner-granted scope, not hidden administrator-level access.",
+    "Check real installed inventory, dependencies, canonical Organizer project/task records and Codex ownership before any migration.",
+    "No new canonical Organizer IDs/tasks, real installation, delete, detach, rename or archive is performed by this reference."
+  ],
+  "operator_source_module_candidates": [
+    {
+      "source_module_id": "windows.adb",
+      "proposed_separate_program_name": "ADB / Android cihaz yönetimi",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.adb/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.cleanup",
+      "proposed_separate_program_name": "Sistem temizleme",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.cleanup/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.continuity-guard",
+      "proposed_separate_program_name": "Devamlılık koruyucusu",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.continuity-guard/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.control",
+      "proposed_separate_program_name": "Bilgisayar kontrol araçları",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.control/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.desktop-control",
+      "proposed_separate_program_name": "Masaüstü kontrol araçları",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.desktop-control/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.filesystem",
+      "proposed_separate_program_name": "Dosya yönetimi",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.filesystem/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.git",
+      "proposed_separate_program_name": "Git proje yönetimi",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.git/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.performance",
+      "proposed_separate_program_name": "Performans analizi",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.performance/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.powershell",
+      "proposed_separate_program_name": "Komut ve betik araçları",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.powershell/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.process-control",
+      "proposed_separate_program_name": "İşlem yönetimi",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.process-control/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.service-control",
+      "proposed_separate_program_name": "Hizmet yönetimi",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.service-control/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.software-factory",
+      "proposed_separate_program_name": "Yazılım üretim araçları (çekirdek Fabrika ile ilişkisi doğrulanacak)",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.software-factory/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.telemetry",
+      "proposed_separate_program_name": "Sistem izleme",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.telemetry/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "windows.transfer",
+      "proposed_separate_program_name": "Dosya aktarımı",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/windows.transfer/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "transport.direct-brain",
+      "proposed_separate_program_name": "Beyin iletişim bağlantısı",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/transport.direct-brain/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    },
+    {
+      "source_module_id": "transport.inventhor",
+      "proposed_separate_program_name": "INVENTHOR iletişim bağlantısı",
+      "source_repository": "inventhor-cloud/inventhor-operator-core",
+      "source_revision": "37ff1010aa5f55240a4324eafe5b3d5d45270e49",
+      "source_manifest_path": "windows/modules/transport.inventhor/module.json",
+      "candidate_role": "DEPENDENCY_CLASSIFICATION_REQUIRED",
+      "program_is_built": false,
+      "program_is_running": false,
+      "installed_module_status": "UNVERIFIED",
+      "native_organizer_item_id": null,
+      "separate_program_project_created": false
+    }
+  ],
+  "brain_source_catalog_candidates": [
+    {
+      "source_module_id": "provider_core",
+      "title": "Provider Core",
+      "classification": "CORE_INTERNAL_ADAPTER_REVIEW",
+      "path": "module_catalog.json",
+      "installed_status": "UNVERIFIED"
+    },
+    {
+      "source_module_id": "notification_panel",
+      "title": "Smart Notification Panel",
+      "classification": "UI_CORE_OR_STANDALONE_REVIEW",
+      "path": "module_catalog.json",
+      "installed_status": "UNVERIFIED"
+    },
+    {
+      "source_module_id": "owner_dev_core",
+      "title": "Owner Development Core",
+      "classification": "FOUR_CORE_OR_STANDALONE_REVIEW",
+      "path": "module_catalog.json",
+      "installed_status": "UNVERIFIED"
+    }
+  ],
+  "owner_named_additional_future_programs": [
+    {
+      "name": "Viktorija öğretmen uygulaması",
+      "source_id": "UNVERIFIED_NATIVE_ONLY",
+      "separate_app_candidate": true
+    },
+    {
+      "name": "Antivirüs uygulaması",
+      "source_id": "UNVERIFIED_NATIVE_ONLY",
+      "separate_app_candidate": true
+    }
+  ],
+  "next_native_step": "Codex under exact canonical Organizer owner/lease: audit current installed modules + service links, classify each as CORE_REQUIRED_INTERNAL or STANDALONE_DEFERRED_PROGRAM; migrate existing project goals and preserve per-app source/evidence/revisions; reversible detach only with backup and independent QA; do not fabricate program IDs."
+}
