@@ -107,7 +107,9 @@ def _ids(value: object, name: str) -> tuple[str, ...]:
 def _platforms(value: object, name: str) -> tuple[str, ...]:
     if not isinstance(value, tuple) or not 1 <= len(value) <= 4:
         raise StudioUiReviewInvalid("INVALID_" + name)
-    if len(value) != len(set(value)) or not set(value) <= _ALLOWED_PLATFORMS:
+    if not all(type(item) is str and item in _ALLOWED_PLATFORMS for item in value):
+        raise StudioUiReviewInvalid("INVALID_" + name)
+    if len(value) != len(set(value)):
         raise StudioUiReviewInvalid("INVALID_" + name)
     return value
 
@@ -149,7 +151,7 @@ def review_studio_semantic_ui_edit(
         raise StudioUiReviewInvalid("DOCUMENT_SCOPE_MISMATCH")
     if snapshot.native_task_revision != expected_native_revision:
         raise StudioUiReviewInvalid("STALE_ORGANIZER_REVISION")
-    if snapshot.operation not in _ALLOWED_OPS:
+    if not isinstance(snapshot.operation, str) or snapshot.operation not in _ALLOWED_OPS:
         raise StudioUiReviewInvalid("UNSUPPORTED_UI_OPERATION")
     _id(snapshot.target_semantic_id, "SEMANTIC_TARGET")
     intended = _ids(snapshot.intended_touched_ids, "INTENDED_TARGETS")
