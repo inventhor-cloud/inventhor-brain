@@ -1,7 +1,10 @@
 # Autonomous Execution Architecture
 
-Status: ACTIVE
-Date: 2026-09-22
+Status: REFERENCE_DESIGN_ONLY_NOT_INSTALLED_ACCEPTANCE
+Original Design Date: 2026-09-22
+Authority Review: 2026-10-23 (owner priority QA Factory + Brain handoff)
+
+**IMPORTANT:** This architecture is a design description, NOT proof that a durable autonomous scheduler, provider router, full QA witness, or release flow is installed. The authoritative task/plan/lease/evidence state comes exclusively from the current owner-controlled Main/Organizer ledger. Stale GitHub tasks cannot initiate native actions. See LIVE_SOURCE_FRESHNESS_GATE.md and FOCUS_ADVISER_NATIVE_INTEGRATION.md.
 
 ## Goal
 

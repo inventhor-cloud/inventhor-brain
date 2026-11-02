@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "owner_instruction_date": "2026-11-02",
+  "owner_goal": "Prioritize Inventhor Brain, existing live Design Studio UI design and real app creation after owner-reported system cleanup. Strengthen current single product rather than build a duplicate Studio or Factory.",
+  "owner_reports_cleanup_done": true,
+  "native_active_noncore_verified_zero": false,
+  "native_situation_note": "Read-only inspection 2026-11-02 saw historical module folders on disk, but installed heartbeat was from 2026-10-03; folder presence or stale heartbeat cannot attest actual live module loads. Do not reintroduce removed modules or mark clean native acceptance without fresh local Operator evidence.",
+  "no_new_task_or_project_id": true,
+  "canonical_organizer_must_be_read_fresh": true,
+  "main_native_studio_existing_source_root": "Desktop/INVENTHOR/INVENTHOR_MAIN_SYSTEM/src",
+  "observed_current_main_studio_files": [
+    "Inventhor.Main.DesignStudio/DesignAiEditEngine.cs",
+    "Inventhor.Main.DesignStudio/DesignPreviewInteraction.cs",
+    "Inventhor.Main.DesignStudio/DesignLivePreviewGate.cs",
+    "Inventhor.Main.DesignStudio/DesignDocumentStore.cs",
+    "Inventhor.Main.DesignStudio/ComponentLibraryEngine.cs",
+    "Inventhor.Main.DesignStudio/DesignQualityLoop.cs",
+    "Inventhor.Main.DesignStudio/DesignStudioView.AiHost.cs",
+    "Inventhor.Main.DesignStudio/DesignStudioView.Interactions.cs",
+    "Inventhor.Main.DesignStudio/DesignStudioView.Persistence.cs",
+    "Inventhor.Main.DesignStudio/DesignStudioView.QualityLoop.cs",
+    "Inventhor.Main.DesignStudio.WorkTests/DesignPreviewInteractionTests.cs",
+    "Inventhor.Main.DesignStudio.WorkTests/DesignLivePreviewGateTests.cs"
+  ],
+  "github_brain_gate": {
+    "source_path": "continuity/studio_semantic_ui_gate.py",
+    "tests_path": "tests/test_studio_semantic_ui_gate.py",
+    "last_verified_run": "https://github.com/inventhor-cloud/inventhor-brain/actions/runs/41495890935",
+    "last_verified_brain_source_tests": 298,
+    "source_only": true,
+    "not_installed_or_live_qa": true,
+    "latest_source_commit": "b29b24e9f0eeafd48c8e12b7c19d00acd48a7f45",
+    "independently_approved_ui_scope_required": {
+      "operation": true,
+      "semantic_target_id": true,
+      "allowed_component_ids": true,
+      "provenance": "Must be read from fresh trusted native Organizer owner-approved task, not echoed from edit snapshot",
+      "check_type": "SOURCE_ONLY_ADVISORY_NO_NATIVE_AUTHORIZATION"
+    },
+    "conflict_and_load_preflight": {
+      "existing_source_path": "continuity/studio_semantic_ui_gate.py",
+      "callable": "review_studio_operation_safety",
+      "operating_scope": "ADVISORY_ONLY_READ_ONLY_NO_NATIVE_RESERVATION_OR_TASK_EXECUTION",
+      "scenarios_checked": [
+        "independent_work_allowed_for_native_preflight",
+        "same_document_disjoint_panels_serialized_and_rebased",
+        "overlapping_panels_and_shared_resource_locks",
+        "duplicate_task_epoch_denied",
+        "expired_leases_require_reconciliation",
+        "memory_headroom_backpressure",
+        "busy_build_slot_backpressure",
+        "stale_metrics_and_incomplete_claim_window_denied"
+      ],
+      "source_tests": "tests/test_studio_semantic_ui_gate.py",
+      "source_test_run": "https://github.com/inventhor-cloud/inventhor-brain/actions/runs/41495890935",
+      "native_live_proven": false
+    }
+  },
+  "native_operator_handoff": {
+    "mechanism": "Existing native Organizer (actual immutable TASK_ID/PROJECT_ID/owner/lease/revision) -> existing Operator handoff and authorized native executor",
+    "recommended_existing_command": "operator_work_handoff(taskId)",
+    "command_status": "REFERENCE_ONLY_NOT_INVOKED",
+    "do_not_use_dc_for_routine_tasks": true,
+    "dc_budget": "Conserve Desktop Commander requests; batch only genuinely necessary owner-PC read-only checks; use existing Operator for routine local execution once authorized",
+    "no_lease_takeover": true,
+    "no_new_operator": true,
+    "no_duplicate_studio": true,
+    "no_duplicate_qa_factory": true,
+    "no_remote_execution_without_native_authorization": true,
+    "additional_next_preflight": "Read native exact task owner/lease/revision, active edit claims/resource locks and measured load; no local writes until atomic native preflight and Codex-owned file reconciliation"
+  },
+  "finite_steps_for_existing_operator_task": [
+    "Read the canonical Organizer task and active lease and acknowledge freshest checkpoint; preserve Codex owner work and local Studio files.",
+    "Native Main/Organizer must compare active task/epoch/lease, overlapping Studio component/document/resource claims and live memory/build capacity before any operation; serialize/rebase collisions and defer capacity-limited work without dropping user request.",
+    "Compare present installed Main/Design Studio sources with Brain reviewer; do not overwrite existing DesignAiEditEngine, DesignDocumentStore, DesignPreviewInteraction or QA links.",
+    "Map an actual owner-language instruction such as making a semantic panel narrower to a stable target_semantic_id, approved operation and bounded intended component IDs.",
+    "Perform an authorized, reversible edit in existing Studio only; preserve before/after document revision and SHA256, undo snapshot and exact changed semantic IDs.",
+    "Render the exact current revision on real target viewport, capture a native action-effect witness, accessibility/keyboard/touch and layout checks plus expected localization/platform coverage.",
+    "Have existing Operator deliver the resulting authenticated evidence to the existing Brain and canonical Organizer; rerun stale/stable semantic UI gate without treating source flags as native witness.",
+    "Use same existing QA Factory to test real built app and fail->fix->retest exact new artifact; do not call preview-only result QA PASS.",
+    "Checkpoint completed/remaining/blockers/evidence to original Organizer and read it back, then mark task status truthfully."
+  ],
+  "acceptance": {
+    "target_stable_semantic_id_required": true,
+    "no_unapproved_component_mutation": true,
+    "no_stale_preview_hash_or_revision": true,
+    "actual_native_render_and_action_effect_required": true,
+    "actual_existing_studio_document_persisted_and_undoable": true,
+    "actual_operated_program_build_run_required": true,
+    "keyboard_touch_accessibility_required": true,
+    "localization_expansion_required": true,
+    "at_least_windows_desktop_viewport_checked": true,
+    "qa_same_existing_factory_required": true,
+    "native_organizer_checkpoint_readback_required": true,
+    "source_ci_is_not_native_qa": true,
+    "ui_operation_matches_owner_approved_intent": true,
+    "semantic_target_matches_owner_approved_intent": true,
+    "observed_and_intended_components_within_owner_approved_scope": true
+  },
+  "current_status": "BRAIN_SEMANTIC_GATE_SOURCE_TESTED_NATIVE_INTEGRATION_NOT_VERIFIED",
+  "next_check": "Native Organizer current lease and active resource claims, measured CPU/memory/build load, then authorized reversible UI operation with existing Studio/Operator and QA Factory evidence.",
+  "owner_execution_policy": {
+    "goal_scope": "OWNER_REQUESTS_ARE_NOT_ARTIFICIALLY_LIMITED_BY_FIXED_TEMPLATES_OR_WORKFLOW_FEATURE_CAPS",
+    "distinction": "An owner's requested outcome is not prohibited simply because a particular existing semantic UI operation does not yet implement it. Inventhor may plan a safe extension through current five systems; unsupported operations are not permission to run arbitrary commands.",
+    "required_safety": [
+      "single_existing_organizer_current_task_and_lease",
+      "native_exact_ownership_and_epoch_checks",
+      "component_document_and_shared_resource_collision_detection",
+      "atomic_write_and_rebase_no_lost_updates",
+      "native_memory_headroom_and_build_concurrency_budget",
+      "backpressure_not_task_deletion",
+      "crash_recovery_and_indeterminate_task_reconciliation_no_blind_replay",
+      "authorization_signing_UAC_and_user_data_protection",
+      "reversible_changes_with_real_Windows_Studio_QA_evidence"
+    ],
+    "do_not_create_new_operator_or_queue_or_studio_or_factory": true,
+    "conflict_policy": "Do not overwrite Codex/other owner lease or mutable files; serialize collisions, independently allow disjoint scoped work after native atomic preflight",
+    "budget_policy": "Conserve DC. Routine authorized OS work through existing Operator. Memory/build-slot capacity deferral is temporary; no request dropped or declared DONE."
+  }
+}

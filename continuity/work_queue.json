@@ -228,5 +228,10 @@
       "priority": "P3",
       "title": "Replace Operator logo and complete final dark visual identity"
     }
-  ]
+  ],
+  "runtime_authoritative": false,
+  "reference_snapshot_only": true,
+  "state_freshness": "UNVERIFIED",
+  "freshness_policy_path": "continuity/LIVE_SOURCE_FRESHNESS_GATE.md",
+  "owner_runtime_task_id_required": true
 }
