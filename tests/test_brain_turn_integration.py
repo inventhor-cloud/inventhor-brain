@@ -19,7 +19,7 @@ NOW = datetime(2026, 10, 23, 17, 30, tzinfo=timezone.utc)
 class TestCli:
     def __init__(self):
         self.task = {
-            "id": "TASK_QA", "state": "TODO",
+            "id": "TASK_QA", "state": "TODO", "owner": "MAIN",
             "project_id": "INVENTHOR_QA", "target_id": "INVENTHOR_OPERATOR",
             "checkpoint_stage": "QA_SOURCE_ONLY",
             "completed": ["draft verified"],
@@ -37,6 +37,7 @@ class TestHost:
     def __init__(self):
         self.task = {
             "source": SOURCE, "task_id": "TASK_QA", "project_id": "INVENTHOR_QA",
+            "owner": "MAIN",
             "target_id": "INVENTHOR_OPERATOR", "revision": 12,
             "observed_at": NOW.isoformat(), "state": "TODO",
             "stage": "QA_SOURCE_ONLY", "completed": ["draft verified"],
@@ -316,6 +317,7 @@ class BrainTurnIntegrationTests(unittest.TestCase):
             ("remaining", ["another pending native step"]),
             ("stage", "DIFFERENT_QA_STAGE"),
             ("blocker", "NEW_NATIVE_BLOCKER"),
+            ("owner", "CODEX"),
             ("next_action", "different native work"),
         ):
             class RacingHost(TestHost):
@@ -336,6 +338,17 @@ class BrainTurnIntegrationTests(unittest.TestCase):
                 self.denied("NATIVE_TASK_CHANGED_DURING_ADVICE",
                             cli=cli, host=h)
             self.assertEqual(h.claims, 0)
+
+    def test_task_assignment_owner_changes_without_lease_denied(self):
+        class RacingHost(TestHost):
+            def read_actor_context(self, task_id, worker):
+                proof = super().read_actor_context(task_id, worker)
+                self.task["owner"] = "OTHER_OWNER"
+                return proof
+
+        host = RacingHost()
+        self.denied("NATIVE_TASK_CHANGED_DURING_ADVICE", host=host)
+        self.assertEqual(host.claims, 0)
 
     def test_dependency_state_change_without_revision_increment_blocks(self):
         class RacingHost(TestHost):
