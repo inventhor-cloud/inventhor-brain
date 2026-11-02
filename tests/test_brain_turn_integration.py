@@ -288,6 +288,60 @@ class BrainTurnIntegrationTests(unittest.TestCase):
         self.assertEqual(h.plan_verifications, 2)
         self.assertEqual(h.claims, 0)
 
+    def test_raw_evidence_and_checkpoint_drift_block_even_same_revision(self):
+        # A provider-redacted display may conceal the difference between
+        # two private evidence references. Compare trusted RAW digest.
+        for field, replacement in (
+            ("evidence_refs", ["https://example.test/a?sig=second"]),
+            ("completed", ["different proof"]),
+            ("remaining", ["another pending native step"]),
+            ("stage", "DIFFERENT_QA_STAGE"),
+            ("blocker", "NEW_NATIVE_BLOCKER"),
+            ("next_action", "different native work"),
+        ):
+            class RacingHost(TestHost):
+                def read_actor_context(self, task_id, worker):
+                    proof = super().read_actor_context(task_id, worker)
+                    self.task[field] = replacement
+                    return proof
+
+            h = RacingHost()
+            if field == "evidence_refs":
+                h.task["evidence_refs"] = ["https://example.test/a?sig=first"]
+                # The CLI's legacy evidence must match initial native data.
+                cli = TestCli()
+                cli.task["evidence"] = h.task["evidence_refs"][0]
+            else:
+                cli = TestCli()
+            with self.subTest(field=field):
+                self.denied("NATIVE_TASK_CHANGED_DURING_ADVICE",
+                            cli=cli, host=h)
+            self.assertEqual(h.claims, 0)
+
+    def test_dependency_state_change_without_revision_increment_blocks(self):
+        class RacingHost(TestHost):
+            def read_actor_context(self, task_id, worker):
+                proof = super().read_actor_context(task_id, worker)
+                self.task["dependencies"] = [
+                    {"task_id": "NEW_DEP", "state": "TODO"}]
+                return proof
+
+        h = RacingHost()
+        self.denied("NATIVE_TASK_CHANGED_DURING_ADVICE", host=h)
+        self.assertEqual(h.claims, 0)
+
+    def test_last_read_timestamp_must_not_go_backwards(self):
+        class ReplayedHost(TestHost):
+            def read_actor_context(self, task_id, worker):
+                proof = super().read_actor_context(task_id, worker)
+                self.task["observed_at"] = (
+                    NOW - timedelta(seconds=2)).isoformat()
+                return proof
+
+        h = ReplayedHost()
+        self.denied("NATIVE_TASK_OBSERVATION_ROLLED_BACK", host=h)
+        self.assertEqual(h.claims, 0)
+
     def test_final_host_exception_never_yields_advice(self):
         class DisconnectedHost(TestHost):
             def read_exact(self, task_id):
