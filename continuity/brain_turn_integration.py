@@ -22,7 +22,7 @@ from continuity.focus_adviser import (
 from continuity.live_handoff_gate import HandoffDenied, LiveTaskPort, resume
 from continuity.native_readonly_attachment import (
     BrainReadOnlyAttachment, ExactHandoffReader,
-    prepare_read_only_attachment,
+    prepare_read_only_attachment, native_task_state_sha256,
 )
 
 
@@ -156,8 +156,14 @@ def prepare_brain_turn(
         or fresh.target_id != attachment.target_id
         or fresh.revision != attachment.canonical_revision
         or fresh.state != attachment.state
-        or fresh.active_worker != attachment.display.active_worker):
+        or fresh.active_worker != attachment.display.active_worker
+        or native_task_state_sha256(fresh)
+           != attachment.native_task_state_sha256):
         raise AgentTurnDenied("NATIVE_TASK_CHANGED_DURING_ADVICE")
+    # A final native read older than the first is a replayed/stale cache,
+    # not a successful final check. Newer timestamps are allowed.
+    if fresh.observed_at < datetime.fromisoformat(attachment.observed_at):
+        raise AgentTurnDenied("NATIVE_TASK_OBSERVATION_ROLLED_BACK")
     # The approved plan may have been superseded by another worker while
     # actor context was read. Its original host verification cannot be
     # treated as a permanent authorization.
