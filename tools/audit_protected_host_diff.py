@@ -182,7 +182,7 @@ def inspect_protected_host_hunks(
             if re.search(r"<[A-Za-z][^\n>]*\bx:Name\s*=", positive):
                 signals.append("NAMED_NATIVE_UI_ELEMENT_ADDED")
             if re.search(
-                r"\b(?:Click|TextChanged|PreviewKeyDown|SelectionChanged)\s*=\s*\\"",
+                r'\b(?:Click|TextChanged|PreviewKeyDown|SelectionChanged)\s*=\s*"',
                 positive,
             ):
                 signals.append("NATIVE_UI_EVENT_HOOK_ADDED")
