@@ -32,6 +32,25 @@ class AgentTurnDenied(ValueError):
         super().__init__(code)
 
 
+@dataclass(frozen=True)
+class CanonicalEpochScope:
+    """Read-only check request; not a native epoch, lease or signed receipt.
+
+    A trusted installed .NET Main/Organizer adapter must atomically compare
+    these claimed values with its OWN current canonical ledger and owner
+    session. No caller, fixture, GitHub file or model may assert success.
+    """
+    task_id: str
+    project_id: str
+    target_id: str
+    task_revision: int
+    task_state_sha256: str
+    plan_id: str
+    plan_revision: int
+    worker_id: str
+    actor_session_id: str
+
+
 class TrustedMainContextPort(LiveTaskPort, Protocol):
     """Only a local, owner-authorized Main/Organizer host can implement this.
 
@@ -54,6 +73,15 @@ class TrustedMainContextPort(LiveTaskPort, Protocol):
     ) -> NativeActorContext: ...
 
     def verify_actor_context(self, context: NativeActorContext) -> bool: ...
+
+    def verify_canonical_epoch(self, scope: CanonicalEpochScope) -> bool:
+        """Native host lock/transaction check of task, plan and owner scope.
+
+        Must independently query the SAME original Organizer epoch, not
+        compare this dataclass to cached source JSON or return a constant.
+        This call is read-only and does not reserve a lease.
+        """
+        ...
 
 
 @dataclass(frozen=True)
@@ -175,6 +203,29 @@ def prepare_brain_turn(
         raise AgentTurnDenied("FOCUS_FINAL_VERIFIER_UNAVAILABLE") from exc
     if plan_still_valid is not True:
         raise AgentTurnDenied("FOCUS_CHANGED_DURING_ADVICE")
+
+    # Close the gap between separately authenticating the task record,
+    # owner-approved plan and the actor's session. Only the real Main host
+    # can confirm all three under ONE native Organizer epoch/lock. Reusing
+    # BrainWorkCenter's id|state|updated_at display hash is NOT a native
+    # revision or sufficient proof of this transaction.
+    scope = CanonicalEpochScope(
+        task_id=attachment.task_id,
+        project_id=attachment.project_id,
+        target_id=attachment.target_id,
+        task_revision=attachment.canonical_revision,
+        task_state_sha256=attachment.native_task_state_sha256,
+        plan_id=focus.plan_id,
+        plan_revision=focus.plan_revision,
+        worker_id=worker,
+        actor_session_id=proof.session_id,
+    )
+    try:
+        verified_epoch = host.verify_canonical_epoch(scope)
+    except Exception as exc:
+        raise AgentTurnDenied("NATIVE_CANONICAL_EPOCH_VERIFIER_UNAVAILABLE") from exc
+    if verified_epoch is not True:
+        raise AgentTurnDenied("NATIVE_CANONICAL_EPOCH_NOT_VERIFIED")
     return BrainTurnPreparation(
         attachment=attachment, advisory=advisory, trace=trace,
         actor=actor, plan_revision=focus.plan_revision,
