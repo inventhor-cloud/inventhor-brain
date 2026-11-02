@@ -225,12 +225,29 @@ def evaluate_core_activation(
     for conflict in snapshot.unresolved_conflicts:
         blockers.append("UNRESOLVED_CONFLICT:" + conflict)
 
+    # Select ONE finite, read-only next verification, not another job,
+    # queue, source of authority, native task claim or deployment command.
+    # A missing inventory outranks a seemingly green set of component/link
+    # status flags: no static observation can prove zero runtime dependencies.
+    if "NONCORE_DEPENDENCY_INVENTORY:NOT_VERIFIED" in blockers:
+        next_action = "READ_ORIGINAL_NATIVE_CORE_DEPENDENCY_INVENTORY"
+    elif any(b.startswith(("CORE_NONCORE_DEPENDENCY:",
+                           "LEGACY_ACTIVATION_ROUTE:",
+                           "NONCORE_ACTIVE:")) for b in blockers):
+        next_action = "RECONCILE_LEGACY_CORE_COUPLING_WITH_NATIVE_OWNER_LEASE"
+    elif any(b.startswith("UNRESOLVED_CONFLICT:") for b in blockers):
+        next_action = "RECONCILE_NATIVE_SOURCE_AND_OWNER_LEASE_CONFLICTS"
+    elif any(b.startswith(cid + ":") for b in blockers for cid in CORE):
+        next_action = "VERIFY_INSTALLED_CORE_HEARTBEAT_SIGNER_AND_ROLLBACK"
+    elif any(b.startswith(lid + ":") for b in blockers for lid in REQUIRED_LINKS):
+        next_action = "VERIFY_FRESH_AUTHENTICATED_NATIVE_LINK_ACKS"
+    elif "QA:LIVE_WITNESS_MISSING" in blockers:
+        next_action = "VERIFY_SAME_EXISTING_QA_FACTORY_LIVE_WITNESS"
+    else:
+        next_action = "VERIFY_NATIVE_HOST_PROVENANCE_LEASE_SIGNER_QA_AND_OWNER_GATES"
+
     return CoreActivationAdvice(
         disposition="BLOCKED" if blockers else "NATIVE_REVIEW_REQUIRED",
         blockers=tuple(blockers),
-        next_action=(
-            "RECONCILE_NATIVE_ORGANIZER_AND_OPERATOR_BEFORE_ACTIVATION"
-            if blockers else
-            "VERIFY_NATIVE_HOST_PROVENANCE_LEASE_SIGNER_QA_AND_OWNER_GATES"
-        ),
+        next_action=next_action,
     )
