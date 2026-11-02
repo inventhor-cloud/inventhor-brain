@@ -42,6 +42,7 @@ def native_task_state_sha256(packet: ResumePacket) -> str:
         "blocker": packet.blocker,
         "next_action": packet.next_action,
         "active_worker": packet.active_worker,
+        "dependency_states": packet.dependency_states,
     }
     serialized = json.dumps(
         canonical, sort_keys=True, ensure_ascii=False,
