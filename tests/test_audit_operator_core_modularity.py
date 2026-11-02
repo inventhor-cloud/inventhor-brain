@@ -25,7 +25,9 @@ class AuditOperatorModularityTests(unittest.TestCase):
             p.write_text("// empty synthetic core implementation\n", encoding="utf-8")
 
     def put(self, filename, data):
-        (self.root / filename).write_text(data, encoding="utf-8")
+        path = self.root / filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(data, encoding="utf-8")
 
     def test_missing_root_fails_without_guessing_clean(self):
         result = audit_source(self.root / "not_present")
@@ -136,6 +138,7 @@ var executors = plugins.Where(p => p.Executor is not null)
         # A directory at the path of an obsolete installer is NOT proof of
         # physical removal; report incomplete and never authorize deletion.
         path = self.root / DEPLOY
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.mkdir(parents=True)
         report = audit_source(self.root)
         self.assertEqual(report["status"], "SOURCE_INCOMPLETE")
