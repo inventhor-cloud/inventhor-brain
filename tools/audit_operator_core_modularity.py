@@ -39,7 +39,7 @@ PATTERNS: tuple[tuple[str, str, str, str], ...] = (
         "windows/src/Inventhor.Operator.Service/OperatorWorker.cs",
         r"plugins\s*\.\s*Where\s*\(\s*p\s*=>\s*p\.Executor",
         "CORE_EXECUTORS_FROM_PLUGINS",
-        "Core execution path is populated exclusively from legacy plugin objects.",
+        "Core still admits optional plugin executors; review which required core capability remains dependent on an old module.",
     ),
     (
         "windows/src/Inventhor.Operator.Service/OperatorWorker.cs",
