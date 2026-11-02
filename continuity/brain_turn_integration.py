@@ -19,7 +19,7 @@ from continuity.decision_trace import AdvisoryTrace, make_advisory_trace
 from continuity.focus_adviser import (
     Advisory, FocusEnvelope, propose_next,
 )
-from continuity.live_handoff_gate import LiveTaskPort
+from continuity.live_handoff_gate import HandoffDenied, LiveTaskPort, resume
 from continuity.native_readonly_attachment import (
     BrainReadOnlyAttachment, ExactHandoffReader,
     prepare_read_only_attachment,
@@ -137,6 +137,38 @@ def prepare_brain_turn(
         proof, action="TASK_ADVICE", destination="INTERNAL_ORGANIZER",
         now=now, verify_host_context=host.verify_actor_context,
     )
+    # The real Organizer task may change while the Brain reads the owner
+    # plan and agent identity. Independently re-read and authenticate the
+    # exact canonical record immediately before returning this advisory.
+    # This is NOT an atomic native lease; the native host must still compare
+    # revision and owner at execution time.
+    try:
+        fresh = resume(
+            host, task_id, now=now, worker=worker,
+            expected_target=expected_target, write=False,
+        )
+    except HandoffDenied as exc:
+        raise AgentTurnDenied("NATIVE_FINAL_TASK_RECHECK_DENIED") from exc
+    except Exception as exc:
+        raise AgentTurnDenied("NATIVE_FINAL_TASK_READ_UNAVAILABLE") from exc
+    if (fresh.task_id != attachment.task_id
+        or fresh.project_id != attachment.project_id
+        or fresh.target_id != attachment.target_id
+        or fresh.revision != attachment.canonical_revision
+        or fresh.state != attachment.state
+        or fresh.active_worker != attachment.display.active_worker):
+        raise AgentTurnDenied("NATIVE_TASK_CHANGED_DURING_ADVICE")
+    # The approved plan may have been superseded by another worker while
+    # actor context was read. Its original host verification cannot be
+    # treated as a permanent authorization.
+    try:
+        plan_still_valid = host.verify_focus_snapshot(
+            attachment, focus, tasks,
+        )
+    except Exception as exc:
+        raise AgentTurnDenied("FOCUS_FINAL_VERIFIER_UNAVAILABLE") from exc
+    if plan_still_valid is not True:
+        raise AgentTurnDenied("FOCUS_CHANGED_DURING_ADVICE")
     return BrainTurnPreparation(
         attachment=attachment, advisory=advisory, trace=trace,
         actor=actor, plan_revision=focus.plan_revision,
