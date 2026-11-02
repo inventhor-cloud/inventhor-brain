@@ -118,11 +118,16 @@ def review_studio_semantic_ui_edit(
     snapshot: SemanticUiEditSnapshot, *, now: datetime,
     expected_task_id: str, expected_project_id: str,
     expected_document_id: str, expected_native_revision: int,
+    approved_operation: str, approved_semantic_target_id: str,
+    approved_touched_ids: tuple[str, ...],
 ) -> SemanticUiEditAdvice:
     """Review a claimed visible UI delta; never trust/execute claims as proof.
 
     This can request a native Studio preview/effect review, NOT approve a
     release or assert that a preview was truly rendered on the user's PC.
+    approved_* must come independently from a fresh, trusted native Organizer
+    scope, never from the untrusted edit snapshot itself. This pure source
+    check cannot authenticate its caller or the native Organizer lease.
     """
     if not isinstance(snapshot, SemanticUiEditSnapshot):
         raise StudioUiReviewInvalid("SNAPSHOT_REQUIRED")
@@ -153,9 +158,19 @@ def review_studio_semantic_ui_edit(
         raise StudioUiReviewInvalid("STALE_ORGANIZER_REVISION")
     if not isinstance(snapshot.operation, str) or snapshot.operation not in _ALLOWED_OPS:
         raise StudioUiReviewInvalid("UNSUPPORTED_UI_OPERATION")
+    if not isinstance(approved_operation, str) or approved_operation not in _ALLOWED_OPS:
+        raise StudioUiReviewInvalid("INVALID_APPROVED_OPERATION")
     _id(snapshot.target_semantic_id, "SEMANTIC_TARGET")
+    _id(approved_semantic_target_id, "APPROVED_SEMANTIC_TARGET")
     intended = _ids(snapshot.intended_touched_ids, "INTENDED_TARGETS")
     observed = _ids(snapshot.observed_touched_ids, "OBSERVED_TARGETS")
+    approved = _ids(approved_touched_ids, "APPROVED_TARGETS")
+    if approved_semantic_target_id not in approved:
+        raise StudioUiReviewInvalid("APPROVED_TARGET_NOT_IN_SCOPE")
+    if snapshot.operation != approved_operation:
+        raise StudioUiReviewInvalid("UI_OPERATION_SCOPE_MISMATCH")
+    if snapshot.target_semantic_id != approved_semantic_target_id:
+        raise StudioUiReviewInvalid("SEMANTIC_TARGET_SCOPE_MISMATCH")
     expected = _platforms(snapshot.expected_platforms, "EXPECTED_PLATFORMS")
     tested = _platforms(snapshot.tested_platforms, "TESTED_PLATFORMS")
     for name, value in (
@@ -198,6 +213,9 @@ def review_studio_semantic_ui_edit(
     need(snapshot.target_semantic_id in intended, "SEMANTIC_TARGET_NOT_IN_SCOPE")
     need(snapshot.target_semantic_id in observed, "SEMANTIC_TARGET_NOT_CHANGED")
     need(set(observed) <= set(intended), "UNRELATED_COMPONENT_MUTATED")
+    need(set(intended) <= set(approved), "UNAPPROVED_INTENDED_COMPONENT")
+    need(set(observed) <= set(approved), "UNAPPROVED_OBSERVED_COMPONENT")
+    need("WINDOWS_DESKTOP" in expected, "REQUIRED_WINDOWS_DESKTOP_NOT_EXPECTED")
     need(set(expected) <= set(tested), "RESPONSIVE_PLATFORM_NOT_TESTED")
     need(snapshot.real_preview_observed, "REAL_PREVIEW_NOT_OBSERVED")
     need(snapshot.target_action_effect_observed, "UI_ACTION_EFFECT_NOT_OBSERVED")
