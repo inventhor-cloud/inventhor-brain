@@ -15,6 +15,7 @@ def record():
     return {
         "source": SOURCE, "task_id": "QA_TASK", "project_id": "INVENTHOR_QA",
         "target_id": "INVENTHOR_OPERATOR", "revision": 7,
+        "owner": "MAIN",
         "observed_at": NOW.isoformat(), "state": "TODO",
         "stage": "SOURCE_TESTED_NOT_INSTALLED",
         "completed": ["signed QA draft hash independently verified"],
@@ -91,6 +92,13 @@ class GateTests(unittest.TestCase):
             with self.subTest(error=error):
                 self.deny(error, p)
             self.assertEqual(p.claims, 0)
+
+    def test_assigned_task_owner_does_not_claim_lease(self):
+        p = NativeFake()
+        packet = run(p)
+        self.assertEqual(packet.assigned_owner, "MAIN")
+        self.assertEqual(packet.active_worker, "")
+        self.assertEqual(p.claims, 0)
 
     def test_native_lease_required(self):
         p = NativeFake()
