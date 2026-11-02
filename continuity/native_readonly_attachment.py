@@ -99,6 +99,18 @@ def _check_consistent(
             if not isinstance(observed_refs, list) or tuple(observed_refs) != trusted.evidence_refs:
                 raise IntegrationDenied("EVIDENCE_CHANGED_DURING_CROSSCHECK")
 
+    # Some installed Organizer CLI builds also expose the canonical
+    # revision. If present, it MUST match the independently authenticated
+    # native Main revision. A missing optional field cannot prove equality,
+    # but a contradictory or malformed field must never be ignored.
+    for revision_key in ("revision", "canonical_revision"):
+        if revision_key in read.task:
+            cli_revision = read.task[revision_key]
+            if type(cli_revision) is not int or cli_revision < 1:
+                raise IntegrationDenied("CLI_REVISION_INVALID")
+            if cli_revision != trusted.revision:
+                raise IntegrationDenied("CLI_NATIVE_REVISION_MISMATCH")
+
     # CLI output varies by installed build: compare optional fields if present.
     for key, expected in (
         ("target_id", trusted.target_id),
