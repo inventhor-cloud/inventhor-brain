@@ -167,6 +167,28 @@ class NativeReadOnlyAttachmentTests(unittest.TestCase):
         n.data["revision"] = 0
         self.assert_denied("NATIVE_REVISION_REQUIRED", c, n)
 
+    def test_cli_optional_revision_is_crosschecked_with_native_ledger(self):
+        for key in ("revision", "canonical_revision"):
+            c, n = Cli(), Native()
+            c.task[key] = 9
+            self.assertEqual(call(c, n).canonical_revision, 9)
+            c.task[key] = 8
+            with self.subTest(key=key):
+                self.assert_denied("CLI_NATIVE_REVISION_MISMATCH", c, n)
+
+    def test_cli_invalid_revision_never_becomes_a_native_match(self):
+        for value in (True, "9", None, 0, -1):
+            c, n = Cli(), Native()
+            c.task["revision"] = value
+            with self.subTest(value=value):
+                self.assert_denied("CLI_REVISION_INVALID", c, n)
+
+    def test_cli_two_distinct_revision_fields_cannot_mask_conflict(self):
+        c, n = Cli(), Native()
+        c.task["revision"] = 9
+        c.task["canonical_revision"] = 12
+        self.assert_denied("CLI_NATIVE_REVISION_MISMATCH", c, n)
+
     def test_native_host_must_independently_authenticate(self):
         c, n = Cli(), Native()
         n.trusted = False
