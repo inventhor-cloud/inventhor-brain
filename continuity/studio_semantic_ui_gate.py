@@ -266,6 +266,12 @@ class StudioResourceSnapshot:
     occupied_build_slots: int
     safe_build_slots: int
     needs_build_slot: bool
+    cpu_load_percent: int
+    cpu_deferral_threshold_percent: int
+    is_cpu_intensive: bool
+    available_disk_mb: int
+    reserve_disk_mb: int
+    expected_extra_disk_mb: int
 
 
 @dataclass(frozen=True)
@@ -338,14 +344,20 @@ def review_studio_operation_safety(
         raise StudioUiReviewInvalid("INVALID_NATIVE_LOAD")
     if type(native_load.needs_build_slot) is not bool:
         raise StudioUiReviewInvalid("INVALID_BUILD_SLOT_DEMAND")
+    if type(native_load.is_cpu_intensive) is not bool:
+        raise StudioUiReviewInvalid("INVALID_CPU_INTENSITY")
     metrics = _aware(native_load.measured_at, "LOAD_MEASUREMENT")
     for label in (
         "available_memory_mb", "reserve_memory_mb", "expected_extra_memory_mb",
         "occupied_build_slots", "safe_build_slots",
+        "cpu_load_percent", "cpu_deferral_threshold_percent",
+        "available_disk_mb", "reserve_disk_mb", "expected_extra_disk_mb",
     ):
         _bounded_count(getattr(native_load, label), label.upper())
     if native_load.safe_build_slots < 1:
         raise StudioUiReviewInvalid("INVALID_SAFE_BUILD_SLOTS")
+    if native_load.cpu_load_percent > 100 or not 1 <= native_load.cpu_deferral_threshold_percent <= 100:
+        raise StudioUiReviewInvalid("INVALID_CPU_CAPACITY")
 
     reasons: list[str] = []
     def add(code: str) -> None:
@@ -363,6 +375,13 @@ def review_studio_operation_safety(
     if (native_load.needs_build_slot and
             native_load.occupied_build_slots >= native_load.safe_build_slots):
         add("BUILD_CAPACITY_BUSY")
+    if (native_load.is_cpu_intensive and
+            native_load.cpu_load_percent >= native_load.cpu_deferral_threshold_percent):
+        add("CPU_PRESSURE_DEFER_HEAVY_OPERATION")
+    if native_load.available_disk_mb < (
+        native_load.reserve_disk_mb + native_load.expected_extra_disk_mb
+    ):
+        add("INSUFFICIENT_DISK_HEADROOM")
 
     # Do not assume a past expiry means an interrupted task is safe to replay.
     if _aware(intent.lease_expires_at, "LEASE_EXPIRY") <= current:
@@ -398,7 +417,8 @@ def review_studio_operation_safety(
         state, action = "RECONCILE_BEFORE_RETRY", "READ_LATEST_CANONICAL_TASK_AND_EVENTS_NO_REPLAY"
     elif any(x in reasons for x in (
         "RESOURCE_MEASUREMENT_STALE", "INSUFFICIENT_MEMORY_HEADROOM",
-        "BUILD_CAPACITY_BUSY",
+        "BUILD_CAPACITY_BUSY", "CPU_PRESSURE_DEFER_HEAVY_OPERATION",
+        "INSUFFICIENT_DISK_HEADROOM",
     )):
         state, action = "DEFER_FOR_CAPACITY", "REMEASURE_NATIVE_LOAD_AND_RESUME_SAME_TASK"
     else:
