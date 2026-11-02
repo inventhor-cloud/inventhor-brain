@@ -3,6 +3,7 @@ import unittest
 
 from tools.audit_protected_host_diff import (
     CoreBoundaryInputInvalid, inspect_protected_host_diff,
+    inspect_protected_host_hunks,
 )
 
 
@@ -99,6 +100,82 @@ class ProtectedHostDiffTests(unittest.TestCase):
                 self.assertFalse(advice.native_owner_lease_verified)
                 self.assertFalse(advice.safe_to_merge_or_deploy)
                 self.assertFalse(advice.automatic_revert_allowed)
+
+
+
+class ProtectedHostHunkTests(unittest.TestCase):
+    def test_pr3_named_ui_and_codebehind_handlers_are_traceable(self):
+        patch = (
+            "@@ -281,2 +277,5 @@ <Grid>\\n"
+            " <Grid>\\n"
+            "+<Border x:Name=\\\"SmartCompressorPanel\\\" Grid.Row=\\\"1\\\">\\n"
+            "+<Button Click=\\\"CompressorSend_Click\\\" />\\n"
+            "+</Border>\\n"
+            "@@ -537,1 +545,2 @@ void ApplyTheme()\\n"
+            "+    // Essential WPF theme repair requires manual review.\\n"
+        )
+        x = inspect_protected_host_hunks((
+            ("windows/src/Inventhor.Operator.Desktop/MainWindow.xaml", patch),
+        ))
+        self.assertEqual(len(x), 2)
+        self.assertEqual((x[0].old_start_line, x[0].new_start_line),
+                         (281, 277))
+        self.assertIn("NAMED_NATIVE_UI_ELEMENT_ADDED", x[0].review_signals)
+        self.assertIn("NATIVE_UI_EVENT_HOOK_ADDED", x[0].review_signals)
+        self.assertIn("HOST_BEHAVIOR_CHANGE_REVIEW", x[1].review_signals)
+        self.assertIn("SOURCE_DIFF_ONLY", x[0].source_class)
+
+    def test_pr5_core_transport_and_remaining_plugin_loader_visible(self):
+        patch = (
+            "@@ -55,2 +58,4 @@ protected override async Task ExecuteAsync(\\n"
+            "-    pluginCatalog.Load(modulesRoot);\\n"
+            "+    pluginCatalog.Load(modulesRoot, includeTransports: false);\\n"
+            "+    var coreTransports = CoreTransportFactory.Create();\\n"
+        )
+        x = inspect_protected_host_hunks((
+            ("windows/src/Inventhor.Operator.Service/OperatorWorker.cs", patch),
+        ))
+        self.assertEqual(len(x), 1)
+        self.assertIn("LEGACY_PLUGIN_LOADER_CALL_REMAINS", x[0].review_signals)
+        self.assertIn("CORE_TRANSPORT_WIRING_TOUCHED", x[0].review_signals)
+        self.assertEqual(x[0].removed_lines, 1)
+        self.assertEqual(x[0].added_lines, 2)
+
+    def test_missing_or_non_text_patch_never_looks_clean(self):
+        for patch in (None, "", "Binary files differ"):
+            with self.subTest(patch=patch):
+                x = inspect_protected_host_hunks((
+                    ("app/src/main/java/example/MainActivity.java", patch),
+                ))
+                self.assertEqual(len(x), 1)
+                self.assertIn("REQUIRES_MANUAL_DIFF", x[0].review_signals)
+
+    def test_normal_extensions_not_misrepresented_as_core_hunks(self):
+        x = inspect_protected_host_hunks((
+            ("src/Gateway/FeatureGateway.cs",
+             "@@ -1,1 +1,1 @@\\n+ safe change\\n"),
+        ))
+        self.assertEqual(x, ())
+
+    def test_hunk_input_limits_and_path_checks_fail_closed(self):
+        for entries in (
+            ("wrong",),
+            (("../MainActivity.kt", "@@ -1 +1 @@\\n+x"),),
+            (("src/MainActivity.kt", "x" * 262145),),
+            (("src/MainActivity.kt", "@@ -1 +1 @@\\n+\\x00"),),
+            tuple(("src/MainActivity.kt", None) for _ in range(129)),
+        ):
+            with self.subTest(entries=str(entries)[:50]):
+                with self.assertRaises(CoreBoundaryInputInvalid):
+                    inspect_protected_host_hunks(entries)
+
+    def test_patch_signal_alone_cannot_grant_native_authorization(self):
+        x = inspect_protected_host_diff((
+            "windows/src/Inventhor.Operator.Desktop/MainWindow.xaml",
+        ))
+        self.assertFalse(x.native_owner_lease_verified)
+        self.assertFalse(x.safe_to_merge_or_deploy)
+        self.assertFalse(x.automatic_revert_allowed)
 
 
 if __name__ == "__main__":
