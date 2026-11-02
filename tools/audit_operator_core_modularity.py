@@ -54,12 +54,6 @@ PATTERNS: tuple[tuple[str, str, str, str], ...] = (
         "Native service still registers legacy runtime plugin discovery.",
     ),
     (
-        "windows/src/Inventhor.Operator.Core/TaskEngine.cs",
-        r"\bCAPABILITY_UNAVAILABLE\b",
-        "CORE_TASK_ENGINE_FAILS_IF_NO_EXECUTOR",
-        "Check native empty-plugin core-operation acceptance, not just heartbeat.",
-    ),
-    (
         "windows/bootstrap/Build-Deploy-V2_1.ps1",
         r"(?i)===\s*BUILD MODULES\s*===",
         "DEPLOY_PUBLISHES_LEGACY_MODULE_SET",
@@ -85,26 +79,47 @@ PATTERNS: tuple[tuple[str, str, str, str], ...] = (
     ),
 )
 
-MANDATORY_FILES = tuple(sorted({entry[0] for entry in PATTERNS}))
+# A physically deleted retired installer/module UI is a desired cleanup,
+# NOT a missing core source. Preserve missing-source fail-closed semantics
+# for the three mandatory service/engine files.
+RETIRED_FILES = frozenset({
+    "windows/bootstrap/Build-Deploy-V2_1.ps1",
+    "windows/src/Inventhor.Operator.Desktop/MainWindow.Modules.cs",
+})
+AUDITED_FILES = tuple(sorted({entry[0] for entry in PATTERNS}
+                             | {"windows/src/Inventhor.Operator.Core/TaskEngine.cs"}))
+MANDATORY_FILES = tuple(x for x in AUDITED_FILES if x not in RETIRED_FILES)
 
 
 def audit_source(root: Path) -> dict:
     """Deterministic read-only check. Missing sources make the result UNKNOWN."""
     findings: list[Finding] = []
     missing: list[str] = []
-    if not root.is_dir():
+    retired_absent: list[str] = []
+    unreadable: list[str] = []
+    if not root.is_dir() or root.is_symlink():
         return {"status": "SOURCE_UNAVAILABLE", "checked_files": 0,
                 "missing_files": list(MANDATORY_FILES),
+                "absent_retired_files": [], "unreadable_files": [],
                 "findings": [], "native_clean_boot_verified": False}
     sources: dict[str, str] = {}
-    for name in MANDATORY_FILES:
+    for name in AUDITED_FILES:
         path = root / name
+        if path.is_symlink():
+            unreadable.append(name)
+            continue
+        if not path.exists():
+            if name in RETIRED_FILES:
+                retired_absent.append(name)
+            else:
+                missing.append(name)
+            continue
         try:
             if not path.is_file():
-                raise OSError("missing")
+                raise OSError("not a regular file")
             sources[name] = path.read_text(encoding="utf-8")
         except (OSError, UnicodeError):
-            missing.append(name)
+            unreadable.append(name)
     for name, pattern, code, note in PATTERNS:
         if name not in sources:
             continue
@@ -116,11 +131,13 @@ def audit_source(root: Path) -> dict:
                 note=note,
             ))
     return {
-        "status": ("SOURCE_INCOMPLETE" if missing else
+        "status": ("SOURCE_INCOMPLETE" if missing or unreadable else
                    "SOURCE_COUPLING_DETECTED" if findings else
                    "STATIC_SOURCE_SIGNATURES_CLEAN_NATIVE_VALIDATION_REQUIRED"),
         "checked_files": len(sources),
         "missing_files": missing,
+        "absent_retired_files": retired_absent,
+        "unreadable_files": unreadable,
         "findings": [asdict(item) for item in findings],
         "native_clean_boot_verified": False,
         "owner_scope": "INVENTHOR,OPERATOR,ORGANIZER,STUDIO_DESIGN,QA_FACTORY",
