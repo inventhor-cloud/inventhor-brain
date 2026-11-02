@@ -117,7 +117,7 @@ def inspect_protected_host_diff(changed_paths: tuple[str, ...]) -> ProtectedHost
 
 # Patch hunks provide evidence of WHERE a host change occurred. They are
 # never a code-semantics proof, a rollback instruction or permission to edit.
-_HUNK = re.compile(r"^@@ -(\\d+)(?:,\\d+)? \\+(\\d+)(?:,\\d+)? @@(.*)$")
+_HUNK = re.compile(r"^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@(.*)$")
 _MAX_PATCH_BYTES = 262144
 _MAX_PATCH_FILES = 128
 _MAX_HUNKS = 1024
@@ -166,7 +166,7 @@ def inspect_protected_host_hunks(
             continue
         if not isinstance(patch, str) or len(patch.encode("utf-8")) > _MAX_PATCH_BYTES:
             raise CoreBoundaryInputInvalid("INVALID_OR_OVERSIZE_PATCH")
-        if "\\x00" in patch:
+        if "\x00" in patch:
             raise CoreBoundaryInputInvalid("INVALID_OR_OVERSIZE_PATCH")
         # GitHub PR patch payloads are hunk-only. Lines before the first @@
         # may be diff metadata and must never count as an inspected hunk.
@@ -177,12 +177,12 @@ def inspect_protected_host_hunks(
         def flush() -> None:
             if start is None:
                 return
-            positive = "\\n".join(added)
+            positive = "\n".join(added)
             signals: list[str] = []
-            if re.search(r"<[A-Za-z][^\\n>]*\\bx:Name\\s*=", positive):
+            if re.search(r"<[A-Za-z][^\n>]*\bx:Name\s*=", positive):
                 signals.append("NAMED_NATIVE_UI_ELEMENT_ADDED")
             if re.search(
-                r"\\b(?:Click|TextChanged|PreviewKeyDown|SelectionChanged)\\s*=\\s*\\\"",
+                r"\b(?:Click|TextChanged|PreviewKeyDown|SelectionChanged)\s*=\s*\\"",
                 positive,
             ):
                 signals.append("NATIVE_UI_EVENT_HOOK_ADDED")
