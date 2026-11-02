@@ -72,8 +72,11 @@ class TestHost:
         self.claims = 0
         self.focus_calls = 0
         self.actor_calls = 0
+        self.native_reads = 0
+        self.plan_verifications = 0
 
     def read_exact(self, task_id):
+        self.native_reads += 1
         return deepcopy(self.task)
 
     def verify_read_provenance(self, record):
@@ -88,6 +91,7 @@ class TestHost:
         return self.focus, deepcopy(self.tasks)
 
     def verify_focus_snapshot(self, read, focus, tasks):
+        self.plan_verifications += 1
         return self.plan_verified
 
     def read_actor_context(self, task_id, worker):
@@ -131,6 +135,8 @@ class BrainTurnIntegrationTests(unittest.TestCase):
         self.assertEqual(host.claims, 0)
         self.assertEqual(host.focus_calls, 1)
         self.assertEqual(host.actor_calls, 1)
+        self.assertEqual(host.native_reads, 2)
+        self.assertEqual(host.plan_verifications, 2)
         self.assertEqual(cli.calls, 1)
 
     def test_wrong_owner_scope_rejected_before_decision(self):
@@ -230,6 +236,68 @@ class BrainTurnIntegrationTests(unittest.TestCase):
         self.assertIsNone(result.advisory.next_step)
         self.assertFalse(result.may_claim)
         self.assertFalse(result.actor.may_send_chat_message)
+
+    def test_task_revision_changed_during_actor_lookup_blocks_advice(self):
+        class RacingHost(TestHost):
+            def read_actor_context(self, task_id, worker):
+                proof = super().read_actor_context(task_id, worker)
+                self.task["revision"] += 1
+                return proof
+
+        h = RacingHost()
+        self.denied("NATIVE_TASK_CHANGED_DURING_ADVICE", host=h)
+        self.assertEqual(h.native_reads, 2)
+        self.assertEqual(h.claims, 0)
+
+    def test_lease_owner_or_task_state_changed_during_advice_blocks(self):
+        for name, value in (
+            ("active_worker", "CODEX"),
+            ("state", "DOING"),
+            ("project_id", "OTHER_PROJECT"),
+        ):
+            class RacingHost(TestHost):
+                def read_actor_context(self, task_id, worker):
+                    proof = super().read_actor_context(task_id, worker)
+                    self.task[name] = value
+                    return proof
+
+            h = RacingHost()
+            with self.subTest(name=name):
+                self.denied("NATIVE_TASK_CHANGED_DURING_ADVICE", host=h)
+            self.assertEqual(h.claims, 0)
+
+    def test_final_native_read_must_still_authenticate(self):
+        class RevokedHost(TestHost):
+            def read_actor_context(self, task_id, worker):
+                proof = super().read_actor_context(task_id, worker)
+                self.source_verified = False
+                return proof
+
+        h = RevokedHost()
+        self.denied("NATIVE_FINAL_TASK_RECHECK_DENIED", host=h)
+        self.assertEqual(h.claims, 0)
+
+    def test_final_owner_plan_verification_catches_superseded_plan(self):
+        class SupersededHost(TestHost):
+            def verify_focus_snapshot(self, read, focus, tasks):
+                self.plan_verifications += 1
+                return self.plan_verifications == 1
+
+        h = SupersededHost()
+        self.denied("FOCUS_CHANGED_DURING_ADVICE", host=h)
+        self.assertEqual(h.plan_verifications, 2)
+        self.assertEqual(h.claims, 0)
+
+    def test_final_host_exception_never_yields_advice(self):
+        class DisconnectedHost(TestHost):
+            def read_exact(self, task_id):
+                if self.native_reads:
+                    raise OSError("native connection lost")
+                return super().read_exact(task_id)
+
+        h = DisconnectedHost()
+        self.denied("NATIVE_FINAL_TASK_READ_UNAVAILABLE", host=h)
+        self.assertEqual(h.claims, 0)
 
     def test_expired_actor_cannot_propose(self):
         from continuity.agent_action_origin import OriginDenied
