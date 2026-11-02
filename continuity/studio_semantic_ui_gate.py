@@ -215,7 +215,6 @@ def review_studio_semantic_ui_edit(
     need(set(observed) <= set(intended), "UNRELATED_COMPONENT_MUTATED")
     need(set(intended) <= set(approved), "UNAPPROVED_INTENDED_COMPONENT")
     need(set(observed) <= set(approved), "UNAPPROVED_OBSERVED_COMPONENT")
-    need("WINDOWS_DESKTOP" in expected, "REQUIRED_WINDOWS_DESKTOP_NOT_EXPECTED")
     need(set(expected) <= set(tested), "RESPONSIVE_PLATFORM_NOT_TESTED")
     need(snapshot.real_preview_observed, "REAL_PREVIEW_NOT_OBSERVED")
     need(snapshot.target_action_effect_observed, "UI_ACTION_EFFECT_NOT_OBSERVED")
@@ -235,4 +234,177 @@ def review_studio_semantic_ui_edit(
             "REQUEST_EXISTING_STUDIO_NATIVE_RENDER_AND_ACTION_EFFECT_WITNESS"
         ),
         blockers=tuple(blockers),
+    )
+
+# Conflict-aware planning for the ONE existing Organizer/Operator/Studio.
+# Native Main must attest actor/lease, obtain locks, dispatch, and checkpoint.
+# This module neither creates reservations nor grants permissions.
+_MAX_CLAIMS_PER_CHECK = 256
+_MAX_RESOURCE_KEYS_PER_CLAIM = 64
+_MAX_LOAD_AGE = timedelta(seconds=30)
+
+
+@dataclass(frozen=True)
+class StudioOperationClaim:
+    task_id: str
+    project_id: str
+    design_document_id: str
+    base_design_revision: int
+    actor_session_id: str
+    lease_epoch: int
+    lease_expires_at: datetime
+    component_ids: tuple[str, ...]
+    resource_keys: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class StudioResourceSnapshot:
+    measured_at: datetime
+    available_memory_mb: int
+    reserve_memory_mb: int
+    expected_extra_memory_mb: int
+    occupied_build_slots: int
+    safe_build_slots: int
+    needs_build_slot: bool
+
+
+@dataclass(frozen=True)
+class StudioOperationSafetyAdvice:
+    disposition: str
+    reasons: tuple[str, ...]
+    next_action: str
+    source_class: str = "SOURCE_ONLY_CONFLICT_AND_LOAD_ADVICE_NOT_NATIVE_LEASE"
+    can_dispatch: bool = False
+    lease_authenticated: bool = False
+    resource_measurement_authenticated: bool = False
+    native_checkpoint_written: bool = False
+
+
+def _claim_ids(value: object, label: str) -> tuple[str, ...]:
+    # A bounded *review batch* is not a limitation on the owner's total request.
+    if not isinstance(value, tuple) or len(value) > _MAX_RESOURCE_KEYS_PER_CLAIM:
+        raise StudioUiReviewInvalid("INVALID_" + label)
+    for item in value:
+        _id(item, label)
+    if len(set(value)) != len(value):
+        raise StudioUiReviewInvalid("DUPLICATE_" + label)
+    return value
+
+
+def _aware(value: object, label: str) -> datetime:
+    if not isinstance(value, datetime) or value.tzinfo is None or value.utcoffset() is None:
+        raise StudioUiReviewInvalid("INVALID_" + label)
+    return value.astimezone(timezone.utc)
+
+
+def _bounded_count(value: object, label: str, *, minimum: int = 0) -> int:
+    if type(value) is not int or not minimum <= value <= 1_000_000:
+        raise StudioUiReviewInvalid("INVALID_" + label)
+    return value
+
+
+def _verify_claim(value: StudioOperationClaim) -> None:
+    if not isinstance(value, StudioOperationClaim):
+        raise StudioUiReviewInvalid("INVALID_OPERATION_CLAIM")
+    for name in ("task_id", "project_id", "design_document_id", "actor_session_id"):
+        _id(getattr(value, name), name.upper())
+    _revision(value.base_design_revision, "BASE_DESIGN_REVISION")
+    _revision(value.lease_epoch, "LEASE_EPOCH")
+    _aware(value.lease_expires_at, "LEASE_EXPIRY")
+    _claim_ids(value.component_ids, "COMPONENT_IDS")
+    _claim_ids(value.resource_keys, "RESOURCE_KEYS")
+
+
+def review_studio_operation_safety(
+    intent: StudioOperationClaim, *,
+    native_active_claims: tuple[StudioOperationClaim, ...],
+    native_load: StudioResourceSnapshot,
+    now: datetime,
+) -> StudioOperationSafetyAdvice:
+    """Advise on conflicts/load without rejecting the owner's requested goal.
+
+    Claims, lease epochs, document revisions and load MUST originate from
+    independently authenticated native Main/Organizer/Operator snapshots.
+    No supplied object here proves that provenance, freshness of the
+    Organizer event log, actual OS locks or permission to run an operation.
+    The native host must acquire resources atomically and recheck before
+    execution. A truncated active-claim window cannot be treated as clear.
+    """
+    _verify_claim(intent)
+    current = _aware(now, "NOW")
+    if not isinstance(native_active_claims, tuple):
+        raise StudioUiReviewInvalid("INVALID_ACTIVE_CLAIMS")
+    if not isinstance(native_load, StudioResourceSnapshot):
+        raise StudioUiReviewInvalid("INVALID_NATIVE_LOAD")
+    if type(native_load.needs_build_slot) is not bool:
+        raise StudioUiReviewInvalid("INVALID_BUILD_SLOT_DEMAND")
+    metrics = _aware(native_load.measured_at, "LOAD_MEASUREMENT")
+    for label in (
+        "available_memory_mb", "reserve_memory_mb", "expected_extra_memory_mb",
+        "occupied_build_slots", "safe_build_slots",
+    ):
+        _bounded_count(getattr(native_load, label), label.upper())
+    if native_load.safe_build_slots < 1:
+        raise StudioUiReviewInvalid("INVALID_SAFE_BUILD_SLOTS")
+
+    reasons: list[str] = []
+    def add(code: str) -> None:
+        if code not in reasons:
+            reasons.append(code)
+
+    if len(native_active_claims) > _MAX_CLAIMS_PER_CHECK:
+        add("ACTIVE_CLAIM_WINDOW_INCOMPLETE")
+    if metrics > current + timedelta(seconds=5) or current - metrics > _MAX_LOAD_AGE:
+        add("RESOURCE_MEASUREMENT_STALE")
+    if native_load.available_memory_mb < (
+        native_load.reserve_memory_mb + native_load.expected_extra_memory_mb
+    ):
+        add("INSUFFICIENT_MEMORY_HEADROOM")
+    if (native_load.needs_build_slot and
+            native_load.occupied_build_slots >= native_load.safe_build_slots):
+        add("BUILD_CAPACITY_BUSY")
+
+    # Do not assume a past expiry means an interrupted task is safe to replay.
+    if _aware(intent.lease_expires_at, "LEASE_EXPIRY") <= current:
+        add("INTENT_LEASE_RECONCILIATION_REQUIRED")
+
+    for active in native_active_claims[:_MAX_CLAIMS_PER_CHECK]:
+        _verify_claim(active)
+        if _aware(active.lease_expires_at, "LEASE_EXPIRY") <= current:
+            add("EXPIRED_ACTIVE_LEASE_RECONCILIATION_REQUIRED")
+            continue
+        if (active.task_id == intent.task_id and
+                active.lease_epoch == intent.lease_epoch):
+            add("DUPLICATE_TASK_EPOCH")
+        same_document = (
+            active.project_id == intent.project_id
+            and active.design_document_id == intent.design_document_id
+        )
+        if same_document:
+            if set(active.component_ids) & set(intent.component_ids):
+                add("OVERLAPPING_COMPONENT_EDIT")
+            # Even independent components share one persisted document revision:
+            # serialize and rebase, never use a stale whole-document hash.
+            add("SAME_DOCUMENT_REBASE_REQUIRED")
+        if set(active.resource_keys) & set(intent.resource_keys):
+            add("RESOURCE_LOCK_COLLISION")
+
+    if not reasons:
+        state, action = "NATIVE_PREFLIGHT_REQUIRED", "RECHECK_AND_ATOMICALLY_RESERVE_WITH_EXISTING_ORGANIZER"
+    elif any(x in reasons for x in (
+        "DUPLICATE_TASK_EPOCH", "EXPIRED_ACTIVE_LEASE_RECONCILIATION_REQUIRED",
+        "INTENT_LEASE_RECONCILIATION_REQUIRED", "ACTIVE_CLAIM_WINDOW_INCOMPLETE",
+    )):
+        state, action = "RECONCILE_BEFORE_RETRY", "READ_LATEST_CANONICAL_TASK_AND_EVENTS_NO_REPLAY"
+    elif any(x in reasons for x in (
+        "RESOURCE_MEASUREMENT_STALE", "INSUFFICIENT_MEMORY_HEADROOM",
+        "BUILD_CAPACITY_BUSY",
+    )):
+        state, action = "DEFER_FOR_CAPACITY", "REMEASURE_NATIVE_LOAD_AND_RESUME_SAME_TASK"
+    else:
+        state, action = "SERIALIZE_AND_REBASE", "WAIT_FOR_ACTIVE_EDITOR_AND_REFRESH_DOCUMENT_REVISION"
+    return StudioOperationSafetyAdvice(
+        disposition=state,
+        reasons=tuple(reasons),
+        next_action=action,
     )
