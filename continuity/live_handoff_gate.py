@@ -57,6 +57,9 @@ class ResumePacket:
     active_worker: str = ""
     # Validated canonical dependency-state projection (not a grant).
     dependency_states: tuple[tuple[str, str], ...] = ()
+    # Assigned task owner and active lease worker are DIFFERENT identities.
+    # Keep this native-only metadata in the private comparison fingerprint.
+    assigned_owner: str = ""
 
 @dataclass(frozen=True)
 class CheckpointDraft:
@@ -142,6 +145,14 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
         or (owner and not all(c.isascii() and (c.isalnum() or c in "_.-")
                               for c in owner))):
         raise HandoffDenied("INVALID_ACTIVE_WORKER")
+    assignment = raw.get("owner")
+    if assignment is None:
+        assignment = ""
+    if (not isinstance(assignment, str) or len(assignment) > 128
+        or (assignment and not all(
+            c.isascii() and (c.isalnum() or c in "_.-")
+            for c in assignment))):
+        raise HandoffDenied("INVALID_ASSIGNED_TASK_OWNER")
     stage, blocker, next_action = (raw.get("stage", ""), raw.get("blocker", ""),
                                     raw.get("next_action", ""))
     if any(not isinstance(s, str) or len(s) > 1024
@@ -198,7 +209,7 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
     return ResumePacket(task_id, project, target, revision, state, stage,
                         completed, remaining, evidence, blocker,
                         next_action.strip(), observed, mode, owner,
-                        tuple(dependency_states))
+                        tuple(dependency_states), assignment)
 
 def draft_next_checkpoint(claimed: ResumePacket, *,
                           verified_completed: list[str],
