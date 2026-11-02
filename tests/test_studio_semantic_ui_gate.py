@@ -180,6 +180,14 @@ class SemanticUiGateTests(unittest.TestCase):
             check(tested_platforms=("LINUX_UNSUPPORTED",))
         self.assertEqual(cm.exception.code, "INVALID_TESTED_PLATFORMS")
 
+    def test_unhashable_platform_or_operation_is_rejected_not_crashed(self):
+        with self.assertRaises(StudioUiReviewInvalid) as cm:
+            check(tested_platforms=(["NOT_A_PLATFORM"],))
+        self.assertEqual(cm.exception.code, "INVALID_TESTED_PLATFORMS")
+        with self.assertRaises(StudioUiReviewInvalid) as cm:
+            check(operation=["EXECUTE_SOMETHING"])
+        self.assertEqual(cm.exception.code, "UNSUPPORTED_UI_OPERATION")
+
     def test_fake_numeric_bool_flag_denied(self):
         with self.assertRaises(StudioUiReviewInvalid) as cm:
             check(real_preview_observed=1)
