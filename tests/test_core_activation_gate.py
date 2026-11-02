@@ -146,5 +146,77 @@ class CoreActivationGateTests(unittest.TestCase):
             review(active_noncore_ids=("SIDE_APP", "SIDE_APP"))
 
 
+    def test_missing_native_dependency_inventory_blocks_even_green_source(self):
+        out = review(noncore_dependency_inventory_complete=False)
+        self.assertEqual(out.disposition, "BLOCKED")
+        self.assertIn("NONCORE_DEPENDENCY_INVENTORY:NOT_VERIFIED", out.blockers)
+        self.assertFalse(out.native_snapshot_authenticated)
+        self.assertFalse(out.deployment_authorized)
+
+    def test_required_core_to_old_factory_edge_blocks_clean_activation(self):
+        out = review(core_to_noncore_dependency_edges=(
+            LegacyDependencyEdge("OPERATOR", "windows.software-factory"),))
+        self.assertIn(
+            "CORE_NONCORE_DEPENDENCY:OPERATOR:windows.software-factory",
+            out.blockers)
+        self.assertFalse(out.deletion_authorized)
+
+    def test_legacy_installer_and_startup_route_blocks_even_with_no_active_plugins(self):
+        out = review(legacy_activation_routes=(
+            "DEPLOYER_V2", "MODULE_STARTUP_DISCOVERY"))
+        self.assertIn("LEGACY_ACTIVATION_ROUTE:DEPLOYER_V2", out.blockers)
+        self.assertIn("LEGACY_ACTIVATION_ROUTE:MODULE_STARTUP_DISCOVERY",
+                      out.blockers)
+
+    def test_multiple_legacy_dependency_edges_are_reviewed_separately(self):
+        edges = (
+            LegacyDependencyEdge("OPERATOR", "windows.software-factory"),
+            LegacyDependencyEdge("STUDIO_DESIGN", "windows.legacy-render"),
+        )
+        out = review(core_to_noncore_dependency_edges=edges)
+        self.assertEqual(
+            len([b for b in out.blockers
+                 if b.startswith("CORE_NONCORE_DEPENDENCY:")]), 2)
+
+    def test_duplicate_or_unknown_legacy_edges_are_rejected(self):
+        e = LegacyDependencyEdge("OPERATOR", "windows.cleanup")
+        for edges in (
+            (e, e),
+            (LegacyDependencyEdge("OUTSIDE", "windows.cleanup"),),
+            (LegacyDependencyEdge("OPERATOR", "QA_FACTORY"),),
+            (("OPERATOR", "windows.cleanup"),),
+        ):
+            with self.subTest(edges=edges):
+                with self.assertRaises(ActivationInvalid):
+                    review(core_to_noncore_dependency_edges=edges)
+
+    def test_invalid_or_duplicate_legacy_routes_are_rejected(self):
+        for routes in (
+            ("MODULE_MENU", "MODULE_MENU"),
+            ("../../legacy",),
+            ("MODULE_MENU", 42),
+        ):
+            with self.subTest(routes=routes):
+                with self.assertRaises(ActivationInvalid):
+                    review(legacy_activation_routes=routes)
+
+    def test_unverified_inventory_flag_cannot_be_forged_by_integer(self):
+        with self.assertRaises(ActivationInvalid) as err:
+            review(noncore_dependency_inventory_complete=1)
+        self.assertEqual(err.exception.code,
+                         "INVALID_NONCORE_DEPENDENCY_INVENTORY")
+
+    def test_inventory_limits_and_tuple_type_are_required(self):
+        for edges, routes in (
+            ([LegacyDependencyEdge("OPERATOR", "windows.cleanup")], ()),
+            ((), ["MODULE_MENU"]),
+            ((LegacyDependencyEdge("OPERATOR", "windows.cleanup"),) * 65, ()),
+            ((), ("MODULE_MENU",) * 65),
+        ):
+            with self.subTest(edges=edges, routes=routes):
+                with self.assertRaises(ActivationInvalid):
+                    review(core_to_noncore_dependency_edges=edges,
+                           legacy_activation_routes=routes)
+
 if __name__ == "__main__":
     unittest.main()
