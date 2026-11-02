@@ -25,10 +25,18 @@
   "github_brain_gate": {
     "source_path": "continuity/studio_semantic_ui_gate.py",
     "tests_path": "tests/test_studio_semantic_ui_gate.py",
-    "last_verified_run": "https://github.com/inventhor-cloud/inventhor-brain/actions/runs/41492165116",
-    "last_verified_brain_source_tests": 278,
+    "last_verified_run": "https://github.com/inventhor-cloud/inventhor-brain/actions/runs/41495352596",
+    "last_verified_brain_source_tests": 285,
     "source_only": true,
-    "not_installed_or_live_qa": true
+    "not_installed_or_live_qa": true,
+    "latest_source_commit": "5df5739ad1a558d23cd716b1f2eb20779ed6126a",
+    "independently_approved_ui_scope_required": {
+      "operation": true,
+      "semantic_target_id": true,
+      "allowed_component_ids": true,
+      "provenance": "Must be read from fresh trusted native Organizer owner-approved task, not echoed from edit snapshot",
+      "check_type": "SOURCE_ONLY_ADVISORY_NO_NATIVE_AUTHORIZATION"
+    }
   },
   "native_operator_handoff": {
     "mechanism": "Existing native Organizer (actual immutable TASK_ID/PROJECT_ID/owner/lease/revision) -> existing Operator handoff and authorized native executor",
@@ -64,7 +72,10 @@
     "at_least_windows_desktop_viewport_checked": true,
     "qa_same_existing_factory_required": true,
     "native_organizer_checkpoint_readback_required": true,
-    "source_ci_is_not_native_qa": true
+    "source_ci_is_not_native_qa": true,
+    "ui_operation_matches_owner_approved_intent": true,
+    "semantic_target_matches_owner_approved_intent": true,
+    "observed_and_intended_components_within_owner_approved_scope": true
   },
   "current_status": "BRAIN_SEMANTIC_GATE_SOURCE_TESTED_NATIVE_INTEGRATION_NOT_VERIFIED",
   "next_check": "Original native Organizer task lease, existing Studio host action-effect test, then one reversible real UI edit without DC routine traffic."
