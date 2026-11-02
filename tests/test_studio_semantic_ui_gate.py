@@ -279,6 +279,12 @@ def capacity(**overrides):
         occupied_build_slots=0,
         safe_build_slots=2,
         needs_build_slot=False,
+        cpu_load_percent=28,
+        cpu_deferral_threshold_percent=85,
+        is_cpu_intensive=False,
+        available_disk_mb=10000,
+        reserve_disk_mb=1000,
+        expected_extra_disk_mb=500,
     )
     fields.update(overrides)
     return StudioResourceSnapshot(**fields)
@@ -361,6 +367,37 @@ class StudioOperationConflictTests(unittest.TestCase):
         x = safety(load=capacity(needs_build_slot=True,
                                  occupied_build_slots=1))
         self.assertEqual(x.disposition, "NATIVE_PREFLIGHT_REQUIRED")
+
+    def test_high_cpu_load_defers_heavy_task_without_discarding_it(self):
+        x = safety(load=capacity(
+            cpu_load_percent=90, cpu_deferral_threshold_percent=85,
+            is_cpu_intensive=True))
+        self.assertEqual(x.disposition, "DEFER_FOR_CAPACITY")
+        self.assertIn("CPU_PRESSURE_DEFER_HEAVY_OPERATION", x.reasons)
+
+    def test_high_cpu_does_not_block_a_lightweight_edit(self):
+        x = safety(load=capacity(
+            cpu_load_percent=90, cpu_deferral_threshold_percent=85,
+            is_cpu_intensive=False))
+        self.assertEqual(x.disposition, "NATIVE_PREFLIGHT_REQUIRED")
+
+    def test_disk_pressure_defers_large_output_without_data_loss(self):
+        x = safety(load=capacity(
+            available_disk_mb=1400, reserve_disk_mb=1000,
+            expected_extra_disk_mb=500))
+        self.assertEqual(x.disposition, "DEFER_FOR_CAPACITY")
+        self.assertIn("INSUFFICIENT_DISK_HEADROOM", x.reasons)
+
+    def test_invalid_cpu_threshold_and_disk_measurement_are_denied(self):
+        for load in (
+            capacity(cpu_load_percent=101),
+            capacity(cpu_deferral_threshold_percent=0),
+            capacity(is_cpu_intensive=1),
+            capacity(available_disk_mb=-1),
+        ):
+            with self.subTest(load=load):
+                with self.assertRaises(StudioUiReviewInvalid):
+                    safety(load=load)
 
     def test_stale_metrics_are_never_accepted_as_free_capacity(self):
         x = safety(load=capacity(measured_at=NOW - timedelta(seconds=31)))
