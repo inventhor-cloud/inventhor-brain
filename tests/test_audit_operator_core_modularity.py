@@ -78,6 +78,31 @@ if(@($j.capabilities).Count -lt 41){throw "CAPABILITY_COUNT_TOO_LOW"}
         self.assertIn("DEPLOY_REQUIRES_LEGACY_CAPABILITY_COUNT", codes)
         self.assertIn("DESKTOP_EXPOSES_LEGACY_MODULE_CENTER", codes)
 
+    def test_compiled_transports_do_not_hide_transitional_plugin_loader(self):
+        # Mirrors the newer Operator PR where transport and build/test/run
+        # were moved to core but other executors still came from plugins.
+        self.put(WORKER, """var plugins = pluginCatalog.Load(
+    modulesRoot,
+    includeTransports: false,
+    includeLegacySoftwareFactory: false);
+var executors = plugins
+    .Where(p => p.Executor is not null)
+    .Select(p => p.Executor!)
+    .Append(new CoreSoftwareProcessExecutor()).ToArray();
+""")
+        report = audit_source(self.root)
+        codes = {item["code"] for item in report["findings"]}
+        self.assertIn("SERVICE_LOADS_LEGACY_PLUGIN_CATALOG", codes)
+        self.assertIn("CORE_EXECUTORS_FROM_PLUGINS", codes)
+        self.assertFalse(report["native_clean_boot_verified"])
+
+    def test_empty_module_loader_folder_is_still_a_source_dependency(self):
+        self.put(WORKER, "var plugins = pluginCatalog.Load(modulesRoot, includeTransports: false);")
+        report = audit_source(self.root)
+        self.assertEqual(report["status"], "SOURCE_COUPLING_DETECTED")
+        self.assertIn("SERVICE_LOADS_LEGACY_PLUGIN_CATALOG",
+                      {item["code"] for item in report["findings"]})
+
     def test_comment_only_mention_does_not_match_real_load_operation(self):
         self.put(WORKER, "// no legacy plugins here\n")
         result = audit_source(self.root)
