@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 from continuity.core_activation_gate import (
     CORE, REQUIRED_LINKS, ActivationInvalid, ComponentObservation,
+    LegacyDependencyEdge,
     LinkObservation, CoreActivationSnapshot, evaluate_core_activation,
 )
 
@@ -25,6 +26,7 @@ def complete():
         active_noncore_ids=(),
         unresolved_conflicts=(),
         qa_live_witness_verified=True,
+        noncore_dependency_inventory_complete=True,
     )
 
 
