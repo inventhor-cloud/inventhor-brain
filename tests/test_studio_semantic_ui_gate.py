@@ -5,7 +5,8 @@ from datetime import datetime, timedelta, timezone
 
 from continuity.studio_semantic_ui_gate import (
     SemanticUiEditSnapshot, StudioUiReviewInvalid,
-    review_studio_semantic_ui_edit,
+    StudioOperationClaim, StudioResourceSnapshot,
+    review_studio_semantic_ui_edit, review_studio_operation_safety,
 )
 
 NOW = datetime(2026, 11, 2, 12, tzinfo=timezone.utc)
@@ -139,11 +140,11 @@ class SemanticUiGateTests(unittest.TestCase):
                     check(**kwargs)
                 self.assertEqual(cm.exception.code, code)
 
-    def test_mobile_only_claim_cannot_skip_required_windows_desktop(self):
+    def test_owner_approved_mobile_only_task_is_not_forced_to_windows(self):
         result = check(expected_platforms=("ANDROID_PHONE",),
                        tested_platforms=("ANDROID_PHONE",))
-        self.assertEqual(result.disposition, "BLOCKED")
-        self.assertIn("REQUIRED_WINDOWS_DESKTOP_NOT_EXPECTED", result.blockers)
+        self.assertEqual(result.disposition, "NATIVE_STUDIO_REVIEW_REQUIRED")
+        self.assertFalse(result.may_execute)
 
     def test_revision_and_manifest_must_advance(self):
         result = check(design_revision=5, after_manifest_sha256=BEFORE,
@@ -253,6 +254,141 @@ class SemanticUiGateTests(unittest.TestCase):
         self.assertFalse(result.may_execute)
         self.assertFalse(result.may_release)
         self.assertEqual(result.task_id, "CANONICAL_TASK")
+
+
+
+def operation_claim(**overrides):
+    fields = dict(
+        task_id="TASK_A", project_id="PROJECT_A",
+        design_document_id="DOC_A", base_design_revision=7,
+        actor_session_id="GPT_SESSION_A", lease_epoch=3,
+        lease_expires_at=NOW + timedelta(minutes=5),
+        component_ids=("panel.right.inspector",),
+        resource_keys=("workspace:A",),
+    )
+    fields.update(overrides)
+    return StudioOperationClaim(**fields)
+
+
+def capacity(**overrides):
+    fields = dict(
+        measured_at=NOW,
+        available_memory_mb=8192,
+        reserve_memory_mb=1024,
+        expected_extra_memory_mb=512,
+        occupied_build_slots=0,
+        safe_build_slots=2,
+        needs_build_slot=False,
+    )
+    fields.update(overrides)
+    return StudioResourceSnapshot(**fields)
+
+
+def safety(active=(), request=None, load=None):
+    return review_studio_operation_safety(
+        request if request is not None else operation_claim(),
+        native_active_claims=active,
+        native_load=load if load is not None else capacity(),
+        now=NOW,
+    )
+
+
+class StudioOperationConflictTests(unittest.TestCase):
+    def test_independent_task_and_document_do_not_block_each_other(self):
+        x = safety(active=(operation_claim(
+            task_id="TASK_B", design_document_id="DOC_B",
+            component_ids=("panel.left.navigation",),
+            resource_keys=("workspace:B",)),))
+        self.assertEqual(x.disposition, "NATIVE_PREFLIGHT_REQUIRED")
+        self.assertEqual(x.reasons, ())
+        self.assertFalse(x.can_dispatch)
+        self.assertFalse(x.lease_authenticated)
+
+    def test_same_document_disjoint_panels_still_rebase_atomically(self):
+        x = safety(active=(operation_claim(
+            task_id="TASK_B", actor_session_id="CODEX_SESSION_B",
+            component_ids=("panel.left.navigation",),
+            resource_keys=("workspace:B",)),))
+        self.assertEqual(x.disposition, "SERIALIZE_AND_REBASE")
+        self.assertIn("SAME_DOCUMENT_REBASE_REQUIRED", x.reasons)
+        self.assertNotIn("OVERLAPPING_COMPONENT_EDIT", x.reasons)
+
+    def test_same_component_and_resource_conflicts(self):
+        x = safety(active=(operation_claim(
+            task_id="TASK_B", actor_session_id="CODEX_SESSION_B"),))
+        self.assertIn("OVERLAPPING_COMPONENT_EDIT", x.reasons)
+        self.assertIn("RESOURCE_LOCK_COLLISION", x.reasons)
+        self.assertEqual(x.disposition, "SERIALIZE_AND_REBASE")
+
+    def test_shared_resource_across_different_documents_serialized(self):
+        x = safety(active=(operation_claim(
+            task_id="TASK_B", project_id="PROJECT_B",
+            design_document_id="DOC_B"),))
+        self.assertIn("RESOURCE_LOCK_COLLISION", x.reasons)
+        self.assertNotIn("SAME_DOCUMENT_REBASE_REQUIRED", x.reasons)
+
+    def test_same_task_epoch_cannot_be_replayed(self):
+        x = safety(active=(operation_claim(),))
+        self.assertEqual(x.disposition, "RECONCILE_BEFORE_RETRY")
+        self.assertIn("DUPLICATE_TASK_EPOCH", x.reasons)
+        self.assertFalse(x.can_dispatch)
+
+    def test_expired_foreign_lease_requires_event_reconciliation(self):
+        x = safety(active=(operation_claim(
+            task_id="TASK_B", lease_expires_at=NOW - timedelta(seconds=1)),))
+        self.assertEqual(x.disposition, "RECONCILE_BEFORE_RETRY")
+        self.assertIn("EXPIRED_ACTIVE_LEASE_RECONCILIATION_REQUIRED", x.reasons)
+
+    def test_expired_intent_is_not_valid_new_execution(self):
+        x = safety(request=operation_claim(
+            lease_expires_at=NOW - timedelta(seconds=1)))
+        self.assertEqual(x.disposition, "RECONCILE_BEFORE_RETRY")
+
+    def test_low_memory_defers_task_but_does_not_reject_goal(self):
+        x = safety(load=capacity(available_memory_mb=1400,
+                                 expected_extra_memory_mb=512))
+        self.assertEqual(x.disposition, "DEFER_FOR_CAPACITY")
+        self.assertIn("INSUFFICIENT_MEMORY_HEADROOM", x.reasons)
+        self.assertFalse(x.can_dispatch)
+
+    def test_busy_build_limit_defers_without_launching_parallel_build(self):
+        x = safety(load=capacity(needs_build_slot=True,
+                                 occupied_build_slots=2))
+        self.assertEqual(x.disposition, "DEFER_FOR_CAPACITY")
+        self.assertIn("BUILD_CAPACITY_BUSY", x.reasons)
+
+    def test_fresh_memory_headroom_and_build_slot_does_not_block(self):
+        x = safety(load=capacity(needs_build_slot=True,
+                                 occupied_build_slots=1))
+        self.assertEqual(x.disposition, "NATIVE_PREFLIGHT_REQUIRED")
+
+    def test_stale_metrics_are_never_accepted_as_free_capacity(self):
+        x = safety(load=capacity(measured_at=NOW - timedelta(seconds=31)))
+        self.assertEqual(x.disposition, "DEFER_FOR_CAPACITY")
+        self.assertIn("RESOURCE_MEASUREMENT_STALE", x.reasons)
+
+    def test_incomplete_claim_window_needs_native_reconciliation(self):
+        claims = tuple(operation_claim(
+            task_id="TASK_B" + str(i),
+            design_document_id="DOC_B" + str(i),
+            resource_keys=("workspace:B" + str(i),))
+            for i in range(257))
+        x = safety(active=claims)
+        self.assertEqual(x.disposition, "RECONCILE_BEFORE_RETRY")
+        self.assertIn("ACTIVE_CLAIM_WINDOW_INCOMPLETE", x.reasons)
+
+    def test_non_sense_load_and_claim_are_rejected_without_dispatch(self):
+        for request, load, active in (
+            (operation_claim(lease_epoch=True), capacity(), ()),
+            (operation_claim(), capacity(available_memory_mb=-1), ()),
+            (operation_claim(), capacity(needs_build_slot=1), ()),
+            (operation_claim(), capacity(), ["not-native-claim"]),
+            (operation_claim(resource_keys=("workspace:A", "workspace:A")),
+             capacity(), ()),
+        ):
+            with self.subTest(request=request, load=load):
+                with self.assertRaises(StudioUiReviewInvalid):
+                    safety(request=request, load=load, active=active)
 
 
 if __name__ == "__main__":
