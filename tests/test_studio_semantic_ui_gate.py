@@ -42,7 +42,9 @@ def base():
     )
 
 
-def check(**changes):
+def check(*, approved_operation="UI_SET_CONSTRAINT",
+          approved_target="panel.right.inspector",
+          approved_ids=("panel.right.inspector",), **changes):
     return review_studio_semantic_ui_edit(
         replace(base(), **changes),
         now=NOW,
@@ -50,6 +52,9 @@ def check(**changes):
         expected_project_id="APP_DESIGN",
         expected_document_id="STUDIO_DOCUMENT",
         expected_native_revision=20,
+        approved_operation=approved_operation,
+        approved_semantic_target_id=approved_target,
+        approved_touched_ids=approved_ids,
     )
 
 
@@ -90,6 +95,55 @@ class SemanticUiGateTests(unittest.TestCase):
         result = check(intended_touched_ids=("panel.left.navigation",))
         self.assertIn("SEMANTIC_TARGET_NOT_IN_SCOPE", result.blockers)
         self.assertIn("UNRELATED_COMPONENT_MUTATED", result.blockers)
+
+    def test_untrusted_operation_cannot_override_approved_ui_intent(self):
+        with self.assertRaises(StudioUiReviewInvalid) as cm:
+            check(operation="UI_HIDE")
+        self.assertEqual(cm.exception.code, "UI_OPERATION_SCOPE_MISMATCH")
+
+    def test_untrusted_semantic_target_cannot_swap_approved_panel(self):
+        with self.assertRaises(StudioUiReviewInvalid) as cm:
+            check(target_semantic_id="toolbar.global.send",
+                  intended_touched_ids=("toolbar.global.send",),
+                  observed_touched_ids=("toolbar.global.send",))
+        self.assertEqual(cm.exception.code, "SEMANTIC_TARGET_SCOPE_MISMATCH")
+
+    def test_self_consistent_but_unapproved_additional_change_is_blocked(self):
+        result = check(intended_touched_ids=(
+            "panel.right.inspector", "toolbar.global.send"),
+            observed_touched_ids=(
+                "panel.right.inspector", "toolbar.global.send"))
+        self.assertEqual(result.disposition, "BLOCKED")
+        self.assertIn("UNAPPROVED_INTENDED_COMPONENT", result.blockers)
+        self.assertIn("UNAPPROVED_OBSERVED_COMPONENT", result.blockers)
+        self.assertFalse(result.may_execute)
+
+    def test_approved_subset_with_extra_component_is_permitted_for_review(self):
+        result = check(approved_ids=(
+            "panel.right.inspector", "toolbar.global.send"))
+        self.assertEqual(result.disposition, "NATIVE_STUDIO_REVIEW_REQUIRED")
+        self.assertFalse(result.native_evidence_authenticated)
+
+    def test_missing_or_invalid_approved_scope_fails_closed(self):
+        for kwargs, code in (
+            ({"approved_operation": "EXECUTE_POWERSHELL"},
+             "INVALID_APPROVED_OPERATION"),
+            ({"approved_target": "panel.unknown"},
+             "APPROVED_TARGET_NOT_IN_SCOPE"),
+            ({"approved_ids": ("panel.right.inspector",
+                                "panel.right.inspector")},
+             "DUPLICATE_APPROVED_TARGETS"),
+        ):
+            with self.subTest(kwargs=kwargs):
+                with self.assertRaises(StudioUiReviewInvalid) as cm:
+                    check(**kwargs)
+                self.assertEqual(cm.exception.code, code)
+
+    def test_mobile_only_claim_cannot_skip_required_windows_desktop(self):
+        result = check(expected_platforms=("ANDROID_PHONE",),
+                       tested_platforms=("ANDROID_PHONE",))
+        self.assertEqual(result.disposition, "BLOCKED")
+        self.assertIn("REQUIRED_WINDOWS_DESKTOP_NOT_EXPECTED", result.blockers)
 
     def test_revision_and_manifest_must_advance(self):
         result = check(design_revision=5, after_manifest_sha256=BEFORE,
