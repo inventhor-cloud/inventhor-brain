@@ -115,6 +115,116 @@ def inspect_protected_host_diff(changed_paths: tuple[str, ...]) -> ProtectedHost
     )
 
 
+# Patch hunks provide evidence of WHERE a host change occurred. They are
+# never a code-semantics proof, a rollback instruction or permission to edit.
+_HUNK = re.compile(r"^@@ -(\\d+)(?:,\\d+)? \\+(\\d+)(?:,\\d+)? @@(.*)$")
+_MAX_PATCH_BYTES = 262144
+_MAX_PATCH_FILES = 128
+_MAX_HUNKS = 1024
+
+
+@dataclass(frozen=True)
+class HostHunkEvidence:
+    path: str
+    old_start_line: int
+    new_start_line: int
+    context: str
+    added_lines: int
+    removed_lines: int
+    review_signals: tuple[str, ...]
+    source_class: str = _SOURCE_ONLY
+
+
+def inspect_protected_host_hunks(
+    patches: tuple[tuple[str, str | None], ...],
+) -> tuple[HostHunkEvidence, ...]:
+    """Inspect the supplied PR patch, not the owner's installed native files.
+
+    Each path is checked using the same frozen-host policy as the ordinary
+    filename audit. A missing/truncated/binary patch is REQUIRES_MANUAL_DIFF,
+    never silently treated as zero changes. Signals identify review targets;
+    they do not establish that particular code should be deleted or moved.
+    """
+    if not isinstance(patches, tuple) or len(patches) > _MAX_PATCH_FILES:
+        raise CoreBoundaryInputInvalid("INVALID_PATCH_FILE_LIST")
+    names: list[str] = []
+    for item in patches:
+        if not isinstance(item, tuple) or len(item) != 2:
+            raise CoreBoundaryInputInvalid("INVALID_PATCH_ENTRY")
+        names.append(item[0])
+    review = inspect_protected_host_diff(tuple(names))
+    output: list[HostHunkEvidence] = []
+    for (raw_path, patch), touch in zip(patches, review.touches):
+        if touch.classification == "NO_PROTECTED_ENTRYPOINT_NAME_MATCH":
+            continue
+        path = _relative_path(raw_path)
+        if patch is None:
+            output.append(HostHunkEvidence(
+                path, 0, 0, "PATCH_UNAVAILABLE", 0, 0,
+                ("REQUIRES_MANUAL_DIFF",),
+            ))
+            continue
+        if not isinstance(patch, str) or len(patch.encode("utf-8")) > _MAX_PATCH_BYTES:
+            raise CoreBoundaryInputInvalid("INVALID_OR_OVERSIZE_PATCH")
+        if "\\x00" in patch:
+            raise CoreBoundaryInputInvalid("INVALID_OR_OVERSIZE_PATCH")
+        # GitHub PR patch payloads are hunk-only. Lines before the first @@
+        # may be diff metadata and must never count as an inspected hunk.
+        start = None
+        context = ""
+        added: list[str] = []
+        removed = 0
+        def flush() -> None:
+            if start is None:
+                return
+            positive = "\\n".join(added)
+            signals: list[str] = []
+            if re.search(r"<[A-Za-z][^\\n>]*\\bx:Name\\s*=", positive):
+                signals.append("NAMED_NATIVE_UI_ELEMENT_ADDED")
+            if re.search(
+                r"\\b(?:Click|TextChanged|PreviewKeyDown|SelectionChanged)\\s*=\\s*\\\"",
+                positive,
+            ):
+                signals.append("NATIVE_UI_EVENT_HOOK_ADDED")
+            if "CoreTransportFactory.Create(" in positive:
+                signals.append("CORE_TRANSPORT_WIRING_TOUCHED")
+            if "pluginCatalog.Load(" in positive:
+                signals.append("LEGACY_PLUGIN_LOADER_CALL_REMAINS")
+            if "HeartbeatFresh" in positive:
+                signals.append("LIVE_STATUS_FRESHNESS_MAPPING_TOUCHED")
+            if not signals:
+                signals.append("HOST_BEHAVIOR_CHANGE_REVIEW")
+            output.append(HostHunkEvidence(
+                path, start[0], start[1], context[:160],
+                len(added), removed, tuple(signals),
+            ))
+        for line in patch.splitlines():
+            match = _HUNK.match(line)
+            if match:
+                flush()
+                if len(output) >= _MAX_HUNKS:
+                    raise CoreBoundaryInputInvalid("TOO_MANY_PATCH_HUNKS")
+                start = (int(match.group(1)), int(match.group(2)))
+                context = match.group(3).strip()
+                added = []
+                removed = 0
+                continue
+            if start is not None:
+                if line.startswith("+") and not line.startswith("+++"):
+                    added.append(line[1:])
+                elif line.startswith("-") and not line.startswith("---"):
+                    removed += 1
+        flush()
+        if start is None:
+            output.append(HostHunkEvidence(
+                path, 0, 0, "NO_PARSABLE_HUNKS", 0, 0,
+                ("REQUIRES_MANUAL_DIFF",),
+            ))
+        if len(output) > _MAX_HUNKS:
+            raise CoreBoundaryInputInvalid("TOO_MANY_PATCH_HUNKS")
+    return tuple(output)
+
+
 def main() -> int:
     """Read a JSON array of PR changed filenames from stdin; print advice."""
     try:
