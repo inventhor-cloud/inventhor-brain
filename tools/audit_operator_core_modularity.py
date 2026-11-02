@@ -31,9 +31,9 @@ class Finding:
 PATTERNS: tuple[tuple[str, str, str, str], ...] = (
     (
         "windows/src/Inventhor.Operator.Service/OperatorWorker.cs",
-        r"pluginCatalog\s*\.\s*Load\s*\(\s*modulesRoot\s*\)",
+        r"pluginCatalog\s*\.\s*Load\s*\(\s*modulesRoot\b",
         "SERVICE_LOADS_LEGACY_PLUGIN_CATALOG",
-        "Core worker obtains its runtime executors/transports from plugin root.",
+        "Core worker still depends on optional runtime plugin discovery, even if Brain transports or Factory operations have been compiled into core.",
     ),
     (
         "windows/src/Inventhor.Operator.Service/OperatorWorker.cs",
