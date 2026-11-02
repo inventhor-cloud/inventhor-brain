@@ -42,6 +42,7 @@ def native_task_state_sha256(packet: ResumePacket) -> str:
         "blocker": packet.blocker,
         "next_action": packet.next_action,
         "active_worker": packet.active_worker,
+        "assigned_owner": packet.assigned_owner,
         "dependency_states": packet.dependency_states,
     }
     serialized = json.dumps(
@@ -121,6 +122,16 @@ def _check_consistent(
     if (not isinstance(cli_worker, str)
         or cli_worker != trusted.active_worker):
         raise IntegrationDenied("ACTIVE_WORKER_CHANGED_DURING_CROSSCHECK")
+
+    # The installed native handoff calls this field "owner". It identifies
+    # task assignment; it must NOT be conflated with active_worker (lease).
+    # If the CLI supplies it, the trusted native host must independently
+    # corroborate it, rather than silently treating a missing owner as valid.
+    if "owner" in read.task:
+        cli_owner = read.task["owner"]
+        if (not isinstance(cli_owner, str)
+            or cli_owner != trusted.assigned_owner):
+            raise IntegrationDenied("ASSIGNED_OWNER_CHANGED_DURING_CROSSCHECK")
 
     # CLI evidence may be an older single string or a list. Compare only
     # when exposed, and compare exact raw values before any redaction.
