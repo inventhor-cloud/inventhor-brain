@@ -36,3 +36,23 @@ python3 -m unittest discover -s tests -v
 ```
 
 `tools/audit_protected_host_diff.py` only reads explicitly supplied changed paths; source-only path classification. It does not read current files, inspect contents, authenticate owner, or grant merge/deploy rights. Reported no-match is not a clean-machine verdict. It leaves the owner's feature goals unconstrained; host integrity gates are separate from user feature approval.
+
+
+## Exact PR diff-hunk triage — 2 November source review
+
+Evidence: existing Operator [PR #3](https://github.com/inventhor-cloud/inventhor-operator-core/pull/3) and [PR #5](https://github.com/inventhor-cloud/inventhor-operator-core/pull/5) **GitHub per-file patches**, not the owner's native PC checkout. Locations below are patch hunk starts, not canonical installed file line numbers.
+
+| PR / file / diff hunk | Source evidence | Safest handling, not yet executed |
+|---|---|---|
+| PR #3 `MainWindow.xaml` `@@ -281 +277` | Direct `SmartCompressorPanel`, `CompressorInput`, button event bindings and layout row insertion in the app shell. | Preserve user-visible functionality; inspect existing composable host slot and move feature panel to the existing Studio/UI adapter tree; keep only an indispensable stable host mount hook. |
+| PR #3 `MainWindow.xaml.cs` `@@ -142 +142` | `ReadKnownUiSetting` defensive fallback for invalid settings. | Keep verified resilience; extract settings implementation only when stable interface and tests can prove identical default/persistence behavior. |
+| PR #3 `MainWindow.xaml.cs` `@@ -473 +491` | `ApplyNavigationAccessibility()` called by shell after language application. | Preserve keyboard/screen-reader names; optional adapter owns labels, minimal shell initialization link if required. |
+| PR #3 `MainWindow.xaml.cs` `@@ -522 +537` | Existing `SolidColorBrush` is mutated instead of replacing a shared `StaticResource` instance. | Treat as a candidate essential WPF UI correctness fix, **do not revert blindly**; native theme toggling regression is required. |
+| PR #3 `MainWindow.xaml.cs` `@@ -2148 +2177` and `@@ -2194 +2239` | Heartbeat freshness, Brain state and global status UI mapping added in window code-behind. | Extract view model/status presentation, retain stale/unknown truthfulness; do not infer signed current ACK from a stale persisted heartbeat. |
+| PR #3 `App.xaml` `@@ -43 +43` | Button template hover/focus/disabled accessibility behavior. | Keep platform UI semantics and test keyboard focus before any move to shared native resources. |
+| PR #5 `OperatorWorker.cs` `@@ -55 +58` | `pluginCatalog.Load(modulesRoot, includeTransports:false)` remains for legacy executors alongside new `CoreTransportFactory.Create()`. | Preserve authenticated core Brain transport; separately migrate remaining old executor and build/test/run dependencies with exact native lease, no loader purge until replacement is real. |
+| PR #5 `PluginCatalog.cs` `@@ -40 +40` and `@@ -63 +64` | Optional transport plugin discovery disabled to prevent duplicates. | Preserve until native empty-plugin acceptance and direct channel ownership verified; remove transitional loader as a later, isolated change. |
+
+`tools/audit_protected_host_diff.py` now also exposes a pure `inspect_protected_host_hunks` inspection API: reports hunk line positions, added/removed line counts and review signals (named UI elements, native event hooks, transport factory, legacy plugin loader, heartbeat freshness). It never auto-edits or blesses native changes. Missing patch content is **REQUIRES_MANUAL_DIFF**, not a clean verdict. No extra product, queue or agent created.
+
+**Next native real open step:** under the *original* Organizer exact task ID/PROJECT_ID/revision/worker/lease, verify local protected host source and compare with PRs, inventory actual existing Gateway–Aggregator–Tree seams, then safely extract just the command-panel logic with exact behavior/evidence and rollback. Current Codex-owned local files must not be overwritten. Source test CI must be read after this change rather than presumed passing.
