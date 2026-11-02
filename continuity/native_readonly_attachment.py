@@ -8,6 +8,7 @@ This function cannot acquire a lease or dispatch any work.
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
+from hashlib import sha256
 from datetime import datetime
 import json
 from typing import Protocol
@@ -19,6 +20,34 @@ from continuity.organizer_cli_reader import NativeHandoffRead
 from continuity.provider_resume_view import (
     TaskResumeView, ResumeViewInvalid, project_native_handoff,
 )
+
+
+def native_task_state_sha256(packet: ResumePacket) -> str:
+    """Opaque drift detector, NOT a native signature, epoch, or authority.
+
+    Includes raw trusted checkpoints and evidence refs, not a provider's
+    sanitized view. The snapshot timestamp is intentionally excluded since
+    a second read can be newer without a task mutation. Never log raw data.
+    """
+    canonical = {
+        "task_id": packet.task_id,
+        "project_id": packet.project_id,
+        "target_id": packet.target_id,
+        "revision": packet.revision,
+        "state": packet.state,
+        "stage": packet.stage,
+        "completed": packet.completed,
+        "remaining": packet.remaining,
+        "evidence_refs": packet.evidence_refs,
+        "blocker": packet.blocker,
+        "next_action": packet.next_action,
+        "active_worker": packet.active_worker,
+    }
+    serialized = json.dumps(
+        canonical, sort_keys=True, ensure_ascii=False,
+        separators=(",", ":"), allow_nan=False,
+    )
+    return sha256(serialized.encode("utf-8")).hexdigest()
 
 
 class ExactHandoffReader(Protocol):
@@ -45,6 +74,9 @@ class BrainReadOnlyAttachment:
     checkpoint_stage: str
     next_action: str
     display: TaskResumeView
+    # Hash of raw authenticated native fields; no secrets/raw paths included
+    # in the packet. Fingerprint alone does not authorize any operation.
+    native_task_state_sha256: str
     integration_class: str = "NATIVE_CLI_HOST_CROSSCHECK_REFERENCE_ONLY"
     source_runtime_installed: bool = False
     may_claim: bool = False
@@ -168,4 +200,5 @@ def prepare_read_only_attachment(
         checkpoint_stage=view.checkpoint_stage,
         next_action=view.next_action,
         display=view,
+        native_task_state_sha256=native_task_state_sha256(trusted),
     )
