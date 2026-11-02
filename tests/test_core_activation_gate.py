@@ -218,5 +218,49 @@ class CoreActivationGateTests(unittest.TestCase):
                     review(core_to_noncore_dependency_edges=edges,
                            legacy_activation_routes=routes)
 
+    def test_next_action_missing_inventory_precedes_all_other_blockers(self):
+        out = review(noncore_dependency_inventory_complete=False,
+                     active_noncore_ids=("windows.cleanup",),
+                     qa_live_witness_verified=False)
+        self.assertEqual(
+            out.next_action, "READ_ORIGINAL_NATIVE_CORE_DEPENDENCY_INVENTORY")
+        self.assertFalse(out.deployment_authorized)
+
+    def test_next_action_fixes_legacy_routes_before_qa(self):
+        out = review(legacy_activation_routes=("V2_INSTALLER",),
+                     qa_live_witness_verified=False)
+        self.assertEqual(
+            out.next_action, "RECONCILE_LEGACY_CORE_COUPLING_WITH_NATIVE_OWNER_LEASE")
+
+    def test_next_action_conflict_resolution_before_general_health(self):
+        out = review(unresolved_conflicts=("PC_CODEX_DIRTY_WORK",),
+                     qa_live_witness_verified=False)
+        self.assertEqual(
+            out.next_action, "RECONCILE_NATIVE_SOURCE_AND_OWNER_LEASE_CONFLICTS")
+
+    def test_next_action_requires_core_signer_and_heartbeat_before_links(self):
+        out = review(components=complete().components[:-1],
+                     links=complete().links[:-1])
+        self.assertEqual(
+            out.next_action, "VERIFY_INSTALLED_CORE_HEARTBEAT_SIGNER_AND_ROLLBACK")
+
+    def test_next_action_checks_authenticated_ack_before_qa_witness(self):
+        out = review(links=complete().links[:-1],
+                     qa_live_witness_verified=False)
+        self.assertEqual(
+            out.next_action, "VERIFY_FRESH_AUTHENTICATED_NATIVE_LINK_ACKS")
+
+    def test_next_action_same_factory_witness_not_duplicate_factory(self):
+        out = review(qa_live_witness_verified=False)
+        self.assertEqual(
+            out.next_action, "VERIFY_SAME_EXISTING_QA_FACTORY_LIVE_WITNESS")
+        self.assertFalse(out.activation_executed)
+
+    def test_even_green_next_action_is_native_review_not_install(self):
+        out = review()
+        self.assertEqual(
+            out.next_action, "VERIFY_NATIVE_HOST_PROVENANCE_LEASE_SIGNER_QA_AND_OWNER_GATES")
+        self.assertFalse(out.deployment_authorized)
+
 if __name__ == "__main__":
     unittest.main()
