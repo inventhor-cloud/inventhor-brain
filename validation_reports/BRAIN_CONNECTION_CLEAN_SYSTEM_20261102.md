@@ -45,3 +45,15 @@ GitHub `main` referanslarının ötesindeki **DRAFT PR #1** kodları: [Architect
 7. Native `NATIVE_ACTIVE_NONCORE_MODULES=0`, `NATIVE_CORE_TO_NONCORE_DEPENDENCY_EDGES=0`, imza/rollback, kaynak tüketimi, kullanıcı yetkisi ve tekrar başlatma kanıtı olmadan **CLEAN/DONE** deme.
 
 **Bu oturumda DC çağrısı: 0.** Kurulu kaynakların ve mevcut native görev kilidinin doğrulanmadığı aşamada Codex'i beklemek şart değil; ama sahte native yetki üretmek, dosya değiştirmek veya canlı bağlandı diye hüküm vermek de doğru değil.
+
+## 2026-11-02: Yalın çekirdek için eksik bağımlılık envanteri koruması
+
+Beyin kaynak katmanındaki `continuity/core_activation_gate.py`, yalnız `active_noncore_ids=()` gördüğü için beş sistemi temiz değerlendirmemelidir. Eski modül aktif olmayabilir ama `OPERATOR → windows.software-factory` gibi **zorunlu runtime bağımlılığı** ya da onu yeniden yükleyebilen **kurulum/startup/menü yolu** kalabilir.
+
+Bu yüzden `CoreActivationSnapshot` şu üç ek source-advisory alanı taşır:
+
+- `noncore_dependency_inventory_complete`: Varsayılan `False`. Native host envanteri hiç vermediğinde `NONCORE_DEPENDENCY_INVENTORY:NOT_VERIFIED` blokajı çıkar. Sohbet, GitHub ve JSON içindeki `True` beyanı kendi başına native yetki/kanıt değildir.
+- `core_to_noncore_dependency_edges`: `LegacyDependencyEdge(core_id, dependency_id)` şeklinde tek tek, kimliği belirli zorunlu çekirdek→noncore kenarları. Boş olması gerekir. Bilinmeyen çekirdek/ikinci sistem, bozuk veya mükerrer kenar kabul edilmez.
+- `legacy_activation_routes`: Kaynak envanterinde açılabilen eski installer, startup, servis veya UI yolları. Eski modülleri geri yükleyebilecek bir yol bile nihai temiz kabulünü engeller. Kaynakta arşivlenmiş fakat çalıştırılamaz tarihsel kodun güvenli muhafazası ayrı değerlendirilmeli.
+
+Çıktı hâlâ salt danışmandır: `native_snapshot_authenticated=False`, `deployment_authorized=False`, `deletion_authorized=False`. Gerçek native host tüm bağımlılık çizgesini ve yerel hizmetleri bağımsız doğrulamadan sistem **CLEAN/DONE** olamaz. Sıfır aktif noncore ve sıfır zorunlu kenar için kaynak testi, tek başına kurulu sistem tanığı yerine geçmez.
