@@ -40,3 +40,14 @@ Run: python3 tools/verify_reference_freshness.py
 Run: python3 -m unittest discover -s tests -v
 
 Testler FAKE port ve FAKE CLI sonuçları kullanır, kurulu Windows UI veya canlı dispatch başarısını kanıtlamaz. Değişiklikler PR #6 içinde review-only durumundadır; owner approval ve güvenilir native kurulum olmadan birleştirme veya yayın yapılmamalı.
+
+
+## 2026-11-02 native kaynak incelemesi — revizyon kimliği ve kesintisiz gözlem
+
+Bilgisayardaki **kurulu ve imzası geçerli** `Inventhor.WorkOrganizer.Tool.exe` üzerinden, sahibi mevcut `work-organizer` kökünde yalnız `handoff --root=... --task=...` komutu ile salt-okunur görev kontrol edildi. Handoff `source=CANONICAL_WORK_ITEMS_AND_EVENTS_READ_ONLY`, `task_count=1` ve `task_id`, `state`, `owner`, `target_id`, `completed`, `remaining`, `dependencies`, `checkpoint_stage` döndürüyor; **`revision` ve `observed_at` alanları bu kurulu CLI sürümünde YOK**. Eksik alanlara yapay revision/timestamp koymak yasak. Kaynak testleri anonim/sentetik görev verisi kullanır; gerçek kimlik, gizli token veya yerel yol kaynak koduna yüklenmez.
+
+Yerel Main'in `Inventhor.Main.Brain/BrainWorkCenter.cs` kaynağı bir `SnapshotId` türetiyor; özet, kayıtların `id|state|updated_at` metninin SHA-256 değeridir. Bu değer **atomik Organizer görev revizyonu değildir**; worker, lease, kanıt, bağımlılık ve checkpoint değiştiğinde güncel kalacağı garanti değildir. `CoreBrainReview.native_revision` ve güvenilir Main portundaki `read_exact().revision` yalnız gerçekten yetkili native Organizer epoch/lease kaydından gelmelidir; Main görünüm özeti ile değiştirilemez.
+
+Source-only Brain portu iki salt-okunur native gözlem arasında `task_id`, `project_id`, `target_id`, `revision`, `state` ve aktif çalışanı tekrar doğrular. Ek olarak `native_task_state_sha256` ile güvenilir native portun **ham** `stage`, `completed`, `remaining`, `evidence_refs`, `blocker`, `next_action` ve doğrulanmış `dependency_states` değerleri karşılaştırılır; sağlayıcıya yansıyan gizlenmiş/metin maskelenmiş alanlar bu kontrolün yerine kullanılamaz. Final gözlem zamanının ilk gözlemden eski olması reddedilir. Bu hash **imza veya yetki değildir**, gerçek Main'in atomik işlem öncesi revizyon ve lease karşılaştırması yine zorunludur.
+
+Canlı kabul için mevcut Main/.NET adapter şu sırayı kendi native Organizer kilidi içinde kanıtlamalı: tam görev/proje/target ve revizyon okuma → owner/worker/lease karşılaştırma → bağımlılıkların güncel DONE kanıtı → preflight-show/ack/verify → atomik claim → gerçek Operator sonuç ACK + kanıt → checkpoint ve release. Bu koşullar olmadan GitHub'daki başarılı kaynak CI, kurulmuş beyin, canlı Fabrika veya temizlik tamamlandı iddiası değildir. Codex ile çakışan mevcut PC source dosyaları, çalışan servisler ve kurulu modüller bu source turunda değiştirilmemiştir.
