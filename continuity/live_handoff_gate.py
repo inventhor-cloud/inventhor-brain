@@ -55,6 +55,8 @@ class ResumePacket:
     observed_at: datetime
     mode: Literal["READ_ONLY", "WRITE_CLAIMED"]
     active_worker: str = ""
+    # Validated canonical dependency-state projection (not a grant).
+    dependency_states: tuple[tuple[str, str], ...] = ()
 
 @dataclass(frozen=True)
 class CheckpointDraft:
@@ -145,6 +147,27 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
     if any(not isinstance(s, str) or len(s) > 1024
            for s in (stage, blocker, next_action)):
         raise HandoffDenied("INVALID_DETAIL")
+    # Validate dependency IDs/states even on READ_ONLY. A dependency
+    # changing while an LLM plans a step must invalidate the source snapshot
+    # without needing a newer revision from a buggy native port.
+    deps = raw.get("dependencies")
+    if not isinstance(deps, list) or len(deps) > MAX_ITEMS:
+        raise HandoffDenied("DEPENDENCIES_MISSING_OR_INVALID")
+    dependency_states: list[tuple[str, str]] = []
+    seen_deps: set[str] = set()
+    for dep in deps:
+        if not isinstance(dep, dict):
+            raise HandoffDenied("INVALID_DEPENDENCY")
+        dep_id = _text(dep, "task_id")
+        dep_state = _text(dep, "state")
+        if dep_id in seen_deps:
+            raise HandoffDenied("DUPLICATE_DEPENDENCY")
+        if dep_id == task_id:
+            raise HandoffDenied("SELF_DEPENDENCY")
+        if dep_state not in STATES:
+            raise HandoffDenied("UNKNOWN_DEPENDENCY_STATE")
+        seen_deps.add(dep_id)
+        dependency_states.append((dep_id, dep_state))
     mode: Literal["READ_ONLY", "WRITE_CLAIMED"] = "READ_ONLY"
     if write:
         if state == "DOING":
@@ -154,19 +177,8 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
             raise HandoffDenied("ACTIVE_TASK_REQUIRES_NATIVE_RECONCILIATION")
         if state != "TODO":
             raise HandoffDenied("NOT_WRITABLE_STATE")
-        deps = raw.get("dependencies")
-        if not isinstance(deps, list) or len(deps) > MAX_ITEMS:
-            raise HandoffDenied("DEPENDENCIES_MISSING_OR_INVALID")
-        seen = set()
-        for dep in deps:
-            if not isinstance(dep, dict):
-                raise HandoffDenied("INVALID_DEPENDENCY")
-            dep_id = _text(dep, "task_id")
-            if dep_id in seen:
-                raise HandoffDenied("DUPLICATE_DEPENDENCY")
-            seen.add(dep_id)
-            if dep.get("state") != "DONE":
-                raise HandoffDenied("DEPENDENCY_NOT_DONE")
+        if any(dep_state != "DONE" for _, dep_state in dependency_states):
+            raise HandoffDenied("DEPENDENCY_NOT_DONE")
         # Even an expired-looking lease must go through native reconciliation.
         if raw.get("active_worker") not in (None, ""):
             raise HandoffDenied("LEASE_REQUIRES_RECONCILIATION")
@@ -185,7 +197,8 @@ def resume(port: LiveTaskPort, task_id: str, *, now: datetime,
         mode = "WRITE_CLAIMED"
     return ResumePacket(task_id, project, target, revision, state, stage,
                         completed, remaining, evidence, blocker,
-                        next_action.strip(), observed, mode, owner)
+                        next_action.strip(), observed, mode, owner,
+                        tuple(dependency_states))
 
 def draft_next_checkpoint(claimed: ResumePacket, *,
                           verified_completed: list[str],
