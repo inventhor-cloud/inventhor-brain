@@ -17,6 +17,7 @@ def host_data():
         "source": SOURCE,
         "task_id": "TASK_QA", "project_id": "INVENTHOR_QA",
         "target_id": "INVENTHOR_OPERATOR", "revision": 9,
+        "owner": "MAIN",
         "observed_at": NOW.isoformat(), "state": "TODO",
         "stage": "QA_SOURCE_ONLY", "blocker": "",
         "completed": ["verified draft SHA"],
@@ -30,7 +31,7 @@ def host_data():
 def cli_task():
     p = host_data()
     return {
-        "id": p["task_id"], "state": p["state"],
+        "id": p["task_id"], "state": p["state"], "owner": "MAIN",
         "project_id": p["project_id"],
         "target_id": p["target_id"],
         "checkpoint_stage": p["stage"],
@@ -219,6 +220,27 @@ class NativeReadOnlyAttachmentTests(unittest.TestCase):
         c, n = Cli(), Native()
         c.task["active_worker"] = "GPT"
         self.assert_denied("ACTIVE_WORKER_CHANGED_DURING_CROSSCHECK", c, n)
+
+    def test_assigned_owner_differs_from_lease_worker_and_must_match(self):
+        cli, host = Cli(), Native()
+        packet = call(cli, host)
+        self.assertEqual(host.data["owner"], "MAIN")
+        self.assertEqual(packet.native_task_state_sha256.__len__(), 64)
+        self.assertNotIn('"assigned_owner":', packet.as_json())
+        host.data["owner"] = "CODEX"
+        self.assert_denied(
+            "ASSIGNED_OWNER_CHANGED_DURING_CROSSCHECK", cli, host)
+
+    def test_owner_does_not_fallback_to_missing_native_proof(self):
+        cli, host = Cli(), Native()
+        del host.data["owner"]
+        self.assert_denied(
+            "ASSIGNED_OWNER_CHANGED_DURING_CROSSCHECK", cli, host)
+
+    def test_malformed_owner_rejected_by_native_read(self):
+        cli, host = Cli(), Native()
+        host.data["owner"] = ["OWNER"]
+        self.assert_denied("NATIVE_INVALID_ASSIGNED_TASK_OWNER", cli, host)
 
     def test_evidence_conflict_is_not_silently_accepted(self):
         c, n = Cli(), Native()
