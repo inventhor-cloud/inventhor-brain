@@ -106,13 +106,13 @@ class ProtectedHostDiffTests(unittest.TestCase):
 class ProtectedHostHunkTests(unittest.TestCase):
     def test_pr3_named_ui_and_codebehind_handlers_are_traceable(self):
         patch = (
-            "@@ -281,2 +277,5 @@ <Grid>\\n"
-            " <Grid>\\n"
-            "+<Border x:Name=\\\"SmartCompressorPanel\\\" Grid.Row=\\\"1\\\">\\n"
-            "+<Button Click=\\\"CompressorSend_Click\\\" />\\n"
-            "+</Border>\\n"
-            "@@ -537,1 +545,2 @@ void ApplyTheme()\\n"
-            "+    // Essential WPF theme repair requires manual review.\\n"
+            "@@ -281,2 +277,5 @@ <Grid>\n"
+            " <Grid>\n"
+            "+<Border x:Name=\"SmartCompressorPanel\" Grid.Row=\"1\">\n"
+            "+<Button Click=\"CompressorSend_Click\" />\n"
+            "+</Border>\n"
+            "@@ -537,1 +545,2 @@ void ApplyTheme()\n"
+            "+    // Essential WPF theme repair requires manual review.\n"
         )
         x = inspect_protected_host_hunks((
             ("windows/src/Inventhor.Operator.Desktop/MainWindow.xaml", patch),
@@ -127,10 +127,10 @@ class ProtectedHostHunkTests(unittest.TestCase):
 
     def test_pr5_core_transport_and_remaining_plugin_loader_visible(self):
         patch = (
-            "@@ -55,2 +58,4 @@ protected override async Task ExecuteAsync(\\n"
-            "-    pluginCatalog.Load(modulesRoot);\\n"
-            "+    pluginCatalog.Load(modulesRoot, includeTransports: false);\\n"
-            "+    var coreTransports = CoreTransportFactory.Create();\\n"
+            "@@ -55,2 +58,4 @@ protected override async Task ExecuteAsync(\n"
+            "-    pluginCatalog.Load(modulesRoot);\n"
+            "+    pluginCatalog.Load(modulesRoot, includeTransports: false);\n"
+            "+    var coreTransports = CoreTransportFactory.Create();\n"
         )
         x = inspect_protected_host_hunks((
             ("windows/src/Inventhor.Operator.Service/OperatorWorker.cs", patch),
@@ -153,16 +153,16 @@ class ProtectedHostHunkTests(unittest.TestCase):
     def test_normal_extensions_not_misrepresented_as_core_hunks(self):
         x = inspect_protected_host_hunks((
             ("src/Gateway/FeatureGateway.cs",
-             "@@ -1,1 +1,1 @@\\n+ safe change\\n"),
+             "@@ -1,1 +1,1 @@\n+ safe change\n"),
         ))
         self.assertEqual(x, ())
 
     def test_hunk_input_limits_and_path_checks_fail_closed(self):
         for entries in (
             ("wrong",),
-            (("../MainActivity.kt", "@@ -1 +1 @@\\n+x"),),
+            (("../MainActivity.kt", "@@ -1 +1 @@\n+x"),),
             (("src/MainActivity.kt", "x" * 262145),),
-            (("src/MainActivity.kt", "@@ -1 +1 @@\\n+\\x00"),),
+            (("src/MainActivity.kt", "@@ -1 +1 @@\n+\x00"),),
             tuple(("src/MainActivity.kt", None) for _ in range(129)),
         ):
             with self.subTest(entries=str(entries)[:50]):
