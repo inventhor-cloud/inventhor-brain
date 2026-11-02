@@ -74,6 +74,9 @@ class TestHost:
         self.actor_calls = 0
         self.native_reads = 0
         self.plan_verifications = 0
+        self.epoch_calls = 0
+        self.epoch_ok = True
+        self.last_epoch = None
 
     def read_exact(self, task_id):
         self.native_reads += 1
@@ -100,6 +103,13 @@ class TestHost:
 
     def verify_actor_context(self, context):
         return self.actor_verified
+
+    def verify_canonical_epoch(self, scope):
+        # Synthetic native test host only. Real Main MUST compare under
+        # its original Organizer lock, not trust incoming scope as proof.
+        self.epoch_calls += 1
+        self.last_epoch = scope
+        return self.epoch_ok
 
 
 def run(cli=None, host=None, **kwargs):
@@ -137,6 +147,15 @@ class BrainTurnIntegrationTests(unittest.TestCase):
         self.assertEqual(host.actor_calls, 1)
         self.assertEqual(host.native_reads, 2)
         self.assertEqual(host.plan_verifications, 2)
+        self.assertEqual(host.epoch_calls, 1)
+        self.assertEqual(host.last_epoch.task_id, "TASK_QA")
+        self.assertEqual(host.last_epoch.task_revision, 12)
+        self.assertEqual(host.last_epoch.plan_id, "PLAN_QA")
+        self.assertEqual(host.last_epoch.plan_revision, 7)
+        self.assertEqual(host.last_epoch.worker_id, "GPT_SOURCE_WORKER")
+        self.assertEqual(host.last_epoch.actor_session_id, "SOURCE_TEST_SESSION")
+        self.assertEqual(host.last_epoch.task_state_sha256,
+                         result.attachment.native_task_state_sha256)
         self.assertEqual(cli.calls, 1)
 
     def test_wrong_owner_scope_rejected_before_decision(self):
@@ -340,6 +359,52 @@ class BrainTurnIntegrationTests(unittest.TestCase):
 
         h = ReplayedHost()
         self.denied("NATIVE_TASK_OBSERVATION_ROLLED_BACK", host=h)
+        self.assertEqual(h.claims, 0)
+
+    def test_missing_canonical_epoch_adapter_cannot_return_advice(self):
+        class MissingEpochPort(TestHost):
+            verify_canonical_epoch = None
+
+        h = MissingEpochPort()
+        self.denied("NATIVE_CANONICAL_EPOCH_VERIFIER_UNAVAILABLE", host=h)
+        self.assertEqual(h.claims, 0)
+
+    def test_canonical_epoch_denial_rejects_stale_snapshot(self):
+        h = TestHost()
+        h.epoch_ok = False
+        self.denied("NATIVE_CANONICAL_EPOCH_NOT_VERIFIED", host=h)
+        self.assertEqual(h.epoch_calls, 1)
+        self.assertEqual(h.claims, 0)
+
+    def test_native_epoch_boolean_is_strict_not_truthiness(self):
+        for false_proof in (1, "true", None, object()):
+            h = TestHost()
+            h.epoch_ok = false_proof
+            with self.subTest(proof_type=type(false_proof).__name__):
+                self.denied("NATIVE_CANONICAL_EPOCH_NOT_VERIFIED", host=h)
+            self.assertEqual(h.claims, 0)
+
+    def test_epoch_check_must_not_raise_or_relabel_failure_as_success(self):
+        class BrokenEpochHost(TestHost):
+            def verify_canonical_epoch(self, scope):
+                raise OSError("native lock unavailable")
+
+        h = BrokenEpochHost()
+        self.denied("NATIVE_CANONICAL_EPOCH_VERIFIER_UNAVAILABLE", host=h)
+        self.assertEqual(h.claims, 0)
+
+    def test_epoch_proof_happens_after_second_provenance_check(self):
+        class OrderHost(TestHost):
+            def verify_canonical_epoch(self, scope):
+                self.epoch_calls += 1
+                if self.native_reads != 2 or self.plan_verifications != 2:
+                    raise AssertionError("NOT_FINAL_NATIVE_EPOCH")
+                return True
+
+        h = OrderHost()
+        out = run(host=h)
+        self.assertEqual(out.advisory.next_step.task_id, "QA_SAFE_STEP")
+        self.assertEqual(h.epoch_calls, 1)
         self.assertEqual(h.claims, 0)
 
     def test_final_host_exception_never_yields_advice(self):
