@@ -8,6 +8,7 @@ This function cannot acquire a lease or dispatch any work.
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
+from hashlib import sha256
 from datetime import datetime
 import json
 from typing import Protocol
@@ -19,6 +20,36 @@ from continuity.organizer_cli_reader import NativeHandoffRead
 from continuity.provider_resume_view import (
     TaskResumeView, ResumeViewInvalid, project_native_handoff,
 )
+
+
+def native_task_state_sha256(packet: ResumePacket) -> str:
+    """Opaque drift detector, NOT a native signature, epoch, or authority.
+
+    Includes raw trusted checkpoints and evidence refs, not a provider's
+    sanitized view. The snapshot timestamp is intentionally excluded since
+    a second read can be newer without a task mutation. Never log raw data.
+    """
+    canonical = {
+        "task_id": packet.task_id,
+        "project_id": packet.project_id,
+        "target_id": packet.target_id,
+        "revision": packet.revision,
+        "state": packet.state,
+        "stage": packet.stage,
+        "completed": packet.completed,
+        "remaining": packet.remaining,
+        "evidence_refs": packet.evidence_refs,
+        "blocker": packet.blocker,
+        "next_action": packet.next_action,
+        "active_worker": packet.active_worker,
+        "assigned_owner": packet.assigned_owner,
+        "dependency_states": packet.dependency_states,
+    }
+    serialized = json.dumps(
+        canonical, sort_keys=True, ensure_ascii=False,
+        separators=(",", ":"), allow_nan=False,
+    )
+    return sha256(serialized.encode("utf-8")).hexdigest()
 
 
 class ExactHandoffReader(Protocol):
@@ -45,6 +76,9 @@ class BrainReadOnlyAttachment:
     checkpoint_stage: str
     next_action: str
     display: TaskResumeView
+    # Hash of raw authenticated native fields; no secrets/raw paths included
+    # in the packet. Fingerprint alone does not authorize any operation.
+    native_task_state_sha256: str
     integration_class: str = "NATIVE_CLI_HOST_CROSSCHECK_REFERENCE_ONLY"
     source_runtime_installed: bool = False
     may_claim: bool = False
@@ -89,6 +123,16 @@ def _check_consistent(
         or cli_worker != trusted.active_worker):
         raise IntegrationDenied("ACTIVE_WORKER_CHANGED_DURING_CROSSCHECK")
 
+    # The installed native handoff calls this field "owner". It identifies
+    # task assignment; it must NOT be conflated with active_worker (lease).
+    # If the CLI supplies it, the trusted native host must independently
+    # corroborate it, rather than silently treating a missing owner as valid.
+    if "owner" in read.task:
+        cli_owner = read.task["owner"]
+        if (not isinstance(cli_owner, str)
+            or cli_owner != trusted.assigned_owner):
+            raise IntegrationDenied("ASSIGNED_OWNER_CHANGED_DURING_CROSSCHECK")
+
     # CLI evidence may be an older single string or a list. Compare only
     # when exposed, and compare exact raw values before any redaction.
     for evidence_key in ("evidence_refs", "evidence"):
@@ -98,6 +142,18 @@ def _check_consistent(
                 observed_refs = [observed_refs] if observed_refs else []
             if not isinstance(observed_refs, list) or tuple(observed_refs) != trusted.evidence_refs:
                 raise IntegrationDenied("EVIDENCE_CHANGED_DURING_CROSSCHECK")
+
+    # Some installed Organizer CLI builds also expose the canonical
+    # revision. If present, it MUST match the independently authenticated
+    # native Main revision. A missing optional field cannot prove equality,
+    # but a contradictory or malformed field must never be ignored.
+    for revision_key in ("revision", "canonical_revision"):
+        if revision_key in read.task:
+            cli_revision = read.task[revision_key]
+            if type(cli_revision) is not int or cli_revision < 1:
+                raise IntegrationDenied("CLI_REVISION_INVALID")
+            if cli_revision != trusted.revision:
+                raise IntegrationDenied("CLI_NATIVE_REVISION_MISMATCH")
 
     # CLI output varies by installed build: compare optional fields if present.
     for key, expected in (
@@ -156,4 +212,5 @@ def prepare_read_only_attachment(
         checkpoint_stage=view.checkpoint_stage,
         next_action=view.next_action,
         display=view,
+        native_task_state_sha256=native_task_state_sha256(trusted),
     )

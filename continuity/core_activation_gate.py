@@ -48,6 +48,18 @@ class LinkObservation:
 
 
 @dataclass(frozen=True)
+class LegacyDependencyEdge:
+    """One still-required runtime edge FROM a core to a noncore dependency.
+
+    A repository path or provider name is not a new core system. This is an
+    observation supplied by the installed inventory host, not a declaration
+    that the source graph was fully enumerated.
+    """
+    core_id: str
+    dependency_id: str
+
+
+@dataclass(frozen=True)
 class CoreActivationSnapshot:
     task_id: str
     native_revision: int
@@ -57,6 +69,11 @@ class CoreActivationSnapshot:
     active_noncore_ids: tuple[str, ...]
     unresolved_conflicts: tuple[str, ...]
     qa_live_witness_verified: bool
+    # A missing inventory MUST NOT be interpreted as zero legacy dependencies.
+    # Only the native owner-controlled host can corroborate this claim.
+    noncore_dependency_inventory_complete: bool = False
+    core_to_noncore_dependency_edges: tuple[LegacyDependencyEdge, ...] = ()
+    legacy_activation_routes: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -117,6 +134,31 @@ def evaluate_core_activation(
         or len(snapshot.unresolved_conflicts) > 32):
         raise ActivationInvalid("BOUNDED_SCOPE_INPUT_REQUIRED")
     _verified_bool(snapshot.qa_live_witness_verified, "QA_WITNESS")
+    _verified_bool(snapshot.noncore_dependency_inventory_complete,
+                   "NONCORE_DEPENDENCY_INVENTORY")
+    if (not isinstance(snapshot.core_to_noncore_dependency_edges, tuple)
+        or len(snapshot.core_to_noncore_dependency_edges) > 64
+        or not isinstance(snapshot.legacy_activation_routes, tuple)
+        or len(snapshot.legacy_activation_routes) > 64):
+        raise ActivationInvalid("BOUNDED_LEGACY_INVENTORY_REQUIRED")
+    edge_keys: set[tuple[str, str]] = set()
+    for edge in snapshot.core_to_noncore_dependency_edges:
+        if not isinstance(edge, LegacyDependencyEdge):
+            raise ActivationInvalid("INVALID_LEGACY_DEPENDENCY_EDGE")
+        core = _id(edge.core_id, "DEPENDENCY_SOURCE")
+        target = _id(edge.dependency_id, "DEPENDENCY_TARGET")
+        if core not in CORE or target in CORE:
+            raise ActivationInvalid("DEPENDENCY_EDGE_NOT_CORE_TO_NONCORE")
+        key = (core, target)
+        if key in edge_keys:
+            raise ActivationInvalid("DUPLICATE_LEGACY_DEPENDENCY_EDGE")
+        edge_keys.add(key)
+    route_keys: set[str] = set()
+    for route in snapshot.legacy_activation_routes:
+        route_id = _id(route, "LEGACY_ACTIVATION_ROUTE")
+        if route_id in route_keys:
+            raise ActivationInvalid("DUPLICATE_LEGACY_ACTIVATION_ROUTE")
+        route_keys.add(route_id)
 
     component_index: dict[str, ComponentObservation] = {}
     for item in snapshot.components:
@@ -171,17 +213,41 @@ def evaluate_core_activation(
             blockers.append(lid + ":NO_AUTHENTICATED_ACK")
     if not snapshot.qa_live_witness_verified:
         blockers.append("QA:LIVE_WITNESS_MISSING")
+    if not snapshot.noncore_dependency_inventory_complete:
+        blockers.append("NONCORE_DEPENDENCY_INVENTORY:NOT_VERIFIED")
+    for edge in snapshot.core_to_noncore_dependency_edges:
+        blockers.append("CORE_NONCORE_DEPENDENCY:"
+                        + edge.core_id + ":" + edge.dependency_id)
+    for route in snapshot.legacy_activation_routes:
+        blockers.append("LEGACY_ACTIVATION_ROUTE:" + route)
     for module_id in snapshot.active_noncore_ids:
         blockers.append("NONCORE_ACTIVE:" + module_id)
     for conflict in snapshot.unresolved_conflicts:
         blockers.append("UNRESOLVED_CONFLICT:" + conflict)
 
+    # Select ONE finite, read-only next verification, not another job,
+    # queue, source of authority, native task claim or deployment command.
+    # A missing inventory outranks a seemingly green set of component/link
+    # status flags: no static observation can prove zero runtime dependencies.
+    if "NONCORE_DEPENDENCY_INVENTORY:NOT_VERIFIED" in blockers:
+        next_action = "READ_ORIGINAL_NATIVE_CORE_DEPENDENCY_INVENTORY"
+    elif any(b.startswith(("CORE_NONCORE_DEPENDENCY:",
+                           "LEGACY_ACTIVATION_ROUTE:",
+                           "NONCORE_ACTIVE:")) for b in blockers):
+        next_action = "RECONCILE_LEGACY_CORE_COUPLING_WITH_NATIVE_OWNER_LEASE"
+    elif any(b.startswith("UNRESOLVED_CONFLICT:") for b in blockers):
+        next_action = "RECONCILE_NATIVE_SOURCE_AND_OWNER_LEASE_CONFLICTS"
+    elif any(b.startswith(cid + ":") for b in blockers for cid in CORE):
+        next_action = "VERIFY_INSTALLED_CORE_HEARTBEAT_SIGNER_AND_ROLLBACK"
+    elif any(b.startswith(lid + ":") for b in blockers for lid in REQUIRED_LINKS):
+        next_action = "VERIFY_FRESH_AUTHENTICATED_NATIVE_LINK_ACKS"
+    elif "QA:LIVE_WITNESS_MISSING" in blockers:
+        next_action = "VERIFY_SAME_EXISTING_QA_FACTORY_LIVE_WITNESS"
+    else:
+        next_action = "VERIFY_NATIVE_HOST_PROVENANCE_LEASE_SIGNER_QA_AND_OWNER_GATES"
+
     return CoreActivationAdvice(
         disposition="BLOCKED" if blockers else "NATIVE_REVIEW_REQUIRED",
         blockers=tuple(blockers),
-        next_action=(
-            "RECONCILE_NATIVE_ORGANIZER_AND_OPERATOR_BEFORE_ACTIVATION"
-            if blockers else
-            "VERIFY_NATIVE_HOST_PROVENANCE_LEASE_SIGNER_QA_AND_OWNER_GATES"
-        ),
+        next_action=next_action,
     )

@@ -15,6 +15,7 @@ def record():
     return {
         "source": SOURCE, "task_id": "QA_TASK", "project_id": "INVENTHOR_QA",
         "target_id": "INVENTHOR_OPERATOR", "revision": 7,
+        "owner": "MAIN",
         "observed_at": NOW.isoformat(), "state": "TODO",
         "stage": "SOURCE_TESTED_NOT_INSTALLED",
         "completed": ["signed QA draft hash independently verified"],
@@ -62,6 +63,41 @@ class GateTests(unittest.TestCase):
         view = run(p)
         self.assertEqual(view.mode, "READ_ONLY")
         self.assertEqual(view.remaining, ("real installed UI effect witness",))
+        self.assertEqual(p.claims, 0)
+
+    def test_read_only_native_dependencies_are_provenance_bound(self):
+        p = NativeFake()
+        packet = run(p)
+        self.assertEqual(packet.dependency_states, (("TEST_PREP", "DONE"),))
+        self.assertEqual(p.claims, 0)
+
+    def test_missing_readonly_dependency_inventory_fails_closed(self):
+        p = NativeFake()
+        del p.data["dependencies"]
+        self.deny("DEPENDENCIES_MISSING_OR_INVALID", p)
+        self.assertEqual(p.claims, 0)
+
+    def test_self_duplicate_and_bad_dependency_state_fail_closed(self):
+        for deps, error in (
+            ([{"task_id": "QA_TASK", "state": "DONE"}],
+             "SELF_DEPENDENCY"),
+            ([{"task_id": "A", "state": "DONE"},
+              {"task_id": "A", "state": "TODO"}],
+             "DUPLICATE_DEPENDENCY"),
+            ([{"task_id": "A", "state": "FAKE_PASSED"}],
+             "UNKNOWN_DEPENDENCY_STATE"),
+        ):
+            p = NativeFake()
+            p.data["dependencies"] = deps
+            with self.subTest(error=error):
+                self.deny(error, p)
+            self.assertEqual(p.claims, 0)
+
+    def test_assigned_task_owner_does_not_claim_lease(self):
+        p = NativeFake()
+        packet = run(p)
+        self.assertEqual(packet.assigned_owner, "MAIN")
+        self.assertEqual(packet.active_worker, "")
         self.assertEqual(p.claims, 0)
 
     def test_native_lease_required(self):

@@ -96,7 +96,10 @@ class OrganizerCliReader:
         tasks = document.get("tasks")
         if not isinstance(tasks, list) or len(tasks) != 1:
             raise NativeHandoffUnavailable("HANDOFF_NOT_EXACT_TASK")
-        if "task_count" in document and document["task_count"] != 1:
+        if "task_count" in document and (
+            type(document["task_count"]) is not int
+            or document["task_count"] != 1
+        ):
             raise NativeHandoffUnavailable("HANDOFF_COUNT_MISMATCH")
         item = tasks[0]
         if not isinstance(item, dict):

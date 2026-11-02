@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "report_kind": "SANITIZED_GITHUB_SOURCE_CONNECTION_AUDIT",
+  "date": "2026-11-02",
+  "owner_scope": [
+    "INVENTHOR",
+    "OPERATOR",
+    "ORGANIZER",
+    "STUDIO_DESIGN",
+    "QA_FACTORY"
+  ],
+  "qa_alias": "QA_FACTORY_IS_SAME_AS_FABRIKA",
+  "authority": "NOT_NATIVE_ORGANIZER_LEDGER",
+  "source_only": true,
+  "native_owner_task_lease_verified": false,
+  "native_main_installed_verified": false,
+  "full_brain_connected_verified": false,
+  "cleanup_complete_verified": false,
+  "qa_factory_live_verified": false,
+  "operator_source": {
+    "repo": "inventhor-cloud/inventhor-operator-core",
+    "legacy_pr3": 3,
+    "native_transport_pr5": 5,
+    "transport_status_hardening_pr6": 6,
+    "transport_hardening_source_status": "DRAFT_NOT_MERGED_OR_INSTALLED",
+    "compiled_inventhor_channel": "SOURCE_PRESENT_PR5",
+    "main_pairing_and_live_ack": "UNVERIFIED",
+    "legacy_plugin_loader_remaining": true,
+    "legacy_module_manifests_in_source": true,
+    "legacy_dependent_test_project_references_remaining": true
+  },
+  "brain_source": {
+    "repo": "inventhor-cloud/inventhor-brain",
+    "main_branch": "main",
+    "continuity_pr6": 6,
+    "protected_host_audit_pr7": 7,
+    "continuity_native_adapter": "INTERFACE_ONLY_NATIVE_HOST_NOT_VERIFIED",
+    "studio_edit_native_runtime": "UNVERIFIED",
+    "core_activation_gate": "SOURCE_ONLY_ADVISORY"
+  },
+  "domain_sources": [
+    {
+      "domain": "architecture",
+      "repository": "inventhor-cloud/inventhor-brain-architecture",
+      "source_pr": 1,
+      "source_sha": "9221e4371559b6aef9c6dac05b944fddd55c8e65",
+      "source_status": "DRAFT_NOT_MERGED",
+      "native_runtime_link": "UNVERIFIED"
+    },
+    {
+      "domain": "design",
+      "repository": "inventhor-cloud/inventhor-brain-design",
+      "source_pr": 1,
+      "source_sha": "491793d6ba3b8f1c6068cbe92faf45823b8f8777",
+      "source_status": "DRAFT_NOT_MERGED",
+      "native_runtime_link": "UNVERIFIED"
+    },
+    {
+      "domain": "visual",
+      "repository": "inventhor-cloud/inventhor-brain-visual",
+      "source_pr": 1,
+      "source_sha": "81940ce0ca2a559c1a5f69f4fddab1b9f9940ad8",
+      "source_status": "DRAFT_NOT_MERGED",
+      "native_runtime_link": "UNVERIFIED"
+    },
+    {
+      "domain": "social",
+      "repository": "inventhor-cloud/inventhor-brain-social",
+      "source_pr": 1,
+      "source_sha": "9f39c3efa6984009e22d745df0bb9ab1418935f2",
+      "source_status": "DRAFT_NOT_MERGED",
+      "native_runtime_link": "UNVERIFIED"
+    },
+    {
+      "domain": "language",
+      "repository": "inventhor-cloud/inventhor-brain-language",
+      "source_pr": 1,
+      "source_sha": "ea16a2e001aed5d18c507c5d49322cb9d538c516",
+      "source_status": "DRAFT_NOT_MERGED",
+      "native_runtime_link": "UNVERIFIED"
+    },
+    {
+      "domain": "automation",
+      "repository": "inventhor-cloud/inventhor-brain-automation",
+      "source_pr": 1,
+      "source_sha": "1f34cc20cbf04613c46150dc04c888056429956a",
+      "source_status": "DRAFT_NOT_MERGED",
+      "native_runtime_link": "UNVERIFIED"
+    },
+    {
+      "domain": "memory",
+      "repository": "inventhor-cloud/inventhor-brain-memory",
+      "source_pr": 1,
+      "source_sha": "e6363a4fbd0cc9e3c0741e48c89f17edb220ef59",
+      "source_status": "DRAFT_NOT_MERGED",
+      "native_runtime_link": "UNVERIFIED"
+    }
+  ],
+  "required_native_links": [
+    {
+      "link_id": "BRAIN_OPERATOR",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "BRAIN_ORGANIZER",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "OPERATOR_ORGANIZER",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "OPERATOR_QA",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "QA_ORGANIZER",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "PROGRAM_ACTION_BRIDGE",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "INVENTHOR_STUDIO",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "STUDIO_OPERATOR",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "STUDIO_QA",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    },
+    {
+      "link_id": "STUDIO_REAL_RENDER",
+      "native_authenticated_ack": "UNVERIFIED",
+      "independent_qa_witness": "UNVERIFIED"
+    }
+  ],
+  "known_blockers": [
+    "Original Organizer current exact task/project/revision/owner lease not independently read",
+    "Codex/current native Main and Operator working-tree diff not available via this GitHub audit",
+    "Native Main implementation of trusted Brain/Organizer host ports is not verified",
+    "Core still has optional legacy PluginCatalog executor dependencies and legacy deployment/test references",
+    "No authenticated real live handshake, result ACK or authoritative heartbeat witness",
+    "No installed Studio real render/build/run and same Factory fail-fix-retest proof",
+    "No signed app install, safe rollback and Organizer checkpoint readback proof"
+  ],
+  "safe_next_actions": [
+    "Keep current single five-system architecture and original Organizer as only task authority",
+    "Read actual native Main/Organizer current task, owner lease, target and Codex local changes before any file mutation",
+    "Review and merge isolated source changes only after native 3-way diff and compile/rollback gates",
+    "Migrate remaining core executor/Factory build/run dependence away from old module loader without losing capabilities",
+    "Pair and authenticate Main-to-Operator channel and verify fresh ACK, cancellation and reconnect under existing Operator",
+    "Prove Studio live edit/render/build/run and same QA Factory fail-fix-retest with exact artifact hashes",
+    "Record canonical checkpoint and independently re-read it in original Organizer"
+  ]
+}

@@ -28,6 +28,7 @@ def activation():
         active_noncore_ids=(),
         unresolved_conflicts=(),
         qa_live_witness_verified=True,
+        noncore_dependency_inventory_complete=True,
     )
 
 

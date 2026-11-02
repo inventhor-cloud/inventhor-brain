@@ -17,6 +17,7 @@ def host_data():
         "source": SOURCE,
         "task_id": "TASK_QA", "project_id": "INVENTHOR_QA",
         "target_id": "INVENTHOR_OPERATOR", "revision": 9,
+        "owner": "MAIN",
         "observed_at": NOW.isoformat(), "state": "TODO",
         "stage": "QA_SOURCE_ONLY", "blocker": "",
         "completed": ["verified draft SHA"],
@@ -30,7 +31,7 @@ def host_data():
 def cli_task():
     p = host_data()
     return {
-        "id": p["task_id"], "state": p["state"],
+        "id": p["task_id"], "state": p["state"], "owner": "MAIN",
         "project_id": p["project_id"],
         "target_id": p["target_id"],
         "checkpoint_stage": p["stage"],
@@ -167,6 +168,28 @@ class NativeReadOnlyAttachmentTests(unittest.TestCase):
         n.data["revision"] = 0
         self.assert_denied("NATIVE_REVISION_REQUIRED", c, n)
 
+    def test_cli_optional_revision_is_crosschecked_with_native_ledger(self):
+        for key in ("revision", "canonical_revision"):
+            c, n = Cli(), Native()
+            c.task[key] = 9
+            self.assertEqual(call(c, n).canonical_revision, 9)
+            c.task[key] = 8
+            with self.subTest(key=key):
+                self.assert_denied("CLI_NATIVE_REVISION_MISMATCH", c, n)
+
+    def test_cli_invalid_revision_never_becomes_a_native_match(self):
+        for value in (True, "9", None, 0, -1):
+            c, n = Cli(), Native()
+            c.task["revision"] = value
+            with self.subTest(value=value):
+                self.assert_denied("CLI_REVISION_INVALID", c, n)
+
+    def test_cli_two_distinct_revision_fields_cannot_mask_conflict(self):
+        c, n = Cli(), Native()
+        c.task["revision"] = 9
+        c.task["canonical_revision"] = 12
+        self.assert_denied("CLI_NATIVE_REVISION_MISMATCH", c, n)
+
     def test_native_host_must_independently_authenticate(self):
         c, n = Cli(), Native()
         n.trusted = False
@@ -197,6 +220,27 @@ class NativeReadOnlyAttachmentTests(unittest.TestCase):
         c, n = Cli(), Native()
         c.task["active_worker"] = "GPT"
         self.assert_denied("ACTIVE_WORKER_CHANGED_DURING_CROSSCHECK", c, n)
+
+    def test_assigned_owner_differs_from_lease_worker_and_must_match(self):
+        cli, host = Cli(), Native()
+        packet = call(cli, host)
+        self.assertEqual(host.data["owner"], "MAIN")
+        self.assertEqual(packet.native_task_state_sha256.__len__(), 64)
+        self.assertNotIn('"assigned_owner":', packet.as_json())
+        host.data["owner"] = "CODEX"
+        self.assert_denied(
+            "ASSIGNED_OWNER_CHANGED_DURING_CROSSCHECK", cli, host)
+
+    def test_owner_does_not_fallback_to_missing_native_proof(self):
+        cli, host = Cli(), Native()
+        del host.data["owner"]
+        self.assert_denied(
+            "ASSIGNED_OWNER_CHANGED_DURING_CROSSCHECK", cli, host)
+
+    def test_malformed_owner_rejected_by_native_read(self):
+        cli, host = Cli(), Native()
+        host.data["owner"] = ["OWNER"]
+        self.assert_denied("NATIVE_INVALID_ASSIGNED_TASK_OWNER", cli, host)
 
     def test_evidence_conflict_is_not_silently_accepted(self):
         c, n = Cli(), Native()
