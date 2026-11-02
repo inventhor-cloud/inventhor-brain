@@ -104,6 +104,42 @@ class CliHandoffTests(unittest.TestCase):
         self.response = native_result(item={"id": "QA_TASK", "state": "TODO"}, task_count=2)
         self.deny("HANDOFF_COUNT_MISMATCH", self.reader().read_task, "QA_TASK")
 
+    def test_installed_handoff_shape_uses_task_id_not_only_legacy_id(self):
+        # Mirrored synthetic shape of a real signed Organizer Tool handoff:
+        # task_id, owner, explicit progress lists and a legacy evidence string.
+        # Source test contains no user task identity, private path or token.
+        record = {
+            "task_id": "QA_TASK", "state": "TODO", "owner": "MAIN",
+            "target_id": "INVENTHOR_BRAIN_SYSTEM",
+            "checkpoint_stage": "SOURCE_ONLY",
+            "completed": [], "remaining": [],
+            "evidence": "", "dependencies": [
+                {"task_id": "PREREQ_A", "state": "DONE"}
+            ],
+            "next_action": "independent native revision check",
+        }
+        self.response = native_result(item=record, task_count=1)
+        read = self.reader().read_task("QA_TASK")
+        self.assertEqual(read.task_id, "QA_TASK")
+        self.assertEqual(read.task["owner"], "MAIN")
+        self.assertNotIn("revision", read.task)
+        self.assertNotIn("observed_at", read.task)
+        # The provider projection MUST never invent missing native facts.
+        from continuity.provider_resume_view import project_native_handoff
+        view = project_native_handoff(read)
+        self.assertEqual(view.task_id, "QA_TASK")
+        self.assertFalse(view.write_authorized)
+        self.assertFalse(view.live_qa_verified)
+
+    def test_native_task_count_must_be_an_actual_integer_one(self):
+        for count in (True, "1", 1.0, False, 0, 2):
+            self.response = native_result(task_count=count)
+            with self.subTest(count=count):
+                self.deny("HANDOFF_COUNT_MISMATCH",
+                          self.reader().read_task, "QA_TASK")
+        self.response = native_result(task_count=1)
+        self.assertEqual(self.reader().read_task("QA_TASK").task_id, "QA_TASK")
+
     def test_refuses_lost_command_and_parse_failure(self):
         self.response = subprocess.CompletedProcess([], 2, "", "native error")
         self.deny("NATIVE_HANDOFF_REFUSED", self.reader().read_task, "QA_TASK")
