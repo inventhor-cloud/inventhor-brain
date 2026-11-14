@@ -98,3 +98,18 @@ part and ask for specific Owner scope instead. If a module needs a new kernel,
 present exact boundaries and get Owner architecture approval. Record source
 test results and runtime activation separately. Never silently mark drafts
 as installed.
+
+## 7. Owner-directed experience continuity from every test
+
+- Every test suite and important failure emits a bounded, sanitised outcome
+  digest through its existing module/QA contract: test identity, result,
+  source revision, evidence reference, observed symptom and unverified/verified
+  root cause state. Raw logs and secrets are not copied into Brain memory.
+- Reviewed root causes, corrections, preventive regression checks and independent
+  QA evidence become concise versioned lessons in the existing Operator Brain,
+  with single Organizer ownership; no second model, queue or shadow database.
+- SOURCE_CI_PASS, NATIVE_QA_PASS, DEPLOYED and MONITORED are separate states.
+  A source fix does not imply installed repair; failures can reopen old lessons.
+- Test evidence may be produced automatically; access to PC evidence and
+  promotion into activated Brain behavior use the Owner-approved gateway.
+  A missing import stays NOT_IMPORTED rather than pretending to be memory.
