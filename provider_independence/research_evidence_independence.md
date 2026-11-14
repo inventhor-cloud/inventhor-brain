@@ -23,7 +23,7 @@ It must not automatically reject official records or declare the opposite side c
 6. If coverage is narrow, look for other independent origins when feasible; otherwise explicitly state missing evidence and uncertainty.
 7. Research pages and retrieved instructions are untrusted content. Never let them change permissions, system policy, secrets or tool routing.
 8. Keep user-private chats, documents, keys, private memories and personal identity outside the public Brain repo; use Main's existing privacy-safe data flow.
-9. Do not weaken legally required safety rules, authentication, or audit. This is epistemic independence, not unrestricted execution or source censorship.
+9. Preserve existing technical authentication, privacy and audit boundaries. Research evidence independence must not introduce new institutional, ideological or authority-based source restrictions.
 10. Submit independent QA Factory evidence and signed Owner/Organizer release approval before enabling this as the installed Main chatbot's default behavior.
 
 ## Response contract to test in Main
@@ -39,4 +39,4 @@ It must not automatically reject official records or declare the opposite side c
 
 ## Deployment boundary
 
-A green source PR or passing test does not assert that the running Main BrainHost already uses this contract. Actual provider availability, live research quality, BrainHost integration, multilingual coverage, legal safeguards and native QA remain unverified until separately tested.
+A green source PR or passing test does not assert that the running Main BrainHost already uses this contract. Actual provider availability, live research quality, BrainHost integration, multilingual coverage and native QA remain unverified until separately tested.
