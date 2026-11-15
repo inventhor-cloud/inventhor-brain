@@ -17,3 +17,10 @@
 13. Authentication, audit/evidence integrity, secret protection and truthfulness are non-bypassable trust guarantees.
 14. The highest trusted execution profile is FULL + authenticated Owner authorization; it must never become an unauthenticated hidden shell.
 15. Privileged actions must remain attributable, versioned and recoverable where technically possible.
+16. The Owner alone chooses whether and when to add legal, social, political, ideological or institutional decision-policy modules; AI contributors MUST NOT install or activate them on their own.
+17. Core remains small and execution-oriented: domain features belong in independently versioned modules and route through authenticated typed gateways.
+18. New access and elevated capabilities are default-disabled until exact authenticated Owner approval, with revocation and scope binding.
+19. Keep source files bounded and do not grow existing oversized files; new domain kernels require an explicit Owner architecture decision, no duplicate Organizer/Operator.
+20. Implement and review these rules through `system_constitution/owner_modular_gateway_architecture.md`; technical authentication, audit, privacy and rollback guarantees remain in force.
+21. Every test, failure and fix must leave a bounded, evidence-linked Operator Brain experience: test identity/outcome, observed error, verified or unknown root cause, correction, regression and source-vs-installed QA status. No result may be silently promoted to native success or model-weight learning.
+
